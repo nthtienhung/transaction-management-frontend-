@@ -7,31 +7,69 @@ import { FaUser } from "react-icons/fa";
 import { GrKey } from "react-icons/gr";
 import { BiHide, BiShow } from "react-icons/bi";
 import * as Yup from "yup";
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 function Login() {
   const [showPassword, setShowPassword] = useState(false);
-
+  const navigate = useNavigate();
   const togglePasswordVisibility = () => {
     setShowPassword((prevState) => !prevState);
   };
   const validationSchema = Yup.object({
-    usernameOrEmail: Yup.string().required(
-      "Username hoặc Email không được để trống"
+    email: Yup.string().required(
+      "Email không được để trống"
     ), // Validate không null
     password: Yup.string().required("Password không được để trống"), // Validate không null
   });
   const userFormData = useFormik({
     initialValues: {
-      usernameOrEmail: "",
+      email: "",
       password: "",
-      role: "",
+      
     },
     validationSchema,
     onSubmit: async (value) => {
-      axios.post("");
+      axios.post("http://localhost:8081/api/v1/login",value).then(res =>{
+        if(res.status == 200){
+          toast.success(`Đăng nhập thành công`, {
+            position: "top-right",
+            autoClose: 3000, // Đặt thời gian autoClose là 5 giây
+            hideProgressBar: true,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+          });
+          
+        }else {
+          toast.error("Tài khoản hoặc mật khẩu sai, thử lại.", {
+            position: "top-right",
+            autoClose: 3000,
+            hideProgressBar: true,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+          });
+        }
+      })
+      .catch((error) => {
+        console.error("Error:", error);
+        toast.error("Tài khoản hoặc mật khẩu sai, thử lại.", {
+          position: "top-right",
+          autoClose: 3000,
+          hideProgressBar: true,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+        });
+      });
     },
   });
   return (
-    <>
+    <> 
+    <ToastContainer></ToastContainer>
       <div class="container-xxl backgroundLayout">
         <div class="authentication-wrapper authentication-basic container-p-y">
           <div class="authentication-inner">
@@ -70,16 +108,16 @@ function Login() {
                     <input
                       type="text"
                       class="form-control formInput"
-                      id="usernameOrEmail"
-                      name="usernameOrEmail"
+                      id="email"
+                      name="email"
                       onChange={userFormData.handleChange}
                       placeholder="Enter your email or username"
                       onBlur={userFormData.handleBlur}
                       autofocus
                     />
                   </div>
-                  {userFormData.touched.usernameOrEmail &&
-                  userFormData.errors.usernameOrEmail ? (
+                  {userFormData.touched.email &&
+                  userFormData.errors.email ? (
                     <div
                       style={{
                         color: "red",
@@ -88,7 +126,7 @@ function Login() {
                         fontSize: "10px",
                       }}
                     >
-                      {userFormData.errors.usernameOrEmail}
+                      {userFormData.errors.email}
                     </div>
                   ) : null}
                   <div class="mb-6 form-password-toggle formInputValue">
