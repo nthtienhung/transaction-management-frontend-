@@ -4,7 +4,6 @@ import './App.css';
 import { Route, Routes } from 'react-router-dom';
 import Login from './App/services/IAM/Login';
 import Register from './App/services/IAM/Register';
-import Home from './App/services/Home';
 import ChangePassword from "./App/services/IAM/ChangePassword";
 import Profile from "./App/services/User/Profile";
 import EditProfile from "./App/services/User/EditProfile";
@@ -14,7 +13,6 @@ function App() {
  <Routes>
       <Route path='/' element={<Login/>}/>
       <Route path='/register' element={<Register/>} />
-      <Route path='/home' element={<Home/>}/>
       <Route path='/change-password' element={<ChangePassword/>}/>
       <Route path='/profile' element={<Profile/>}/>
       <Route path='/edit-profile' element={<EditProfile/>}/>
