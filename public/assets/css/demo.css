@@ -126,12 +126,12 @@ display: inline-flex;
 justify-content: space-between;
 width: 100%;
 }
-.backgroundLayout{
+/* .backgroundLayout{
   background-image: url("https://previews.123rf.com/images/chormuang/chormuang2105/chormuang210500019/168785814-internet-banking-technology-isometric-illustration-of-bank-on-dark-blue-technology-background.jpg");
-}
-#root{
+} */
+/* #root{
   background-image: url("https://previews.123rf.com/images/chormuang/chormuang2105/chormuang210500019/168785814-internet-banking-technology-isometric-illustration-of-bank-on-dark-blue-technology-background.jpg");
-}
+} */
 .formInput{
   margin-left: 20px;
 }
