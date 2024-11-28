@@ -9,6 +9,7 @@ import { BiHide, BiShow } from "react-icons/bi";
 import * as Yup from "yup";
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import Cookies from 'js-cookie';
 function Login() {
   const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
@@ -29,7 +30,7 @@ function Login() {
     },
     validationSchema,
     onSubmit: async (value) => {
-      axios.post("http://localhost:8081/auth/login",value).then(res =>{
+      axios.post("http://localhost:8081/path/login",value).then(res =>{
         if(res.status == 200){
           toast.success(`Đăng nhập thành công`, {
             position: "top-right",
@@ -40,7 +41,8 @@ function Login() {
             draggable: true,
             progress: undefined,
           });
-          
+          Cookies.set('its-cms-accessToken', res.data.data.csrfToken, { expires: 7, path: '/' });
+          console.log(Cookies.get('its-cms-accessToken'));
         }else {
           toast.error("Tài khoản hoặc mật khẩu sai, thử lại.", {
             position: "top-right",
@@ -70,6 +72,7 @@ function Login() {
   return (
     <> 
     <ToastContainer></ToastContainer>
+
       <div class="container-xxl backgroundLayout">
         <div class="authentication-wrapper authentication-basic container-p-y">
           <div class="authentication-inner">
