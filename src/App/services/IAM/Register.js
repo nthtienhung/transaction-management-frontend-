@@ -1,252 +1,211 @@
-import { useFormik } from "formik";
-import { useState } from "react";
-import { BiHide, BiShow } from "react-icons/bi";
-import * as Yup from "yup";
-function Register() {
-  const [showPassword, setShowPassword] = useState(false);
-  const togglePasswordVisibility = () => {
-    setShowPassword((prevState) => !prevState);
-  };
-  const validationSchema = Yup.object({
-    fisrtname: Yup.string()
-      .required("Tên không được để trống")
-      .matches(
-        /^[a-zA-ZÀÁÂÃÈÉÊÌÍÒÓÔÕÙÚĂĐĨŨƠàáâãèéêìíòóôõùúăđĩũơƯĂƠƯăơưÁÀÂẤẦẨẪẬÉÈÊẾỀỂỄỆÍÌÎĨĪÌÔỐỒỔỖỘƠỜỞỠỢÚÙÛÜÝỲỶỸỴỹýỳỵ\s]+$/,
-        "Tên không được chứa số hoặc ký tự đặc biệt"
-      ),
-    lastname: Yup.string()
-      .required("Tên không được để trống")
-      .matches(
-        /^[a-zA-ZÀÁÂÃÈÉÊÌÍÒÓÔÕÙÚĂĐĨŨƠàáâãèéêìíòóôõùúăđĩũơƯĂƠƯăơưÁÀÂẤẦẨẪẬÉÈÊẾỀỂỄỆÍÌÎĨĪÌÔỐỒỔỖỘƠỜỞỠỢÚÙÛÜÝỲỶỸỴỹýỳỵ\s]+$/,
-        "Tên không được chứa số hoặc ký tự đặc biệt"
-      ),
-    email: Yup.string()
-      .required("Email không được để trống")
-      .email("Email không hợp lệ")
-      .matches(/^\S+@\S+\.\S+$/, "Email không được chứa khoảng trắng"),
-    dateOfBirth: Yup.date()
-      .max(new Date(), "Ngày tháng năm sinh không được lớn hơn hiện tại") // Kiểm tra không lớn hơn hiện tại
-      .required("Ngày tháng năm sinh không được để trống"),
-    numberPhone: Yup.string()
-      .required("Số điện thoại không được để trống")
-      .matches(
-        /^[0-9]+$/,
-        "Số điện thoại chỉ được chứa chữ số và không có khoảng trắng"
-      )
-      .min(10, "Số điện thoại phải có ít nhất 10 chữ số")
-      .max(11, "Số điện thoại không được vượt quá 11 chữ số"),
-    address: Yup.string().required("Địa chỉ không được để trống"),
-    password: Yup.string().required("Password không được để trống"),
-  });
-  const userRegisterForm = useFormik({
-    initialValues: {
-      fisrtname: "",
-      lastname: "",
-      email: "",
-      dateOfBirth: "",
-      numberPhone: "",
-      address: "",
-      password: "",
-    },
-    validationSchema,
-    onSubmit: async (value) => {
-      console.log(value);
-    },
-  });
-  return (
-    <>
-      <div class="container-xxl">
-        <div class="authentication-wrapper authentication-basic container-p-y">
-          <div class="authentication-inner">
-            <div class="card px-sm-6 px-0">
-              <div class="card-body">
-                <form
-                  id="formAuthentication"
-                  class="mb-6"
-                  action={userRegisterForm.handleSubmit}
-                >
-                  <div class="mb-6 formInputValue">
-                    <label for="fisrtname" class="form-label">
-                      Fisrt name *
-                    </label>
-                    <input
-                      onBlur={userRegisterForm.handleBlur}
-                      onChange={userRegisterForm.handleChange}
-                      type="text"
-                      class="form-control formRegisterInput"
-                      id="fisrtname"
-                      name="fisrtname"
-                      autofocus
-                    />
-                  </div>
-                  {userRegisterForm.touched.fisrtname &&
-                  userRegisterForm.errors.fisrtname ? (
-                    <div
-                      style={{
-                        color: "red",
-                        paddingLeft: "50px",
-                        marginTop: "-15px",
-                        fontSize: "10px",
-                      }}
-                    >
-                      {userRegisterForm.errors.fisrtname}
-                    </div>
-                  ) : null}
-                  <div class="mb-6 formInputValue">
-                    <label for="lastName" class="form-label">
-                      Last name *
-                    </label>
-                    <input
-                      onChange={userRegisterForm.handleChange}
-                      onBlur={userRegisterForm.handleBlur}
-                      type="text"
-                      class="form-control formRegisterInput"
-                      id="lastName"
-                      name="lastName"
-                    />
-                  </div>
-                  {userRegisterForm.touched.lastname &&
-                  userRegisterForm.errors.lastname ? (
-                    <div
-                      style={{
-                        color: "red",
-                        paddingLeft: "50px",
-                        marginTop: "-15px",
-                        fontSize: "10px",
-                      }}
-                    >
-                      {userRegisterForm.errors.lastname}
-                    </div>
-                  ) : null}
-                  <div class="mb-6 formInputValue">
-                    <label for="email" class="form-label">
-                      Email *
-                    </label>
-                    <input
-                      onChange={userRegisterForm.handleChange}
-                      onBlur={userRegisterForm.handleBlur}
-                      type="text"
-                      class="form-control formEmailRegisterInput"
-                      id="email"
-                      name="email"
-                    />
-                  </div>
-                  {userRegisterForm.touched.email &&
-                  userRegisterForm.errors.email ? (
-                    <div
-                      style={{
-                        color: "red",
-                        paddingLeft: "50px",
-                        marginTop: "-15px",
-                        fontSize: "10px",
-                      }}
-                    >
-                      {userRegisterForm.errors.email}
-                    </div>
-                  ) : null}
-                  <div class="mb-6 formInputValue">
-                    <label for="dateOfBirth" class="form-label">
-                      DOB *
-                    </label>
-                    <input
-                      onChange={userRegisterForm.handleChange}
-                      onBlur={userRegisterForm.handleBlur}
-                      type="date"
-                      class="form-control formDOBRegisterInput"
-                      id="dateOfBirth"
-                      name="dateOfBirth"
-                    />
-                  </div>
-                  {userRegisterForm.touched.dateOfBirth &&
-                  userRegisterForm.errors.dateOfBirth ? (
-                    <div
-                      style={{
-                        color: "red",
-                        paddingLeft: "50px",
-                        marginTop: "-15px",
-                        fontSize: "10px",
-                      }}
-                    >
-                      {userRegisterForm.errors.dateOfBirth}
-                    </div>
-                  ) : null}
-                  <div class="mb-6 formInputValue">
-                    <label for="numberPhone" class="form-label">
-                      Phone *
-                    </label>
-                    <input
-                      onChange={userRegisterForm.handleChange}
-                      onBlur={userRegisterForm.handleBlur}
-                      type="text"
-                      class="form-control formPhoneRegisterInput"
-                      id="numberPhone"
-                      name="numberPhone"
-                    />
-                  </div>
-                  {userRegisterForm.touched.dateOfBirth &&
-                  userRegisterForm.errors.dateOfBirth ? (
-                    <div
-                      style={{
-                        color: "red",
-                        paddingLeft: "50px",
-                        marginTop: "-15px",
-                        fontSize: "10px",
-                      }}
-                    >
-                      {userRegisterForm.errors.dateOfBirth}
-                    </div>
-                  ) : null}
-                  <div class="mb-6 formInputValue">
-                    <label for="address" class="form-label">
-                      Address *
-                    </label>
-                    <input
-                      onChange={userRegisterForm.handleChange}
-                      onBlur={userRegisterForm.handleBlur}
-                      type="text"
-                      class="form-control formAddressRegisterInput"
-                      id="numberPhone"
-                      name="numberPhone"
-                    />
-                  </div>
-                  <div class="mb-6 form-password-toggle formInputValue">
-                    <label class="form-label" for="password">
-                      Password *
-                    </label>
-                    <div class="input-group input-group-merge">
-                      <input
-                        onChange={userRegisterForm.handleChange}
-                        onBlur={userRegisterForm.handleBlur}
-                        type={showPassword ? "text" : "password"}
-                        id="password"
-                        class="form-control formPasswordRegisterInput"
-                        name="password"
-                        placeholder="&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;"
-                        aria-describedby="password"
-                      />
-                      <span
-                        className="input-group-text cursor-pointer"
-                        onClick={togglePasswordVisibility} // Gắn sự kiện nhấp
-                      >
-                        {showPassword ? <BiShow /> : <BiHide />}{" "}
-                      </span>
-                    </div>
-                  </div>
-                  <button class="btn btn-primary d-grid w-100">Sign up</button>
-                </form>
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { register, generateOtp } from "../api/authService";
+import Toast from "./Toast";
 
-                <p class="text-center">
-                  <span>Already have an account?</span>
-                  <a href="/">
-                    <span>Sign in</span>
-                  </a>
-                </p>
-              </div>
+const Register = () => {
+  const [formData, setFormData] = useState({
+    firstName: "",
+    lastName: "",
+    email: "",
+    password: "",
+    dateOfBirth: "",
+    address: "",
+    phone: "",
+  });
+  const [errors, setErrors] = useState({});
+  const [showPassword, setShowPassword] = useState(false);
+  const [message, setMessage] = useState("");
+  const [messageType, setMessageType] = useState("");
+  const navigate = useNavigate();
+
+  const regexPatterns = {
+    firstName: /^[\p{L}\s]+( [\p{L}\s]+)*$/u,
+    lastName: /^[\p{L}\s]+( [\p{L}\s]+)*$/u,
+    email: /^(?=.{1,64}@)[A-Za-z0-9_-]+(\.[A-Za-z0-9_-]+)*@(gmail|GMAIL)\.(com|COM)$/,
+    password: /^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[!@#$%^&*_+])[A-Za-z\d!@#$%^&*_+]{8,20}$/,
+    phone: /^((\s){0,}(0))((9|8|7|3|5|4|2)[0-9]{8,9}(\s){0,})$/,
+  };
+
+  const validateInput = (name, value) => {
+    let error = "";
+    if (!value.trim()) {
+      error = `${name} is required.`;
+    } else if (regexPatterns[name] && !regexPatterns[name].test(value)) {
+      error = `${name} is invalid.`;
+    }
+    return error;
+  };
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData({ ...formData, [name]: value });
+
+    // Validate input
+    const error = validateInput(name, value);
+    setErrors((prevErrors) => ({
+      ...prevErrors,
+      [name]: error,
+    }));
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    // Validate all fields before submitting
+    const newErrors = {};
+    Object.keys(formData).forEach((key) => {
+      const error = validateInput(key, formData[key]);
+      if (error) newErrors[key] = error;
+    });
+
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
+      return;
+    }
+
+    try {
+      await register(formData);
+      await generateOtp(formData.email);
+      setMessage("Registration successful. OTP has been sent to your email.");
+      setMessageType("success");
+      navigate("/verify", { state: { email: formData.email } });
+    } catch (error) {
+      setMessage(error.response?.data?.message || "An error occurred.");
+      setMessageType("error");
+    }
+  };
+
+  return (
+      <div className="d-flex justify-content-center align-items-center vh-100">
+        <div className="card p-4" style={{ width: "400px" }}>
+          <h2 className="text-center">Register</h2>
+          <form onSubmit={handleSubmit}>
+            <div className="mb-3">
+              <label htmlFor="firstName" className="form-label">
+                First Name
+              </label>
+              <input
+                  type="text"
+                  id="firstName"
+                  name="firstName"
+                  className={`form-control ${errors.firstName ? "is-invalid" : ""}`}
+                  placeholder="Enter your first name"
+                  onChange={handleChange}
+                  required
+              />
+              {errors.firstName && <div className="invalid-feedback">{errors.firstName}</div>}
             </div>
-          </div>
+            <div className="mb-3">
+              <label htmlFor="lastName" className="form-label">
+                Last Name
+              </label>
+              <input
+                  type="text"
+                  id="lastName"
+                  name="lastName"
+                  className={`form-control ${errors.lastName ? "is-invalid" : ""}`}
+                  placeholder="Enter your last name"
+                  onChange={handleChange}
+                  required
+              />
+              {errors.lastName && <div className="invalid-feedback">{errors.lastName}</div>}
+            </div>
+            <div className="mb-3">
+              <label htmlFor="email" className="form-label">
+                Email
+              </label>
+              <input
+                  type="email"
+                  id="email"
+                  name="email"
+                  className={`form-control ${errors.email ? "is-invalid" : ""}`}
+                  placeholder="Enter your email"
+                  onChange={handleChange}
+                  required
+              />
+              {errors.email && <div className="invalid-feedback">{errors.email}</div>}
+            </div>
+            <label htmlFor="password" className="form-label">
+              Password
+            </label>
+            <div className="mb-3 position-relative">
+              <input
+                  type={showPassword ? "text" : "password"}
+                  id="password"
+                  name="password"
+                  className={`form-control ${errors.password ? "is-invalid" : ""}`}
+                  placeholder="Enter your password"
+                  onChange={handleChange}
+                  required
+              />
+              <button
+                  type="button"
+                  className="btn btn-sm btn-outline-secondary position-absolute end-0 top-0"
+                  style={{height: "100%", width: "50px"}}
+                  onClick={() => setShowPassword(!showPassword)}
+              >
+                {showPassword ? "Hide" : "Show"}
+              </button>
+              {errors.password && <div className="invalid-feedback">{errors.password}</div>}
+            </div>
+
+            <div className="mb-3">
+              <label htmlFor="dateOfBirth" className="form-label">
+                Date of Birth
+              </label>
+              <input
+                  type="date"
+                  id="dateOfBirth"
+                  name="dateOfBirth"
+                  className="form-control"
+                  onChange={handleChange}
+                  required
+              />
+            </div>
+            <div className="mb-3">
+              <label htmlFor="address" className="form-label">
+                Address
+              </label>
+              <input
+                  type="text"
+                  id="address"
+                  name="address"
+                  className="form-control"
+                  placeholder="Enter your address"
+                  onChange={handleChange}
+                  required
+              />
+            </div>
+            <div className="mb-3">
+              <label htmlFor="phone" className="form-label">
+                Phone
+              </label>
+              <input
+                  type="text"
+                  id="phone"
+                  name="phone"
+                  className={`form-control ${errors.phone ? "is-invalid" : ""}`}
+                  placeholder="Enter your phone number"
+                  onChange={handleChange}
+                  required
+              />
+              {errors.phone && <div className="invalid-feedback">{errors.phone}</div>}
+            </div>
+            <button type="submit" className="btn btn-primary w-100 mb-2">
+              Register
+            </button>
+          </form>
+          <button
+              className="btn btn-link w-100"
+              onClick={() => navigate("/login")}
+          >
+            Back to Login
+          </button>
+          {message && <Toast message={message} type={messageType} onClose={() => setMessage("")} />}
         </div>
       </div>
-    </>
   );
-}
+};
+
 export default Register;
