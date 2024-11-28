@@ -198,7 +198,7 @@ const Register = () => {
           </form>
           <button
               className="btn btn-link w-100"
-              onClick={() => navigate("/login")}
+              onClick={() => navigate("/")}
           >
             Back to Login
           </button>
