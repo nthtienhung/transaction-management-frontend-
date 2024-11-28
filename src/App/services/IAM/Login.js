@@ -29,7 +29,7 @@ function Login() {
     },
     validationSchema,
     onSubmit: async (value) => {
-      axios.post("http://localhost:8081/api/v1/login",value).then(res =>{
+      axios.post("http://localhost:8081/auth/login",value).then(res =>{
         if(res.status == 200){
           toast.success(`Đăng nhập thành công`, {
             position: "top-right",
