@@ -30,7 +30,7 @@ function Login() {
     },
     validationSchema,
     onSubmit: async (value) => {
-      axios.post("http://localhost:8081/path/login",value).then(res =>{
+      axios.post("http://localhost:8081/auth/login",value).then(res =>{
         if(res.status == 200){
           toast.success(`Đăng nhập thành công`, {
             position: "top-right",
@@ -43,6 +43,7 @@ function Login() {
           });
           Cookies.set('its-cms-accessToken', res.data.data.csrfToken, { expires: 7, path: '/' });
           console.log(Cookies.get('its-cms-accessToken'));
+          navigate("/profile")
         }else {
           toast.error("Tài khoản hoặc mật khẩu sai, thử lại.", {
             position: "top-right",

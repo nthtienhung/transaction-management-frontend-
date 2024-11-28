@@ -50,7 +50,7 @@ const Profile = () => {
                     return;
                 }
 
-                const response = await axios.get("http://localhost:8082/api/v1/profile", {
+                const response = await axios.get("http://localhost:8082/user/profile", {
                     headers: { Authorization: token },
                 });
                 setUser(response.data.data);
@@ -119,7 +119,7 @@ const Profile = () => {
                     navigate("/");
                     return;
                 }
-                const response = await fetch("http://localhost:8081/api/v1/change-password", {
+                const response = await fetch("http://localhost:8081/auth/change-password", {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",
