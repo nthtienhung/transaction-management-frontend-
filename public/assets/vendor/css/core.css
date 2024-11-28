@@ -3547,10 +3547,26 @@ textarea.form-control-lg {
   background-color: transparent;
 }
 
-.dropdown-menu.show {
-  display: block;
+/* Cơ chế ẩn dropdown mặc định */
+.dropdown-menu {
+  display: none;
+  opacity: 0;
+  margin-top: -10px;
+  transform: translateY(-40px) translateX(-50px); /* Dịch chuyển dropdown menu sang trái */
+  transition: opacity 0.3s ease, transform 0.3s ease;
 }
 
+/* Hiển thị dropdown khi hover */
+.nav-item.dropdown:hover .dropdown-menu {
+  display: block;
+  opacity: 1;
+  transform: translateY(0) translateX(-120px); /* Điều chỉnh lại khi hiển thị */
+}
+
+/* Đảm bảo dropdown không biến mất khi di chuột vào bên trong */
+.dropdown-menu {
+  pointer-events: auto;
+}
 .dropdown-header {
   display: block;
   padding: var(--bs-dropdown-header-padding-y) var(--bs-dropdown-header-padding-x);
@@ -22300,9 +22316,13 @@ html:not(.layout-menu-fixed) .menu-inner-shadow {
   min-height: 100vh;
 }
 
-.layout-wrapper,
+.layout-wrapper{
+  display: flex;
+  flex: 1 1 auto;
+  align-items: stretch;
+}
 .layout-container {
-  width: 100%;
+  width: 60%;
   display: flex;
   flex: 1 1 auto;
   align-items: stretch;
@@ -22431,10 +22451,10 @@ html:not(.layout-menu-fixed) .menu-inner-shadow {
   box-shadow: none;
 }
 .layout-wrapper .layout-navbar .dropdown-menu[data-bs-popper] {
-  top: 144%;
+  top: 62%;
 }
 .layout-navbar .navbar-dropdown .dropdown-menu {
-  min-width: 22rem;
+  min-width: 16rem;
   overflow: hidden;
 }
 .layout-navbar .navbar-dropdown .dropdown-menu .dropdown-item {
@@ -23747,4 +23767,18 @@ html:not(.layout-footer-fixed) .content-wrapper {
 }
 .footer.bg-light hr {
   border-color: rgba(100, 110, 120, 0.0791315686);
+}
+#layout-menu {
+  max-height: 100vh;
+  overflow-y: auto;
+}
+.menu-sub {
+  display: none;
+}
+
+.menu-sub.show {
+  display: block;
+}
+.menu-item:hover {
+  background-color: #f1f1f1; /* Thêm hiệu ứng khi hover */
 }
