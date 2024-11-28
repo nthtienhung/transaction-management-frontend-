@@ -6,8 +6,8 @@ import Login from './App/services/IAM/Login';
 import Register from './App/services/IAM/Register';
 import ChangePassword from "./App/services/IAM/ChangePassword";
 import HomeAdmin from './App/services/Business/HomePage/HomeAdmin';
-import Profile from "./App/services/User/Profile";
-import EditProfile from "./App/services/User/EditProfile";
+import Profile from "./App/services/Business/User/Profile";
+import EditProfile from "./App/services/Business/User/EditProfile";
 import ForgotPassword from "./App/services/IAM/ForgotPassword";
 import VerifyOtp from "./App/services/IAM/VerifyOtp";
 
