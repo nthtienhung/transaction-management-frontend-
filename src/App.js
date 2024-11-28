@@ -6,6 +6,8 @@ import Login from './App/services/IAM/Login';
 import Register from './App/services/IAM/Register';
 import Home from './App/services/Home';
 import ChangePassword from "./App/services/IAM/ChangePassword";
+import Profile from "./App/services/User/Profile";
+import EditProfile from "./App/services/User/EditProfile";
 import VerifyOtp from "./App/services/IAM/VerifyOtp";
 
 function App() {
@@ -17,6 +19,9 @@ function App() {
       <Route path='/home' element={<Home/>}/>
       <Route path='/change-password' element={<ChangePassword/>}/>
      <Route path='/verify' element={<VerifyOtp/>}/>
+      <Route path='/profile' element={<Profile/>}/>
+      <Route path='/edit-profile' element={<EditProfile/>}/>
+
 </Routes>
 </>
   )
