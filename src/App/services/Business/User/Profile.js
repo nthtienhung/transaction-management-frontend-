@@ -27,6 +27,7 @@ const Profile = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [openChangePasswordDialog, setOpenChangePasswordDialog] = useState(false);
+    const [openEditProfileDialog, setOpenEditProfileDialog] = useState(false);
     const [showPassword, setShowPassword] = useState({
         oldPassword: false,
         newPassword: false,
@@ -79,6 +80,13 @@ const Profile = () => {
         confirmPassword: Yup.string()
             .oneOf([Yup.ref("newPassword"), null], "Passwords must match")
             .required("Confirm password is required"),
+        firstName: Yup.string().required('First Name is required'),
+        lastName: Yup.string().required('Last Name is required'),
+        phone: Yup.string()
+            .matches(/^((\s){0,}(0))((9|8|7|3|5|4|2)[0-9]{8,9}(\s){0,})$/, 'Phone number is invalid')
+            .required('Phone is required'),
+        address: Yup.string().required('Address is required'),
+        dob: Yup.date().required('Date of Birth is required')
     });
 
     const handleClickShowPassword = (field) => {
@@ -136,6 +144,57 @@ const Profile = () => {
         },
     });
 
+    const handleEditProfileSubmit = async () => {
+        try {
+            const token = Cookies.get("its-cms-accessToken");
+            if (!token) {
+                setSnackbar({
+                    open: true,
+                    message: "You are not logged in. Please log in to continue.",
+                    severity: "error",
+                });
+                navigate("/");
+                return;
+            }
+
+            const updatedProfile = {
+                firstName: user?.firstName,
+                lastName: user?.lastName,
+                phone: user?.phone,
+                address: user?.address,
+                dob: user?.dob,
+            };
+
+            const response = await axios.put("http://localhost:8082/user/profile", updatedProfile, {
+                headers: { Authorization: token },
+            });
+
+            if (response.status === 200) {
+                setUser(response.data.data);
+                setSnackbar({
+                    open: true,
+                    message: "Profile updated successfully!",
+                    severity: "success",
+                });
+                setOpenEditProfileDialog(false);
+            } else {
+                setUser(response.data.data);
+                setSnackbar({
+                    open: true,
+                    message: "Profile updated fail!",
+                    severity: "error",
+                });
+                setOpenEditProfileDialog(false);
+            }
+        } catch (err) {
+            setSnackbar({
+                open: true,
+                message: "Failed to update profile. Please try again later.",
+                severity: "error",
+            });
+        }
+    };
+
     return (
         <div style={{ background: "linear-gradient(to right, #6a11cb, #2575fc)", minHeight: "100vh", paddingTop: "20px" }}>
             <Box sx={{ maxWidth: "1200px", width: "100%", margin: "0 auto", padding: "20px" }}>
@@ -187,7 +246,7 @@ const Profile = () => {
                                     startIcon={<Edit />}
                                     variant="contained"
                                     color="primary"
-                                    onClick={() => navigate("/edit-profile")}
+                                    onClick={() => setOpenEditProfileDialog(true)}
                                 >
                                     Edit Profile
                                 </Button>
@@ -338,6 +397,94 @@ const Profile = () => {
                     </Grid>
                 </form>
             </Dialog>
+
+            {/* Edit Profile Dialog */}
+            <Dialog open={openEditProfileDialog} onClose={() => setOpenEditProfileDialog(false)} maxWidth="sm" fullWidth>
+                <DialogTitle>Edit Profile</DialogTitle>
+                <div>
+                    <Box sx={{ maxWidth: "800px", margin: "20px auto", padding: "20px" }}>
+                        <Paper elevation={3} sx={{ padding: "20px" }}>
+                            <Box component="form" display="flex" flexDirection="column" gap={3}>
+                                <Grid container spacing={3}>
+                                    <Grid item xs={12} sm={6}>
+                                        <TextField
+                                            label="First Name"
+                                            name="firstName"
+                                            value={user?.firstName}
+                                            fullWidth
+                                            onChange={(e) => setUser({ ...user, firstName: e.target.value })}
+                                            required
+                                        />
+                                    </Grid>
+                                    <Grid item xs={12} sm={6}>
+                                        <TextField
+                                            label="Last Name"
+                                            name="lastName"
+                                            value={user?.lastName}
+                                            fullWidth
+                                            onChange={(e) => setUser({ ...user, lastName: e.target.value })}
+                                            required
+                                        />
+                                    </Grid>
+                                    <Grid item xs={12}>
+                                        <TextField
+                                            label="Email"
+                                            name="email"
+                                            type="email"
+                                            value={user?.email}
+                                            fullWidth
+                                            disabled
+                                            required
+                                        />
+                                    </Grid>
+                                    <Grid item xs={12}>
+                                        <TextField
+                                            label="Phone"
+                                            name="phone"
+                                            value={user?.phone}
+                                            fullWidth
+                                            onChange={(e) => setUser({ ...user, phone: e.target.value })}
+                                            required
+                                        />
+                                    </Grid>
+                                    <Grid item xs={12}>
+                                        <TextField
+                                            label="Address"
+                                            name="address"
+                                            value={user?.address}
+                                            fullWidth
+                                            onChange={(e) => setUser({ ...user, address: e.target.value })}
+                                            required
+                                        />
+                                    </Grid>
+                                    <Grid item xs={12}>
+                                        <TextField
+                                            label="Date of Birth"
+                                            name="dob"
+                                            type="date"
+                                            value={user?.dob}
+                                            fullWidth
+                                            InputLabelProps={{ shrink: true }}
+                                            onChange={(e) => setUser({ ...user, dob: e.target.value })}
+                                            required
+                                        />
+                                    </Grid>
+                                </Grid>
+                                <Box display="flex" justifyContent="flex-end" mt={2}>
+                                    <Button
+                                        variant="contained"
+                                        color="success"
+                                        onClick={handleEditProfileSubmit} // Thực hiện submit
+                                    >
+                                        Save
+                                    </Button>
+                                </Box>
+                            </Box>
+                        </Paper>
+                    </Box>
+                </div>
+            </Dialog>
+
 
 
             {/* Snackbar for success or error messages */}
