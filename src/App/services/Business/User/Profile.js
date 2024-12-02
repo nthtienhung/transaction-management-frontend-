@@ -71,6 +71,7 @@ const Profile = () => {
         newPassword: Yup.string()
             .required("New password is required")
             .min(8, "Password must be at least 8 characters")
+            .max(20, "Password must only have a maximum of 20 characters")
             .matches(/.*[A-Z].*/, "Password must contain at least one uppercase letter")
             .matches(/.*[a-z].*/, "Password must contain at least one lowercase letter")
             .matches(/.*\d.*/, "Password must contain at least one number")
@@ -84,32 +85,14 @@ const Profile = () => {
         setShowPassword({ ...showPassword, [field]: !showPassword[field] });
     };
 
-    const getEmailFromStorage = () => {
-        const email = localStorage.getItem("email");
-        const storedTime = localStorage.getItem("emailTime");
-
-        if (email && storedTime) {
-            const currentTime = new Date().getTime();
-            const timeDifference = currentTime - parseInt(storedTime);
-
-            // If more than 1 minute (60000 ms), remove email
-            if (timeDifference > 60000) {
-                localStorage.removeItem("email");
-                localStorage.removeItem("emailTime");
-                return "";
-            }
-            return email;
-        }
-        return "";
-    };
-
     const formik = useFormik({
         initialValues: {
-            email: getEmailFromStorage(),
+            email: user?.email || "",
             oldPassword: "",
             newPassword: "",
             confirmPassword: "",
         },
+        enableReinitialize: true, // Để cập nhật lại initialValues khi user thay đổi
         validationSchema: validationSchema,
         onSubmit: async (values) => {
             try {
@@ -152,16 +135,6 @@ const Profile = () => {
             }
         },
     });
-
-    const handleEmailChange = (event) => {
-        const email = event.target.value;
-        const currentTime = new Date().getTime();
-
-        localStorage.setItem("email", email); // Store email in localStorage
-        localStorage.setItem("emailTime", currentTime); // Store the current time
-
-        formik.setFieldValue("email", email); // Update the formik value for email
-    };
 
     return (
         <div style={{ background: "linear-gradient(to right, #6a11cb, #2575fc)", minHeight: "100vh", paddingTop: "20px" }}>
@@ -271,23 +244,6 @@ const Profile = () => {
                 <DialogTitle>Change Password</DialogTitle>
                 <form onSubmit={formik.handleSubmit}>
                     <Grid container spacing={3} sx={{padding: 2}}>
-                        <Grid item xs={12}>
-                            <TextField
-                                fullWidth
-                                id="email"
-                                name="email"
-                                label="Email"
-                                value={formik.values.email}
-                                onChange={handleEmailChange} // Gọi handleEmailChange khi người dùng thay đổi
-                                onBlur={formik.handleBlur}
-                                error={formik.touched.email && Boolean(formik.errors.email)}
-                                helperText={formik.touched.email && formik.errors.email}
-                                FormHelperTextProps={{
-                                    style: { minHeight: "10px" }, // Đảm bảo khoảng cách
-                                }}
-                                variant="outlined"
-                            />
-                        </Grid>
                         <Grid item xs={12}>
                             <TextField
                                 fullWidth
