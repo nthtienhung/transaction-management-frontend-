@@ -172,7 +172,7 @@ function Login() {
                   ) : null}
                   <div class="mb-9">
                     <div class="d-flex justify-content-between mt-8">
-                      <a href="auth-forgot-password-basic.html" class="ms-auto">
+                      <a href="/forgot-password" class="ms-auto">
                         <span>Forgot Password?</span>
                       </a>
                     </div>
