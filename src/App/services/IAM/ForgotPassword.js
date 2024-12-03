@@ -41,7 +41,7 @@ function ForgotPassword() {
             try {
                 if (!emailSent) {
                     // Send email verification request
-                    const response = await axios.post("http://localhost:8081/auth/forgot-password/verify-mail", { email: values.email });
+                    const response = await axios.post("http://localhost:8888/api/v1/auth/forgot-password/verify-mail", { email: values.email });
                     if (response.status === 200) {
                         toast.success("Verification email sent. Please check your inbox!", {
                             position: "top-right",
@@ -51,7 +51,7 @@ function ForgotPassword() {
                     }
                 } else if (!otpGenerated) {
                     // Generate OTP after email verification
-                    const response = await axios.post(`http://localhost:8081/auth/forgot-password/generate?email=${values.email}`);
+                    const response = await axios.post(`http://localhost:8888/api/v1/auth/forgot-password/generate?email=${values.email}`);
                     if (response.status === 200) {
                         toast.success("OTP sent successfully to your email.", {
                             position: "top-right",
@@ -61,7 +61,7 @@ function ForgotPassword() {
                     }
                 } else if (!otpVerified) {
                     // Verify OTP
-                    const response = await axios.post("http://localhost:8081/auth/forgot-password/verify-otp", { email: values.email, otp: values.otp });
+                    const response = await axios.post("http://localhost:8888/api/v1/auth/forgot-password/verify-otp", { email: values.email, otp: values.otp });
                     if (response.status === 200) {
                         toast.success("OTP verified successfully!", {
                             position: "top-right",
@@ -71,7 +71,7 @@ function ForgotPassword() {
                     }
                 } else {
                     // Reset password
-                    const response = await axios.post("http://localhost:8081/auth/forgot-password/reset", {
+                    const response = await axios.post("http://localhost:8888/api/v1/auth/forgot-password/reset", {
                         email: values.email,
                         newPassword: values.newPassword,
                         confirmPassword: values.confirmPassword,
