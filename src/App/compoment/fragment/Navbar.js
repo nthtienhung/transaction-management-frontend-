@@ -38,7 +38,7 @@ function Navbar(){
     <aside id="layout-menu" className="layout-menu menu-vertical menu bg-menu-theme" ref={menuRef}>
       <div className="app-brand demo">
         <a href="index.html" className="app-brand-link">
-          <span className="app-brand-text demo menu-text fw-bold ms-2">sneat</span>
+          <span className="app-brand-text demo menu-text fw-bold ms-2"><img style={{width:"20%"}} src="https://rubicmarketing.com/wp-content/uploads/2022/11/y-nghia-logo-mb-bank-2.jpg"/></span>
         </a>
         <a href="javascript:void(0);" className="layout-menu-toggle menu-link text-large ms-auto d-block d-xl-none">
           <i className="bx bx-chevron-left bx-sm d-flex align-items-center justify-content-center"></i>
@@ -50,7 +50,6 @@ function Navbar(){
           <a href="javascript:void(0);" className="menu-link menu-toggle" onClick={handleDashboardToggle}>
             <i className="menu-icon tf-icons bx bx-home-smile"></i>
             <div className="text-truncate" data-i18n="Dashboards">Dashboards</div>
-            <span className="badge rounded-pill bg-danger ms-auto">5</span>
           </a>
           {isDashboardOpen && (
             <ul className="menu-sub">

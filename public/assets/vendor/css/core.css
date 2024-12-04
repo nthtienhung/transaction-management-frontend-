@@ -23782,3 +23782,28 @@ html:not(.layout-footer-fixed) .content-wrapper {
 .menu-item:hover {
   background-color: #f1f1f1; /* Thêm hiệu ứng khi hover */
 }
+.dropdown-menu .dropdown-item:hover {
+  background-color: #f0f0f0; /* Màu nền khi hover */
+  color: #333; /* Màu chữ khi hover */
+  transition: background-color 0.3s ease, color 0.3s ease; /* Hiệu ứng mượt */
+}
+.navbar-nav .nav-link:hover .avatar img {
+  transform: scale(1.1); /* Phóng to nhẹ */
+  transition: transform 0.3s ease; /* Hiệu ứng mượt */
+}
+.dropdown-menu .dropdown-item i {
+  transition: transform 0.3s ease; /* Hiệu ứng khi hover */
+}
+
+.dropdown-menu .dropdown-item:hover i {
+  transform: translateX(5px); /* Dịch chuyển icon khi hover */
+}
+.nav-item.dropdown:hover .dropdown-menu {
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Thêm bóng đổ */
+  background-color: #fff; /* Đảm bảo menu sáng rõ hơn */
+}
+.dropdown-menu .dropdown-item:last-child:hover {
+  background-color: #ff4d4d; /* Màu đỏ */
+  color: white; /* Chữ trắng */
+  border: 1px solid #d63333; /* Đường viền */
+}

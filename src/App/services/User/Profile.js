@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Box, Button, Typography, Avatar, Paper, Grid } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import axios from "axios"; // Thêm axios để gọi API
-
+import Cookies from "js-cookie";
 const Profile = () => {
     const navigate = useNavigate();
 
@@ -13,9 +13,9 @@ const Profile = () => {
     useEffect(() => {
         const fetchProfile = async () => {
             try {
-                const response = await axios.get("http://localhost:8082/api/v1/profile", {
+                const response = await axios.get("http://localhost:8082/user/profile", {
                     headers: {
-                        Authorization: `Bearer ${localStorage.getItem("username")}` // Lấy JWT từ localStorage hoặc cookie
+                        Authorization: `${Cookies.get("its-cms-accessToken")}` // Lấy JWT từ localStorage hoặc cookie
                     }
                 });
                 setUser(response.data.data); // Lưu thông tin vào state
@@ -55,6 +55,9 @@ const Profile = () => {
                         <Typography variant="h4">Profile</Typography>
                         <Button variant="contained" color="primary" onClick={() => navigate("/edit-profile")}>
                             Edit Profile
+                        </Button>
+                        <Button variant="contained" color="primary" onClick={() => navigate("/homeUser")}>
+                            Back to Home
                         </Button>
                     </Box>
                     <Grid container spacing={3}>

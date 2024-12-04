@@ -1,4 +1,72 @@
+import axios from "axios";
+import { useEffect, useState } from "react";
+import Cookies from "js-cookie";
+import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 function Header() {
+  const [users, setUsers] = useState({ firstName: "", lastName: "" });
+  const [role, setRoles] = useState();
+  const navigate = useNavigate();
+  useEffect(() => {
+    if (!Cookies.get("its-cms-accessToken")) {
+      toast.error("Tài khoản truy cập trái phép, xin vui lòng đăng nhập !", {
+        position: "top-right",
+        autoClose: 3000,
+        hideProgressBar: true,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+      });
+      navigate("/");
+    }
+    axios
+      .get("http://localhost:8082/user/profile", {
+        headers: {
+          Authorization: `${Cookies.get("its-cms-accessToken")}`,
+        },
+      })
+      .then((res) => {
+        console.log(res.data.data);
+        setUsers(res.data.data);
+      })
+      .catch((err) => {
+        if (err.response?.status === 401) {
+          console.log("Token hết hạn hoặc không hợp lệ. Hãy đăng nhập lại.");
+          navigate("/");
+          // Chuyển hướng người dùng đến trang login
+        } else {
+          console.error("Error fetching user data:", err);
+        }
+      });
+    axios
+      .get("http://localhost:8082/user/getRole", {
+        headers: {
+          Authorization: `${Cookies.get("its-cms-accessToken")}`,
+        },
+      })
+      .then((res) => {
+        console.log(res);
+        setRoles(res.data);
+      });
+  }, []);
+  const logout = () => {
+    axios.get("http://localhost:8888/api/v1/auth/logoutAccount", {
+      headers: {
+        Authorization: `${Cookies.get("its-cms-accessToken")}`,
+      },
+      withCredentials: true, // Nếu backend yêu cầu cookie
+    })
+  .then(() => {
+    console.log("Logout thành công");
+    Cookies.remove("its-cms-accessToken");
+    navigate("/");
+  })
+  .catch((error) => {
+    console.error("Logout thất bại:", error);
+  });
+  };
+  console.log(users);
   return (
     <>
       <nav
@@ -57,8 +125,13 @@ function Header() {
                         </div>
                       </div>
                       <div class="flex-grow-1">
-                        <h6 class="mb-0">John Doe</h6>
-                        <small class="text-muted">Admin</small>
+                        {users ? (
+                          <h6 className="mb-0">
+                            {users.firstName || "Chưa có dữ liệu"}
+                          </h6>
+                        ) : (
+                          <p>Đang tải dữ liệu...</p>
+                        )}
                       </div>
                     </div>
                   </a>
@@ -67,7 +140,12 @@ function Header() {
                   <hr class="dropdown-divider" />
                 </li>
                 <li>
-                  <a class="dropdown-item" href="#">
+                  <p class="dropdown-item">
+                    <i>Quyền hạn: {role}</i> 
+                  </p>
+                </li>
+                <li>
+                  <a class="dropdown-item" href="/profile">
                     <i class="bx bx-user bx-sm me-2"></i> My Profile
                   </a>
                 </li>
@@ -86,8 +164,10 @@ function Header() {
                   <hr class="dropdown-divider" />
                 </li>
                 <li>
-                  <a class="dropdown-item" href="javascript:void(0);">
-                    <i class="bx bx-power-off bx-sm me-2"></i> Log Out
+                  <a class="dropdown-item">
+                    <button onClick={() => logout()}>
+                      <i class="bx bx-power-off bx-sm me-2"></i> Log Out
+                    </button>
                   </a>
                 </li>
               </ul>
