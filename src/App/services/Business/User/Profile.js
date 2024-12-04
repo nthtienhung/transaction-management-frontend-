@@ -16,10 +16,10 @@ import {
     Alert, CardContent, Card,
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
-import {Edit, Lock, Email, Phone, Home, Cake, People, ArrowBack} from "@mui/icons-material";
+import { Edit, Lock, Email, Phone, Home, Cake, People, ArrowBack } from "@mui/icons-material";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
 import * as Yup from "yup";
-import {useFormik} from "formik";
+import { useFormik } from "formik";
 
 const Profile = () => {
     const navigate = useNavigate();
@@ -51,7 +51,7 @@ const Profile = () => {
                     return;
                 }
 
-                const response = await axios.get("http://localhost:8082/user/profile", {
+                const response = await axios.get("http://localhost:8888/api/v1/user/profile", {
                     headers: { Authorization: token },
                 });
                 setUser(response.data.data);
@@ -103,6 +103,9 @@ const Profile = () => {
         enableReinitialize: true, // Để cập nhật lại initialValues khi user thay đổi
         validationSchema: validationSchema,
         onSubmit: async (values) => {
+            console.log("Here");
+            console.log("Errors: ", formik.errors);
+            console.log("Touched: ", formik.touched);
             try {
                 const token = Cookies.get("its-cms-accessToken");
                 if (!token) {
@@ -110,7 +113,7 @@ const Profile = () => {
                     navigate("/");
                     return;
                 }
-                const response = await fetch("http://localhost:8081/auth/change-password", {
+                const response = await fetch("http://localhost:8888/api/v1/auth/change-password", {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",
@@ -165,7 +168,7 @@ const Profile = () => {
                 dob: user?.dob,
             };
 
-            const response = await axios.put("http://localhost:8082/user/profile", updatedProfile, {
+            const response = await axios.put("http://localhost:8888/api/v1/user/profile", updatedProfile, {
                 headers: { Authorization: token },
             });
 
@@ -302,7 +305,7 @@ const Profile = () => {
             <Dialog open={openChangePasswordDialog} onClose={() => setOpenChangePasswordDialog(false)} maxWidth="sm" fullWidth>
                 <DialogTitle>Change Password</DialogTitle>
                 <form onSubmit={formik.handleSubmit}>
-                    <Grid container spacing={3} sx={{padding: 2}}>
+                    <Grid container spacing={3} sx={{ padding: 2 }}>
                         <Grid item xs={12}>
                             <TextField
                                 fullWidth
@@ -491,12 +494,12 @@ const Profile = () => {
             <Snackbar
                 open={snackbar.open}
                 autoHideDuration={6000}
-                onClose={() => setSnackbar({...snackbar, open: false})}
+                onClose={() => setSnackbar({ ...snackbar, open: false })}
             >
                 <Alert
-                    onClose={() => setSnackbar({...snackbar, open: false})}
+                    onClose={() => setSnackbar({ ...snackbar, open: false })}
                     severity={snackbar.severity}
-                    sx={{width: "100%"}}
+                    sx={{ width: "100%" }}
                 >
                     {snackbar.message}
                 </Alert>

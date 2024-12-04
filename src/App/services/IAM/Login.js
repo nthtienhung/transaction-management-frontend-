@@ -10,6 +10,8 @@ import * as Yup from "yup";
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import Cookies from 'js-cookie';
+import { jwtDecode } from 'jwt-decode'; // Cú pháp khác cho import cụ thể
+
 function Login() {
   const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
@@ -30,7 +32,7 @@ function Login() {
     },
     validationSchema,
     onSubmit: async (value) => {
-      axios.post("http://localhost:8081/auth/login",value).then(res =>{
+      axios.post("http://localhost:8888/api/v1/auth/login",value).then(res =>{
         if(res.status == 200){
           toast.success(`Đăng nhập thành công`, {
             position: "top-right",
@@ -43,7 +45,16 @@ function Login() {
           });
           Cookies.set('its-cms-accessToken', res.data.data.csrfToken, { expires: 7, path: '/' });
           console.log(Cookies.get('its-cms-accessToken'));
-          navigate("/profile")
+          // Giải mã token để lấy role
+          const decodedToken = jwtDecode(res.data.data.csrfToken); // Giải mã JWT
+          const role = decodedToken.role; // Lấy role từ payload của token
+
+          // Điều hướng dựa trên role
+          if (role === "ROLE_ADMIN") {
+            navigate("/homeAdmin");
+          } else {
+            navigate("/profile");
+          }
         }else {
           toast.error("Tài khoản hoặc mật khẩu sai, thử lại.", {
             position: "top-right",
