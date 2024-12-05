@@ -111,34 +111,7 @@ function Navbar({ setActiveContent }) {
                     </li>
 
                     {/* Other Menus */}
-                    <li className="menu-item">
-                        <a href="javascript:void(0);" className="menu-link menu-toggle">
-                            <i className="menu-icon tf-icons bx bx-store"></i>
-                            <div className="text-truncate" data-i18n="Front Pages">Front Pages</div>
-                            <div className="badge rounded-pill bg-label-primary text-uppercase fs-tiny ms-auto">Pro
-                            </div>
-                        </a>
-                        <ul className="menu-sub">
-                            <li className="menu-item">
-                                <a href="https://demos.themeselection.com/sneat-bootstrap-html-admin-template/html/front-pages/landing-page.html"
-                                   className="menu-link" target="_blank">
-                                    <div className="text-truncate" data-i18n="Landing">Landing</div>
-                                </a>
-                            </li>
-                            <li className="menu-item">
-                                <a href="https://demos.themeselection.com/sneat-bootstrap-html-admin-template/html/front-pages/pricing-page.html"
-                                   className="menu-link" target="_blank">
-                                    <div className="text-truncate" data-i18n="Pricing">Pricing</div>
-                                </a>
-                            </li>
-                            <li className="menu-item">
-                                <a href="https://demos.themeselection.com/sneat-bootstrap-html-admin-template/html/front-pages/payment-page.html"
-                                   className="menu-link" target="_blank">
-                                    <div className="text-truncate" data-i18n="Payment">Payment</div>
-                                </a>
-                            </li>
-                        </ul>
-                    </li>
+                    
                 </ul>
 
             </aside>
