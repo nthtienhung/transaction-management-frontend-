@@ -20,7 +20,7 @@ const ConfigService = () => {
   const [page, setPage] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
 
-  const pageSize = 10; // Kích thước trang cố định
+  const pageSize = 5; // Kích thước trang cố định
 
   useEffect(() => {
     fetchConfigs();
@@ -30,6 +30,7 @@ const ConfigService = () => {
     try {
       const response = await ConfigAPI.getConfigs(
         filterGroup,
+        // "USER",
         filterType,
         filterConfigKey,
         filterStatus,
@@ -41,10 +42,6 @@ const ConfigService = () => {
 
       setConfigs(content);
       setTotalPages(Math.ceil(totalElements / pageSize)); // Tính toán số trang
-
-      console.log('Total Elements:', totalElements);
-console.log('Page Size:', pageSize);
-console.log('Total Pages:', Math.ceil(totalElements / pageSize));
     } catch (error) {
       console.error('Error fetching configs:', error);
     }
@@ -93,9 +90,9 @@ console.log('Total Pages:', Math.ceil(totalElements / pageSize));
     }
   };
 
-  const handleFilterChange = () => {
+  const handleFilterChange = async () => {
     setPage(0); // Reset về trang đầu tiên
-    fetchConfigs();
+    await fetchConfigs();
   };
 
   const handlePageChange = (newPage) => {
@@ -104,9 +101,11 @@ console.log('Total Pages:', Math.ceil(totalElements / pageSize));
 
   return (
     <div>
-      <h2>Config Service</h2>
+      <div className="config-header">
+        <h2>Config Service</h2>
+      </div>
       <div>
-        <button onClick={handleAddConfigClick}>Add Config</button>
+        <button className="add-button" onClick={handleAddConfigClick}>Add Config</button>
         <div className="filter-container">
           <label>
             Group:
