@@ -2,10 +2,14 @@ import { useEffect, useRef, useState } from "react";
 import PerfectScrollbar from "perfect-scrollbar";
 import axios from "axios";
 import Cookies from "js-cookie";
+import {jwtDecode} from "jwt-decode";
+import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 function Navbar() {
   const [isDashboardOpen, setIsDashboardOpen] = useState(false); // Quản lý trạng thái mở menu Dashboard
   const menuRef = useRef(null);
   const [role, setRoles] = useState();
+  const navigate = useNavigate();
   useEffect(() => {
     const menuToggles = menuRef.current.querySelectorAll(".menu-toggle");
 
@@ -29,19 +33,13 @@ function Navbar() {
       });
     };
   }, []);
-  useEffect(() => {
-    axios
-      .get("http://localhost:8082/user/getRole", {
-        headers: {
-          Authorization: `${Cookies.get("its-cms-accessToken")}`,
-        },
-      })
-      .then((res) => {
-        console.log(res);
-        setRoles(res.data);
-      });
-  }, []);
-
+    useEffect(() =>{
+      if(Cookies.get("its-cms-accessToken")){
+        const decodeToken = jwtDecode(Cookies.get("its-cms-accessToken"));
+        const roleUser = decodeToken.role;
+        setRoles(roleUser);
+      }
+    },[])
   // Hàm để thay đổi trạng thái của menu Dashboard
   const handleDashboardToggle = () => {
     setIsDashboardOpen((prev) => !prev);

@@ -10,6 +10,7 @@ import * as Yup from "yup";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Cookies from "js-cookie";
+import {jwtDecode} from "jwt-decode";
 function Login() {
   const [showPassword, setShowPassword] = useState(false);
   const [role, setRoles] = useState();
@@ -23,7 +24,7 @@ function Login() {
   });
   const userFormData = useFormik({
     initialValues: {
-      role: "ADMIN",
+      role: "ROLE_ADMIN",
       email: "",
       password: "",
     },
@@ -34,71 +35,49 @@ function Login() {
         .post("http://localhost:8888/api/v1/auth/login", value)
         .then((res) => {
           if (res.status == 200) {
-            toast.success("Đăng nhập thành công", {
-              position: "top-right",
-              autoClose: 3000, // Tự động đóng sau 3 giây
-              hideProgressBar: true,
-              closeOnClick: true,
-              pauseOnHover: true,
-              draggable: true,
-              progress: undefined,
-            });
             Cookies.remove("its-cms-accessToken");
             Cookies.set("its-cms-accessToken", res.data.data.csrfToken, {
               expires: 30 / (24 * 60), // 30 phút = 30 phút / (24 * 60 phút trong một ngày)
               path: "/",
             });
             setTimeout(() => {
-              console.log(Cookies.get("its-cms-accessToken"));
-              axios
-                .get("http://localhost:8888/api/v1/user/getRole", {
-                  headers: {
-                    Authorization: `${Cookies.get("its-cms-accessToken")}`, // Lấy JWT từ cookie
-                  },
-                })
-                .then((response) => {
-                  console.log(response.data);
-
-                  // Kiểm tra quyền của người dùng
-                  if (response.data.trim() === value.role.trim()) {
-                    if (response.data.trim() === "USER") {
-                      navigate("/homeUser");
-                    } else {
-                      navigate("/homeAdmin");
-                    }
-                  } else {
-                    toast.error(
-                      "Tài khoản không có quyền truy cập vào trang web này, xin thử lại!",
-                      {
-                        position: "top-right",
-                        autoClose: 3000,
-                        hideProgressBar: true,
-                        closeOnClick: true,
-                        pauseOnHover: true,
-                        draggable: true,
-                        progress: undefined,
-                      }
-                    );
-                  }
-                })
-                .catch((error) => {
-                  console.error("Error fetching user role:", error);
-
-                  // Hiển thị thông báo lỗi
-                  toast.error(
-                    "Đã xảy ra lỗi khi kiểm tra quyền, xin thử lại!",
-                    {
-                      position: "top-right",
-                      autoClose: 3000,
-                      hideProgressBar: true,
-                      closeOnClick: true,
-                      pauseOnHover: true,
-                      draggable: true,
-                      progress: undefined,
-                    }
-                  );
+            console.log(Cookies.get("its-cms-accessToken"));
+            const decodeToken = jwtDecode(Cookies.get("its-cms-accessToken"));
+            const role = decodeToken.role;
+            console.log(role);
+            if(value.role === role){
+              setTimeout(() =>{
+                toast.success("Đăng nhập thành công", {
+                  position: "top-right",
+                  autoClose: 3000, // Tự động đóng sau 3 giây
+                  hideProgressBar: true,
+                  closeOnClick: true,
+                  pauseOnHover: true,
+                  draggable: true,
+                  progress: undefined,
                 });
-            }, 3300); // Trì hoãn 3 giây
+              },500);
+             setTimeout(() => {
+              if(role === "ROLE_ADMIN"){
+                navigate("/homeAdmin");
+              }else{
+                navigate("/homeUser")
+              }
+             }, 1500);
+
+            }else{
+              toast.error("Đăng nhập thất bại, quyền hạn người dùng không được phép vào trang web này", {
+                position: "top-right",
+                autoClose: 2000, // Tự động đóng sau 3 giây
+                hideProgressBar: true,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+              });
+            }
+            }, 500); 
+           
           } else {
             toast.error("Tài khoản hoặc mật khẩu sai, thử lại.", {
               position: "top-right",
@@ -112,8 +91,20 @@ function Login() {
           }
         })
         .catch((error) => {
-          console.error("Error:", error);
+          const messageError = error.response.data.message;
+          console.error("Error:", error.response.data.message);
+         if(messageError === "Email or password is wrong"){
           toast.error("Tài khoản hoặc mật khẩu sai, thử lại.", {
+            position: "top-right",
+            autoClose: 2000,
+            hideProgressBar: true,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+          });
+         }else if(messageError === "Account has been temporarily locked"){
+          toast.error("Tài khoản đã bị khóa do đăng nhập sai quá 5 lần, thử lại sau", {
             position: "top-right",
             autoClose: 3000,
             hideProgressBar: true,
@@ -122,6 +113,27 @@ function Login() {
             draggable: true,
             progress: undefined,
           });
+         } else if(messageError === "Email is invalid (abc@gmail.com)."){
+          toast.error("Tài khoản sai định dạng (abc@gmail.com), thử lại.", {
+            position: "top-right",
+            autoClose: 3000,
+            hideProgressBar: true,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+          });
+         } else{
+          toast.error("Tài khoản hoặc mật khẩu sai, thử lại", {
+            position: "top-right",
+            autoClose: 3000,
+            hideProgressBar: true,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+          });
+         }
         });
     },
   });
@@ -156,10 +168,10 @@ function Login() {
                         value={userFormData.values.role}
                         className="form-control"
                       >
-                        <option defaultValue={"ADMIN"} value={"ADMIN"}>
+                        <option defaultValue={"ROLE_ADMIN"} value={"ROLE_ADMIN"}>
                           ADMIN
                         </option>
-                        <option value={"USER"}>USER</option>
+                        <option value={"ROLE_USER"}>USER</option>
                       </select>
                     </div>
                   </div>
