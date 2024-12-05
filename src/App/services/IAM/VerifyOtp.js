@@ -4,7 +4,6 @@ import { verifyOtp, generateOtp } from "../Api/authService";
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
-
 const VerifyOtp = () => {
     const location = useLocation();
     const [formData, setFormData] = useState({
