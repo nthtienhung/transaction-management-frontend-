@@ -7,9 +7,7 @@ export const register = async (data) => {
 };
 
 export const generateOtp = async (email) => {
-    return axios.post(`${API_BASE_URL}/auth/register/generate-otp`, null, {
-        params: { email },
-    });
+    return axios.post(`${API_BASE_URL}/auth/register/generate-otp`, { email });
 };
 
 export const verifyOtp = async (data) => {

@@ -51,7 +51,7 @@ const decodeToken = (token) => {
   };
   
   export const getConfigs = async (group, type, configKey, status, pageable) => {
-    console.log(pageable)
+    console.log(group, type, configKey, status, pageable)
     return axios.get(`${API_BASE_URL}/config/getconfig`, {
       params: { group, type, configKey, status, ...pageable },
       headers: getAuthHeaders(),
