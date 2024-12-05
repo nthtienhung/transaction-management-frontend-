@@ -10,7 +10,6 @@ import Profile from "./App/services/Business/User/Profile";
 import ForgotPassword from "./App/services/IAM/ForgotPassword";
 import VerifyOtp from "./App/services/IAM/VerifyOtp";
 
-
 function App() {
   return(
 <>
@@ -22,7 +21,6 @@ function App() {
       {/* <Route path='/change-password' element={<ChangePassword/>}/> */}
       <Route path='/verify' element={<VerifyOtp/>}/>
       <Route path='/profile' element={<Profile/>}/>
-      <Route path='/edit-profile' element={<EditProfile/>}/>
       <Route path='/verify' element={<VerifyOtp/>}/>
       <Route path="/forgot-password" element={<ForgotPassword />} />
  </Routes>

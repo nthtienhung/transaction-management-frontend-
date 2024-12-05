@@ -51,7 +51,7 @@ function Login() {
             setTimeout(() => {
               console.log(Cookies.get("its-cms-accessToken"));
               axios
-                .get("http://localhost:8082/user/getRole", {
+                .get("http://localhost:8888/api/v1/user/getRole", {
                   headers: {
                     Authorization: `${Cookies.get("its-cms-accessToken")}`, // Lấy JWT từ cookie
                   },
