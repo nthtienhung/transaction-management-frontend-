@@ -53,7 +53,7 @@ const Profile = () => {
                     return;
                 }
 
-                const response = await axios.get("http://localhost:8082/user/profile", {
+                const response = await axios.get("http://localhost:8888/api/v1/user/profile", {
                     headers: { Authorization: token },
                 });
                 setUser(response.data.data);
@@ -63,10 +63,10 @@ const Profile = () => {
                 setLoading(false);
             }
         };
-        
+
         fetchProfile();
     }, [navigate]);
-     
+
     // Validation schema for password change form
     const validationSchema = Yup.object({
         oldPassword: Yup.string().required("Old password is required"),
@@ -99,9 +99,9 @@ const Profile = () => {
         setShowPassword({ ...showPassword, [field]: !showPassword[field] });
     };
 
-    const changePasswordFormik = useFormik({
+const changePasswordFormik = useFormik({
         initialValues: {
-            email: user?.email || "",
+            email: user?.email,
             oldPassword: "",
             newPassword: "",
             confirmPassword: "",
@@ -210,7 +210,7 @@ const Profile = () => {
         },
     });
 
-    return (
+return (
         <div style={{ background: "linear-gradient(to right, #6a11cb, #2575fc)", minHeight: "100vh", paddingTop: "20px" }}>
             <Box sx={{ maxWidth: "1200px", width: "100%", margin: "0 auto", padding: "20px" }}>
                 <Paper elevation={3} sx={{ padding: "40px", borderRadius: "15px", backgroundColor: "#fff" }}>
@@ -282,7 +282,8 @@ const Profile = () => {
                             <Grid item xs={12} sm={6}>
                                 <Card elevation={2} sx={{ borderRadius: "10px", textAlign: "center" }}>
                                     <CardContent>
-                                        <Typography variant="h6" color="primary">
+
+<Typography variant="h6" color="primary">
                                             Welcome Back!
                                         </Typography>
                                         <Typography variant="body2" sx={{ color: "gray" }}>
@@ -342,7 +343,7 @@ const Profile = () => {
                             />
                         </Grid>
 
-                        {/* New Password */}
+{/* New Password */}
                         <Grid item xs={12}>
                             <TextField
                                 fullWidth
@@ -400,7 +401,7 @@ const Profile = () => {
                 </form>
             </Dialog>
 
-            {/* Edit Profile Dialog */}
+{/* Edit Profile Dialog */}
             <Dialog
                 open={openEditProfileDialog}
                 onClose={() => setOpenEditProfileDialog(false)}
@@ -467,7 +468,8 @@ const Profile = () => {
                                     onBlur={editProfileFormik.handleBlur}
                                     fullWidth
                                     error={editProfileFormik.touched.address && Boolean(editProfileFormik.errors.address)}
-                                    helperText={editProfileFormik.touched.address && editProfileFormik.errors.address}
+
+helperText={editProfileFormik.touched.address && editProfileFormik.errors.address}
                                 />
                             </Grid>
                             <Grid item xs={12}>

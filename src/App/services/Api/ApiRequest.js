@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const API = axios.create({
-    baseURL: 'http://localhost:8080', // Thay bằng URL của backend
+    baseURL: 'http://localhost:8888/api/v1', // Thay bằng URL của backend
 });
 
 export const verifyMail = (email) => API.post('/forgot-password/verify-mail', { email });

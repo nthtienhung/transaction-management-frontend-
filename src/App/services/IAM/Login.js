@@ -7,10 +7,11 @@ import { FaUser } from "react-icons/fa";
 import { GrKey } from "react-icons/gr";
 import { BiHide, BiShow } from "react-icons/bi";
 import * as Yup from "yup";
-import { toast, ToastContainer } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
-import Cookies from "js-cookie";
-import {jwtDecode} from "jwt-decode";
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import Cookies from 'js-cookie';
+import { jwtDecode } from 'jwt-decode'; // Cú pháp khác cho import cụ thể
+
 function Login() {
   const [showPassword, setShowPassword] = useState(false);
   const [role, setRoles] = useState();
@@ -49,21 +50,21 @@ function Login() {
               setTimeout(() =>{
                 toast.success("Đăng nhập thành công", {
                   position: "top-right",
-                  autoClose: 3000, // Tự động đóng sau 3 giây
+                  autoClose: 2000, // Tự động đóng sau 3 giây
                   hideProgressBar: true,
                   closeOnClick: true,
                   pauseOnHover: true,
                   draggable: true,
                   progress: undefined,
                 });
-              },500);
+              },200);
              setTimeout(() => {
               if(role === "ROLE_ADMIN"){
                 navigate("/homeAdmin");
               }else{
                 navigate("/homeUser")
               }
-             }, 1500);
+             }, 2000);
 
             }else{
               toast.error("Đăng nhập thất bại, quyền hạn người dùng không được phép vào trang web này", {
@@ -76,7 +77,7 @@ function Login() {
                 progress: undefined,
               });
             }
-            }, 500); 
+            }, 100); 
            
           } else {
             toast.error("Tài khoản hoặc mật khẩu sai, thử lại.", {
@@ -103,8 +104,10 @@ function Login() {
             draggable: true,
             progress: undefined,
           });
+
          }else if(messageError === "Account has been temporarily locked"){
           toast.error("Tài khoản đã bị khóa do đăng nhập sai quá 5 lần, thử lại sau", {
+
             position: "top-right",
             autoClose: 3000,
             hideProgressBar: true,
