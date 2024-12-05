@@ -22,7 +22,6 @@ function App() {
       {/* <Route path='/change-password' element={<ChangePassword/>}/> */}
       <Route path='/verify' element={<VerifyOtp/>}/>
       <Route path='/profile' element={<Profile/>}/>
-      <Route path='/edit-profile' element={<EditProfile/>}/>
       <Route path='/verify' element={<VerifyOtp/>}/>
       <Route path="/forgot-password" element={<ForgotPassword />} />
  </Routes>

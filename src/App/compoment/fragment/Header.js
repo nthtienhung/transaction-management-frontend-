@@ -3,12 +3,26 @@ import { useEffect, useState } from "react";
 import Cookies from "js-cookie";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
+import {jwtDecode} from "jwt-decode";
 function Header() {
   const [users, setUsers] = useState({ firstName: "", lastName: "" });
   const [role, setRoles] = useState();
   const navigate = useNavigate();
   useEffect(() => {
-    if (!Cookies.get("its-cms-accessToken")) {
+    if (Cookies.get("its-cms-accessToken")) {
+      const decodeToken = jwtDecode(Cookies.get("its-cms-accessToken"));
+      const roleUser = decodeToken.role;
+      setRoles(roleUser);
+      axios
+      .get("http://localhost:8082/user/profile", {
+        headers: {
+          Authorization: `${Cookies.get("its-cms-accessToken")}`,
+        },
+      })
+      .then((res) => {
+        setUsers(res.data.data);
+      })
+    }else{
       toast.error("Tài khoản truy cập trái phép, xin vui lòng đăng nhập !", {
         position: "top-right",
         autoClose: 3000,
@@ -20,53 +34,37 @@ function Header() {
       });
       navigate("/");
     }
-    axios
-      .get("http://localhost:8082/user/profile", {
-        headers: {
-          Authorization: `${Cookies.get("its-cms-accessToken")}`,
-        },
-      })
-      .then((res) => {
-        console.log(res.data.data);
-        setUsers(res.data.data);
-      })
-      .catch((err) => {
-        if (err.response?.status === 401) {
-          console.log("Token hết hạn hoặc không hợp lệ. Hãy đăng nhập lại.");
-          navigate("/");
-          // Chuyển hướng người dùng đến trang login
-        } else {
-          console.error("Error fetching user data:", err);
-        }
-      });
-    axios
-      .get("http://localhost:8082/user/getRole", {
-        headers: {
-          Authorization: `${Cookies.get("its-cms-accessToken")}`,
-        },
-      })
-      .then((res) => {
-        console.log(res);
-        setRoles(res.data);
-      });
   }, []);
+ 
+  
   const logout = () => {
+    console.log(Cookies.get("its-cms-accessToken"))
     axios.get("http://localhost:8888/api/v1/auth/logoutAccount", {
       headers: {
         Authorization: `${Cookies.get("its-cms-accessToken")}`,
       },
-      withCredentials: true, // Nếu backend yêu cầu cookie
     })
   .then(() => {
-    console.log("Logout thành công");
-    Cookies.remove("its-cms-accessToken");
-    navigate("/");
+    setTimeout(()=>{
+      toast.success("Hẹn gặp lại ❤️❤️❤️!", {
+        position: "top-right",
+        autoClose: 3000,
+        hideProgressBar: true,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+      });
+    },500)
+    setTimeout(() =>{
+      Cookies.remove("its-cms-accessToken");
+      navigate("/");
+    },1000)
   })
   .catch((error) => {
     console.error("Logout thất bại:", error);
   });
   };
-  console.log(users);
   return (
     <>
       <nav
