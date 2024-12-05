@@ -156,8 +156,8 @@ function Header() {
                 </li>
                 <li>
                   <a class="dropdown-item" href="#">
-                    <i class="bx bx-credit-card bx-sm me-2"></i> Billing Plan
-                    <span class="badge bg-danger rounded-pill ms-2">4</span>
+                    <i class="bx bx-credit-card bx-sm me-2"></i> Wallet
+                    {/* <span class="badge bg-danger rounded-pill ms-2">4</span> */}
                   </a>
                 </li>
                 <li>

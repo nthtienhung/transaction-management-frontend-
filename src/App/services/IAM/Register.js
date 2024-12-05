@@ -13,17 +13,57 @@ const Register = () => {
     address: "",
     phone: "",
   });
-  const [showPassword, setShowPassword] = useState(false); // Trạng thái để hiển thị hoặc ẩn mật khẩu
+  const [errors, setErrors] = useState({});
+  const [showPassword, setShowPassword] = useState(false);
   const [message, setMessage] = useState("");
   const [messageType, setMessageType] = useState("");
   const navigate = useNavigate();
 
+  const regexPatterns = {
+    firstName: /^[\p{L}\s]+( [\p{L}\s]+)*$/u,
+    lastName: /^[\p{L}\s]+( [\p{L}\s]+)*$/u,
+    email: /^(?=.{1,64}@)[A-Za-z0-9_-]+(\.[A-Za-z0-9_-]+)*@(gmail|GMAIL)\.(com|COM)$/,
+    password: /^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[!@#$%^&*_+])[A-Za-z\d!@#$%^&*_+]{8,20}$/,
+    phone: /^((\s){0,}(0))((9|8|7|3|5|4|2)[0-9]{8,9}(\s){0,})$/,
+  };
+
+  const validateInput = (name, value) => {
+    let error = "";
+    if (!value.trim()) {
+      error = `${name} is required.`;
+    } else if (regexPatterns[name] && !regexPatterns[name].test(value)) {
+      error = `${name} is invalid.`;
+    }
+    return error;
+  };
+
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    setFormData({ ...formData, [name]: value });
+
+    // Validate input
+    const error = validateInput(name, value);
+    setErrors((prevErrors) => ({
+      ...prevErrors,
+      [name]: error,
+    }));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    // Validate all fields before submitting
+    const newErrors = {};
+    Object.keys(formData).forEach((key) => {
+      const error = validateInput(key, formData[key]);
+      if (error) newErrors[key] = error;
+    });
+
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
+      return;
+    }
+
     try {
       await register(formData);
       await generateOtp(formData.email);
@@ -42,94 +82,127 @@ const Register = () => {
           <h2 className="text-center">Register</h2>
           <form onSubmit={handleSubmit}>
             <div className="mb-3">
+              <label htmlFor="firstName" className="form-label">
+                First Name
+              </label>
               <input
                   type="text"
+                  id="firstName"
                   name="firstName"
-                  className="form-control"
-                  placeholder="First Name"
+                  className={`form-control ${errors.firstName ? "is-invalid" : ""}`}
+                  placeholder="Enter your first name"
                   onChange={handleChange}
                   required
               />
+              {errors.firstName && <div className="invalid-feedback">{errors.firstName}</div>}
             </div>
             <div className="mb-3">
+              <label htmlFor="lastName" className="form-label">
+                Last Name
+              </label>
               <input
                   type="text"
+                  id="lastName"
                   name="lastName"
-                  className="form-control"
-                  placeholder="Last Name"
+                  className={`form-control ${errors.lastName ? "is-invalid" : ""}`}
+                  placeholder="Enter your last name"
                   onChange={handleChange}
                   required
               />
+              {errors.lastName && <div className="invalid-feedback">{errors.lastName}</div>}
             </div>
             <div className="mb-3">
+              <label htmlFor="email" className="form-label">
+                Email
+              </label>
               <input
                   type="email"
+                  id="email"
                   name="email"
-                  className="form-control"
-                  placeholder="Email"
+                  className={`form-control ${errors.email ? "is-invalid" : ""}`}
+                  placeholder="Enter your email"
                   onChange={handleChange}
                   required
               />
+              {errors.email && <div className="invalid-feedback">{errors.email}</div>}
             </div>
+            <label htmlFor="password" className="form-label">
+              Password
+            </label>
             <div className="mb-3 position-relative">
               <input
-                  type={showPassword ? "text" : "password"} // Đổi giữa 'password' và 'text'
+                  type={showPassword ? "text" : "password"}
+                  id="password"
                   name="password"
-                  className="form-control"
-                  placeholder="Password"
+                  className={`form-control ${errors.password ? "is-invalid" : ""}`}
+                  placeholder="Enter your password"
                   onChange={handleChange}
                   required
               />
               <button
                   type="button"
                   className="btn btn-sm btn-outline-secondary position-absolute end-0 top-0"
-                  style={{ height: "100%", width: "50px" }}
+                  style={{height: "100%", width: "50px"}}
                   onClick={() => setShowPassword(!showPassword)}
               >
-                {showPassword ? "Ẩn" : "Hiện"}
+                {showPassword ? "Hide" : "Show"}
               </button>
+              {errors.password && <div className="invalid-feedback">{errors.password}</div>}
             </div>
+
             <div className="mb-3">
+              <label htmlFor="dateOfBirth" className="form-label">
+                Date of Birth
+              </label>
               <input
                   type="date"
+                  id="dateOfBirth"
                   name="dateOfBirth"
                   className="form-control"
-                  placeholder="Date of Birth"
                   onChange={handleChange}
                   required
               />
             </div>
             <div className="mb-3">
+              <label htmlFor="address" className="form-label">
+                Address
+              </label>
               <input
                   type="text"
+                  id="address"
                   name="address"
                   className="form-control"
-                  placeholder="Address"
+                  placeholder="Enter your address"
                   onChange={handleChange}
                   required
               />
             </div>
             <div className="mb-3">
+              <label htmlFor="phone" className="form-label">
+                Phone
+              </label>
               <input
                   type="text"
+                  id="phone"
                   name="phone"
-                  className="form-control"
-                  placeholder="Phone"
+                  className={`form-control ${errors.phone ? "is-invalid" : ""}`}
+                  placeholder="Enter your phone number"
                   onChange={handleChange}
                   required
               />
+              {errors.phone && <div className="invalid-feedback">{errors.phone}</div>}
             </div>
-            <button type="submit" className="btn btn-primary w-100">
+            <button type="submit" className="btn btn-primary w-100 mb-2">
               Register
             </button>
           </form>
-          {message && (
-              <Toast
-                  message={message}
-                  type={messageType}
-                  onClose={() => setMessage("")}
-              />
-          )}
+          <button
+              className="btn btn-link w-100"
+              onClick={() => navigate("/")}
+          >
+            Back to Login
+          </button>
+          {message && <Toast message={message} type={messageType} onClose={() => setMessage("")} />}
         </div>
       </div>
   );

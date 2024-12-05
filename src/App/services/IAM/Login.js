@@ -34,9 +34,9 @@ function Login() {
         .post("http://localhost:8888/api/v1/auth/login", value)
         .then((res) => {
           if (res.status == 200) {
-            toast.success(`Đăng nhập thành công`, {
+            toast.success("Đăng nhập thành công", {
               position: "top-right",
-              autoClose: 3000, // Đặt thời gian autoClose là 5 giây
+              autoClose: 3000, // Tự động đóng sau 3 giây
               hideProgressBar: true,
               closeOnClick: true,
               pauseOnHover: true,
@@ -45,39 +45,60 @@ function Login() {
             });
             Cookies.remove("its-cms-accessToken");
             Cookies.set("its-cms-accessToken", res.data.data.csrfToken, {
-              expires: 7,
+              expires: 30 / (24 * 60), // 30 phút = 30 phút / (24 * 60 phút trong một ngày)
               path: "/",
             });
-            sessionStorage.setItem("its-cms-accessToken",Cookies.get("its-cms-accessToken"));
-            console.log(Cookies.get("its-cms-accessToken"));
-            axios.get("http://localhost:8082/user/getRole", {
-              headers: {
-                Authorization: `${Cookies.get("its-cms-accessToken")}`, // Lấy JWT từ localStorage hoặc cookie
-              },
-            }).then(res =>{
-              console.log(res.data);
-              if (res.data.trim() === value.role.trim()) {
-                if (res.data.trim() === "USER") {
-                  navigate("/homeUser");
-                } else {
-                  navigate("/homeAdmin");
-                }
-              } else {
-                toast.error(
-                  "Tài khoản không có quyền truy cập vào trang web này, xin thử lại !",
-                  {
-                    position: "top-right",
-                    autoClose: 3000,
-                    hideProgressBar: true,
-                    closeOnClick: true,
-                    pauseOnHover: true,
-                    draggable: true,
-                    progress: undefined,
+            setTimeout(() => {
+              console.log(Cookies.get("its-cms-accessToken"));
+              axios
+                .get("http://localhost:8082/user/getRole", {
+                  headers: {
+                    Authorization: `${Cookies.get("its-cms-accessToken")}`, // Lấy JWT từ cookie
+                  },
+                })
+                .then((response) => {
+                  console.log(response.data);
+
+                  // Kiểm tra quyền của người dùng
+                  if (response.data.trim() === value.role.trim()) {
+                    if (response.data.trim() === "USER") {
+                      navigate("/homeUser");
+                    } else {
+                      navigate("/homeAdmin");
+                    }
+                  } else {
+                    toast.error(
+                      "Tài khoản không có quyền truy cập vào trang web này, xin thử lại!",
+                      {
+                        position: "top-right",
+                        autoClose: 3000,
+                        hideProgressBar: true,
+                        closeOnClick: true,
+                        pauseOnHover: true,
+                        draggable: true,
+                        progress: undefined,
+                      }
+                    );
                   }
-                );
-              }
-            });
-           
+                })
+                .catch((error) => {
+                  console.error("Error fetching user role:", error);
+
+                  // Hiển thị thông báo lỗi
+                  toast.error(
+                    "Đã xảy ra lỗi khi kiểm tra quyền, xin thử lại!",
+                    {
+                      position: "top-right",
+                      autoClose: 3000,
+                      hideProgressBar: true,
+                      closeOnClick: true,
+                      pauseOnHover: true,
+                      draggable: true,
+                      progress: undefined,
+                    }
+                  );
+                });
+            }, 3300); // Trì hoãn 3 giây
           } else {
             toast.error("Tài khoản hoặc mật khẩu sai, thử lại.", {
               position: "top-right",
@@ -135,7 +156,9 @@ function Login() {
                         value={userFormData.values.role}
                         className="form-control"
                       >
-                        <option defaultValue={"ADMIN"} value={"ADMIN"}>ADMIN</option>
+                        <option defaultValue={"ADMIN"} value={"ADMIN"}>
+                          ADMIN
+                        </option>
                         <option value={"USER"}>USER</option>
                       </select>
                     </div>
@@ -206,7 +229,7 @@ function Login() {
                   ) : null}
                   <div class="mb-9">
                     <div class="d-flex justify-content-between mt-8">
-                      <a href="auth-forgot-password-basic.html" class="ms-auto">
+                      <a href="/forgot-password" class="ms-auto">
                         <span>Forgot Password?</span>
                       </a>
                     </div>
