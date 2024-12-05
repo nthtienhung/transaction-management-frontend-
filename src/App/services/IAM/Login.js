@@ -7,10 +7,11 @@ import { FaUser } from "react-icons/fa";
 import { GrKey } from "react-icons/gr";
 import { BiHide, BiShow } from "react-icons/bi";
 import * as Yup from "yup";
-import { toast, ToastContainer } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
-import Cookies from "js-cookie";
-import {jwtDecode} from "jwt-decode";
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import Cookies from 'js-cookie';
+import { jwtDecode } from 'jwt-decode'; // Cú pháp khác cho import cụ thể
+
 function Login() {
   const [showPassword, setShowPassword] = useState(false);
   const [role, setRoles] = useState();
@@ -103,8 +104,10 @@ function Login() {
             draggable: true,
             progress: undefined,
           });
+
          }else if(messageError === "Account has been temporarily locked"){
           toast.error("Tài khoản đã bị khóa do đăng nhập sai quá 5 lần, thử lại sau", {
+
             position: "top-right",
             autoClose: 3000,
             hideProgressBar: true,

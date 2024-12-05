@@ -13,9 +13,7 @@ import {
     TextField,
     IconButton,
     Snackbar,
-    Alert,
-    CardContent,
-    Card,
+    Alert, CardContent, Card,
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { Edit, Lock, Email, Phone, Home, Cake, People, ArrowBack } from "@mui/icons-material";
@@ -53,7 +51,7 @@ const Profile = () => {
                     return;
                 }
 
-                const response = await axios.get("http://localhost:8082/user/profile", {
+                const response = await axios.get("http://localhost:8888/api/v1/user/profile", {
                     headers: { Authorization: token },
                 });
                 setUser(response.data.data);
@@ -63,12 +61,13 @@ const Profile = () => {
                 setLoading(false);
             }
         };
-        
+
         fetchProfile();
     }, [navigate]);
-     
+
     // Validation schema for password change form
     const validationSchema = Yup.object({
+        email: Yup.string().email("Invalid email address").required("Email is required"),
         oldPassword: Yup.string().required("Old password is required"),
         newPassword: Yup.string()
             .required("New password is required")
@@ -81,34 +80,31 @@ const Profile = () => {
         confirmPassword: Yup.string()
             .oneOf([Yup.ref("newPassword"), null], "Passwords must match")
             .required("Confirm password is required"),
-    });
-
-    const validationEditProfileSchema = Yup.object({
-        firstName: Yup.string().required("First Name is required"),
-        lastName: Yup.string().required("Last Name is required"),
+        firstName: Yup.string().required('First Name is required'),
+        lastName: Yup.string().required('Last Name is required'),
         phone: Yup.string()
-            .matches(/^((\s){0,}(0))((9|8|7|3|5|4|2)[0-9]{8,9}(\s){0,})$/, "Phone number is invalid")
-            .required("Phone is required"),
-        address: Yup.string().required("Address is required"),
-        dob: Yup.date()
-            .max(new Date(), "Date of Birth must be in the past")
-            .required("Date of Birth is required"),
+            .matches(/^((\s){0,}(0))((9|8|7|3|5|4|2)[0-9]{8,9}(\s){0,})$/, 'Phone number is invalid')
+            .required('Phone is required'),
+        address: Yup.string().required('Address is required'),
+        dob: Yup.date().required('Date of Birth is required')
     });
 
     const handleClickShowPassword = (field) => {
         setShowPassword({ ...showPassword, [field]: !showPassword[field] });
     };
-
-    const changePasswordFormik = useFormik({
+    const formik = useFormik({
         initialValues: {
             email: user?.email || "",
             oldPassword: "",
             newPassword: "",
             confirmPassword: "",
         },
-        enableReinitialize: true,
+        enableReinitialize: true, // Để cập nhật lại initialValues khi user thay đổi
         validationSchema: validationSchema,
         onSubmit: async (values) => {
+            console.log("Here");
+            console.log("Errors: ", formik.errors);
+            console.log("Touched: ", formik.touched);
             try {
                 const token = Cookies.get("its-cms-accessToken");
                 if (!token) {
@@ -139,7 +135,6 @@ const Profile = () => {
                         message: data.message,
                         severity: "error",
                     });
-                    console.log(values);
                 }
             } catch (error) {
                 setSnackbar({
@@ -151,64 +146,55 @@ const Profile = () => {
         },
     });
 
-    const editProfileFormik = useFormik({
-        initialValues: {
-            firstName: user?.firstName || "",
-            lastName: user?.lastName || "",
-            email: user?.email,
-            phone: user?.phone || "",
-            address: user?.address || "",
-            dob: user?.dob || "",
-        },
-        enableReinitialize: true,
-        validationSchema: validationEditProfileSchema,
-        onSubmit: async (values) => {
-            try {
-                const token = Cookies.get("its-cms-accessToken");
-                if (!token) {
-                    setSnackbar({
-                        open: true,
-                        message: "You are not logged in. Please log in to continue.",
-                        severity: "error",
-                    });
-                    navigate("/");
-                    return;
-                }
-
-                const response = await axios.put(
-                    "http://localhost:8888/api/v1/user/profile",
-                    values,
-                    {
-                        headers: {
-                            "Content-Type": "application/json",
-                            Authorization: token,
-                        },
-                    }
-                );
-
-                if (response.status === 200) {
-                    setSnackbar({
-                        open: true,
-                        message: response.data.message,
-                        severity: "success",
-                    });
-                    setUser(response.data.data); // Update the user state
-                } else {
-                    setSnackbar({
-                        open: true,
-                        message: response.data.message,
-                        severity: "error",
-                    });
-                }
-            } catch (error) {
+    const handleEditProfileSubmit = async () => {
+        try {
+            const token = Cookies.get("its-cms-accessToken");
+            if (!token) {
                 setSnackbar({
                     open: true,
-                    message: "Unable to connect to the server. Please try again later.",
+                    message: "You are not logged in. Please log in to continue.",
                     severity: "error",
                 });
+                navigate("/");
+                return;
             }
-        },
-    });
+            const updatedProfile = {
+                firstName: user?.firstName,
+                lastName: user?.lastName,
+                phone: user?.phone,
+                address: user?.address,
+                dob: user?.dob,
+            };
+
+            const response = await axios.put("http://localhost:8888/api/v1/user/profile", updatedProfile, {
+                headers: { Authorization: token },
+            });
+
+            if (response.status === 200) {
+                setUser(response.data.data);
+                setSnackbar({
+                    open: true,
+                    message: "Profile updated successfully!",
+                    severity: "success",
+                });
+                setOpenEditProfileDialog(false);
+            } else {
+                setUser(response.data.data);
+                setSnackbar({
+                    open: true,
+                    message: "Profile updated fail!",
+                    severity: "error",
+                });
+                setOpenEditProfileDialog(false);
+            }
+        } catch (err) {
+            setSnackbar({
+                open: true,
+                message: "Failed to update profile. Please try again later.",
+                severity: "error",
+            });
+        }
+    };
 
     return (
         <div style={{ background: "linear-gradient(to right, #6a11cb, #2575fc)", minHeight: "100vh", paddingTop: "20px" }}>
@@ -316,9 +302,8 @@ const Profile = () => {
             {/* Change Password Dialog */}
             <Dialog open={openChangePasswordDialog} onClose={() => setOpenChangePasswordDialog(false)} maxWidth="sm" fullWidth>
                 <DialogTitle>Change Password</DialogTitle>
-                <form onSubmit={changePasswordFormik.handleSubmit}>
+                <form onSubmit={formik.handleSubmit}>
                     <Grid container spacing={3} sx={{ padding: 2 }}>
-                        {/* Old Password */}
                         <Grid item xs={12}>
                             <TextField
                                 fullWidth
@@ -326,11 +311,14 @@ const Profile = () => {
                                 name="oldPassword"
                                 label="Old Password"
                                 type={showPassword.oldPassword ? "text" : "password"}
-                                value={changePasswordFormik.values.oldPassword}
-                                onChange={changePasswordFormik.handleChange}
-                                onBlur={changePasswordFormik.handleBlur}
-                                error={changePasswordFormik.touched.oldPassword && Boolean(changePasswordFormik.errors.oldPassword)}
-                                helperText={changePasswordFormik.touched.oldPassword && changePasswordFormik.errors.oldPassword}
+                                value={formik.values.oldPassword}
+                                onChange={formik.handleChange}
+                                onBlur={formik.handleBlur}
+                                error={formik.touched.oldPassword && Boolean(formik.errors.oldPassword)}
+                                helperText={formik.touched.oldPassword && formik.errors.oldPassword}
+                                FormHelperTextProps={{
+                                    style: { minHeight: "24px" },
+                                }}
                                 variant="outlined"
                                 InputProps={{
                                     endAdornment: (
@@ -341,7 +329,6 @@ const Profile = () => {
                                 }}
                             />
                         </Grid>
-
                         {/* New Password */}
                         <Grid item xs={12}>
                             <TextField
@@ -350,11 +337,14 @@ const Profile = () => {
                                 name="newPassword"
                                 label="New Password"
                                 type={showPassword.newPassword ? "text" : "password"}
-                                value={changePasswordFormik.values.newPassword}
-                                onChange={changePasswordFormik.handleChange}
-                                onBlur={changePasswordFormik.handleBlur}
-                                error={changePasswordFormik.touched.newPassword && Boolean(changePasswordFormik.errors.newPassword)}
-                                helperText={changePasswordFormik.touched.newPassword && changePasswordFormik.errors.newPassword}
+                                value={formik.values.newPassword}
+                                onChange={formik.handleChange}
+                                onBlur={formik.handleBlur}
+                                error={formik.touched.newPassword && Boolean(formik.errors.newPassword)}
+                                helperText={formik.touched.newPassword && formik.errors.newPassword}
+                                FormHelperTextProps={{
+                                    style: { minHeight: "24px" },
+                                }}
                                 variant="outlined"
                                 InputProps={{
                                     endAdornment: (
@@ -374,11 +364,14 @@ const Profile = () => {
                                 name="confirmPassword"
                                 label="Confirm Password"
                                 type={showPassword.confirmPassword ? "text" : "password"}
-                                value={changePasswordFormik.values.confirmPassword}
-                                onChange={changePasswordFormik.handleChange}
-                                onBlur={changePasswordFormik.handleBlur}
-                                error={changePasswordFormik.touched.confirmPassword && Boolean(changePasswordFormik.errors.confirmPassword)}
-                                helperText={changePasswordFormik.touched.confirmPassword && changePasswordFormik.errors.confirmPassword}
+                                value={formik.values.confirmPassword}
+                                onChange={formik.handleChange}
+                                onBlur={formik.handleBlur}
+                                error={formik.touched.confirmPassword && Boolean(formik.errors.confirmPassword)}
+                                helperText={formik.touched.confirmPassword && formik.errors.confirmPassword}
+                                FormHelperTextProps={{
+                                    style: { minHeight: "24px" },
+                                }}
                                 variant="outlined"
                                 InputProps={{
                                     endAdornment: (
@@ -392,117 +385,120 @@ const Profile = () => {
 
                         {/* Submit Button */}
                         <Grid item xs={12}>
-                            <Button variant="contained" color="primary" fullWidth type="submit">
+                            <Button
+                                type="submit"
+                                fullWidth
+                                variant="contained"
+                                color="primary"
+                                sx={{ padding: "12px", fontWeight: "bold" }}>
                                 Change Password
                             </Button>
                         </Grid>
                     </Grid>
                 </form>
             </Dialog>
-
             {/* Edit Profile Dialog */}
-            <Dialog
-                open={openEditProfileDialog}
-                onClose={() => setOpenEditProfileDialog(false)}
-                maxWidth="sm"
-                fullWidth
-            >
+            <Dialog open={openEditProfileDialog} onClose={() => setOpenEditProfileDialog(false)} maxWidth="sm" fullWidth>
                 <DialogTitle>Edit Profile</DialogTitle>
-                <form onSubmit={editProfileFormik.handleSubmit}>
-                    <Box padding={3}>
-                        <Grid container spacing={3}>
-                            <Grid item xs={12} sm={6}>
-                                <TextField
-                                    label="First Name"
-                                    name="firstName"
-                                    value={editProfileFormik.values.firstName}
-                                    onChange={editProfileFormik.handleChange}
-                                    onBlur={editProfileFormik.handleBlur}
-                                    fullWidth
-                                    error={editProfileFormik.touched.firstName && Boolean(editProfileFormik.errors.firstName)}
-                                    helperText={editProfileFormik.touched.firstName && editProfileFormik.errors.firstName}
-                                />
-                            </Grid>
-                            <Grid item xs={12} sm={6}>
-                                <TextField
-                                    label="Last Name"
-                                    name="lastName"
-                                    value={editProfileFormik.values.lastName}
-                                    onChange={editProfileFormik.handleChange}
-                                    onBlur={editProfileFormik.handleBlur}
-                                    fullWidth
-                                    error={editProfileFormik.touched.lastName && Boolean(editProfileFormik.errors.lastName)}
-                                    helperText={editProfileFormik.touched.lastName && editProfileFormik.errors.lastName}
-                                />
-                            </Grid>
-                            <Grid item xs={12}>
-                                <TextField
-                                    label="Email"
-                                    name="email"
-                                    value={editProfileFormik.values.email}
-                                    onChange={editProfileFormik.handleChange}
-                                    onBlur={editProfileFormik.handleBlur}
-                                    fullWidth
-                                    disabled={true}
-                                />
-                            </Grid>
-                            <Grid item xs={12}>
-                                <TextField
-                                    label="Phone"
-                                    name="phone"
-                                    value={editProfileFormik.values.phone}
-                                    onChange={editProfileFormik.handleChange}
-                                    onBlur={editProfileFormik.handleBlur}
-                                    fullWidth
-                                    error={editProfileFormik.touched.phone && Boolean(editProfileFormik.errors.phone)}
-                                    helperText={editProfileFormik.touched.phone && editProfileFormik.errors.phone}
-                                />
-                            </Grid>
-                            <Grid item xs={12}>
-                                <TextField
-                                    label="Address"
-                                    name="address"
-                                    value={editProfileFormik.values.address}
-                                    onChange={editProfileFormik.handleChange}
-                                    onBlur={editProfileFormik.handleBlur}
-                                    fullWidth
-                                    error={editProfileFormik.touched.address && Boolean(editProfileFormik.errors.address)}
-                                    helperText={editProfileFormik.touched.address && editProfileFormik.errors.address}
-                                />
-                            </Grid>
-                            <Grid item xs={12}>
-                                <TextField
-                                    label="Date of Birth"
-                                    name="dob"
-                                    type="date"
-                                    value={editProfileFormik.values.dob}
-                                    onChange={editProfileFormik.handleChange}
-                                    onBlur={editProfileFormik.handleBlur}
-                                    fullWidth
-                                    error={editProfileFormik.touched.dob && Boolean(editProfileFormik.errors.dob)}
-                                    helperText={editProfileFormik.touched.dob && editProfileFormik.errors.dob}
-                                    InputLabelProps={{
-                                        shrink: true,
-                                    }}
-                                />
-                            </Grid>
-                        </Grid>
-                        <Box textAlign="right" mt={3}>
-                            <Button type="submit" variant="contained" color="primary">
-                                Save
-                            </Button>
-                        </Box>
+                <div>
+                    <Box sx={{ maxWidth: "800px", margin: "20px auto", padding: "20px" }}>
+                        <Paper elevation={3} sx={{ padding: "20px" }}>
+                            <Box component="form" display="flex" flexDirection="column" gap={3}>
+                                <Grid container spacing={3}>
+                                    <Grid item xs={12} sm={6}>
+                                        <TextField
+                                            label="First Name"
+                                            name="firstName"
+                                            value={user?.firstName}
+                                            fullWidth
+                                            onChange={(e) => setUser({ ...user, firstName: e.target.value })}
+                                            required
+                                        />
+                                    </Grid>
+                                    <Grid item xs={12} sm={6}>
+                                        <TextField
+                                            label="Last Name"
+                                            name="lastName"
+                                            value={user?.lastName}
+                                            fullWidth
+                                            onChange={(e) => setUser({ ...user, lastName: e.target.value })}
+                                            required
+                                        />
+                                    </Grid>
+                                    <Grid item xs={12}>
+                                        <TextField
+                                            label="Email"
+                                            name="email"
+                                            type="email"
+                                            value={user?.email}
+                                            fullWidth
+                                            disabled
+                                            required
+                                        />
+                                    </Grid>
+                                    <Grid item xs={12}>
+                                        <TextField
+                                            label="Phone"
+                                            name="phone"
+                                            value={user?.phone}
+                                            fullWidth
+                                            onChange={(e) => setUser({ ...user, phone: e.target.value })}
+                                            required
+                                        />
+                                    </Grid>
+                                    <Grid item xs={12}>
+                                        <TextField
+                                            label="Address"
+                                            name="address"
+                                            value={user?.address}
+                                            fullWidth
+                                            onChange={(e) => setUser({ ...user, address: e.target.value })}
+                                            required
+                                        />
+                                    </Grid>
+                                    <Grid item xs={12}>
+                                        <TextField
+                                            label="Date of Birth"
+                                            name="dob"
+                                            type="date"
+                                            value={user?.dob}
+                                            fullWidth
+                                            InputLabelProps={{ shrink: true }}
+                                            onChange={(e) => setUser({ ...user, dob: e.target.value })}
+                                            required
+                                        />
+                                    </Grid>
+                                </Grid>
+                                <Box display="flex" justifyContent="flex-end" mt={2}>
+                                    <Button
+                                        variant="contained"
+                                        color="success"
+                                        onClick={handleEditProfileSubmit} // Thực hiện submit
+                                    >
+                                        Save
+                                    </Button>
+                                </Box>
+                            </Box>
+                        </Paper>
                     </Box>
-                </form>
+                </div>
             </Dialog>
 
-            {/* Snackbar for showing alerts */}
+
+
+            {/* Snackbar for success or error messages */}
             <Snackbar
                 open={snackbar.open}
                 autoHideDuration={6000}
                 onClose={() => setSnackbar({ ...snackbar, open: false })}
             >
-                <Alert severity={snackbar.severity}>{snackbar.message}</Alert>
+                <Alert
+                    onClose={() => setSnackbar({ ...snackbar, open: false })}
+                    severity={snackbar.severity}
+                    sx={{ width: "100%" }}
+                >
+                    {snackbar.message}
+                </Alert>
             </Snackbar>
         </div>
     );

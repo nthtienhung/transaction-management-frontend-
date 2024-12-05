@@ -23880,7 +23880,7 @@ html:not(.layout-footer-fixed) .content-wrapper {
 }
 .dasboard-table{
   width: 3000px; /* Chiều rộng của item */
-  height: 438px; /* Chiều cao của item */
+  height: auto; /* Chiều cao của item */
   border: 2px solid var(--bs-black); /* Viền màu đen với độ dày 4px */
   border-radius: 10px; /* Bo góc */
   padding-top: 10px;

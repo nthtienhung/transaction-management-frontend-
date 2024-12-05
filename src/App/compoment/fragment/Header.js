@@ -14,7 +14,7 @@ function Header() {
       const roleUser = decodeToken.role;
       setRoles(roleUser);
       axios
-      .get("http://localhost:8082/user/profile", {
+      .get("http://localhost:8888/api/v1/user/profile", {
         headers: {
           Authorization: `${Cookies.get("its-cms-accessToken")}`,
         },
