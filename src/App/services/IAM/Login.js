@@ -1,6 +1,6 @@
 import axios from "axios";
 import { useFormik } from "formik";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { PiPlugFill } from "react-icons/pi";
 import { FaUser } from "react-icons/fa";
@@ -10,42 +10,104 @@ import * as Yup from "yup";
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import Cookies from 'js-cookie';
+import { jwtDecode } from 'jwt-decode'; // Cú pháp khác cho import cụ thể
+
 function Login() {
   const [showPassword, setShowPassword] = useState(false);
+  const [role, setRoles] = useState();
   const navigate = useNavigate();
   const togglePasswordVisibility = () => {
     setShowPassword((prevState) => !prevState);
   };
   const validationSchema = Yup.object({
-    email: Yup.string().required(
-      "Email không được để trống"
-    ), // Validate không null
+    email: Yup.string().required("Email không được để trống"), // Validate không null
     password: Yup.string().required("Password không được để trống"), // Validate không null
   });
   const userFormData = useFormik({
     initialValues: {
+      role: "ROLE_ADMIN",
       email: "",
       password: "",
-      
     },
     validationSchema,
     onSubmit: async (value) => {
-      axios.post("http://localhost:8081/auth/login",value).then(res =>{
-        if(res.status == 200){
-          toast.success(`Đăng nhập thành công`, {
+      console.log(value);
+      axios
+        .post("http://localhost:8888/api/v1/auth/login", value)
+        .then((res) => {
+          if (res.status == 200) {
+            Cookies.remove("its-cms-accessToken");
+            Cookies.set("its-cms-accessToken", res.data.data.csrfToken, {
+              expires: 30 / (24 * 60), // 30 phút = 30 phút / (24 * 60 phút trong một ngày)
+              path: "/",
+            });
+            setTimeout(() => {
+            console.log(Cookies.get("its-cms-accessToken"));
+            const decodeToken = jwtDecode(Cookies.get("its-cms-accessToken"));
+            const role = decodeToken.role;
+            console.log(role);
+            if(value.role === role){
+              setTimeout(() =>{
+                toast.success("Đăng nhập thành công", {
+                  position: "top-right",
+                  autoClose: 2000, // Tự động đóng sau 3 giây
+                  hideProgressBar: true,
+                  closeOnClick: true,
+                  pauseOnHover: true,
+                  draggable: true,
+                  progress: undefined,
+                });
+              },200);
+             setTimeout(() => {
+              if(role === "ROLE_ADMIN"){
+                navigate("/homeAdmin");
+              }else{
+                navigate("/homeUser")
+              }
+             }, 2000);
+
+            }else{
+              toast.error("Đăng nhập thất bại, quyền hạn người dùng không được phép vào trang web này", {
+                position: "top-right",
+                autoClose: 2000, // Tự động đóng sau 3 giây
+                hideProgressBar: true,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+              });
+            }
+            }, 100); 
+           
+          } else {
+            toast.error("Tài khoản hoặc mật khẩu sai, thử lại.", {
+              position: "top-right",
+              autoClose: 3000,
+              hideProgressBar: true,
+              closeOnClick: true,
+              pauseOnHover: true,
+              draggable: true,
+              progress: undefined,
+            });
+          }
+        })
+        .catch((error) => {
+          const messageError = error.response.data.message;
+          console.error("Error:", error.response.data.message);
+         if(messageError === "Email or password is wrong"){
+          toast.error("Tài khoản hoặc mật khẩu sai, thử lại.", {
             position: "top-right",
-            autoClose: 3000, // Đặt thời gian autoClose là 5 giây
+            autoClose: 2000,
             hideProgressBar: true,
             closeOnClick: true,
             pauseOnHover: true,
             draggable: true,
             progress: undefined,
           });
-          Cookies.set('its-cms-accessToken', res.data.data.csrfToken, { expires: 7, path: '/' });
-          console.log(Cookies.get('its-cms-accessToken'));
-          navigate("/profile")
-        }else {
-          toast.error("Tài khoản hoặc mật khẩu sai, thử lại.", {
+
+         }else if(messageError === "Account has been temporarily locked"){
+          toast.error("Tài khoản đã bị khóa do đăng nhập sai quá 5 lần, thử lại sau", {
+
             position: "top-right",
             autoClose: 3000,
             hideProgressBar: true,
@@ -54,25 +116,33 @@ function Login() {
             draggable: true,
             progress: undefined,
           });
-        }
-      })
-      .catch((error) => {
-        console.error("Error:", error);
-        toast.error("Tài khoản hoặc mật khẩu sai, thử lại.", {
-          position: "top-right",
-          autoClose: 3000,
-          hideProgressBar: true,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
+         } else if(messageError === "Email is invalid (abc@gmail.com)."){
+          toast.error("Tài khoản sai định dạng (abc@gmail.com), thử lại.", {
+            position: "top-right",
+            autoClose: 3000,
+            hideProgressBar: true,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+          });
+         } else{
+          toast.error("Tài khoản hoặc mật khẩu sai, thử lại", {
+            position: "top-right",
+            autoClose: 3000,
+            hideProgressBar: true,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+          });
+         }
         });
-      });
     },
   });
   return (
-    <> 
-    <ToastContainer></ToastContainer>
+    <>
+      <ToastContainer></ToastContainer>
 
       <div class="container-xxl backgroundLayout">
         <div class="authentication-wrapper authentication-basic container-p-y">
@@ -98,10 +168,13 @@ function Login() {
                         onChange={userFormData.handleChange}
                         id="role"
                         name="role"
+                        value={userFormData.values.role}
                         className="form-control"
                       >
-                        <option value={"ADMIN"}>ADMIN</option>
-                        <option value={"USER"}>USER</option>
+                        <option defaultValue={"ROLE_ADMIN"} value={"ROLE_ADMIN"}>
+                          ADMIN
+                        </option>
+                        <option value={"ROLE_USER"}>USER</option>
                       </select>
                     </div>
                   </div>
@@ -120,8 +193,7 @@ function Login() {
                       autofocus
                     />
                   </div>
-                  {userFormData.touched.email &&
-                  userFormData.errors.email ? (
+                  {userFormData.touched.email && userFormData.errors.email ? (
                     <div
                       style={{
                         color: "red",

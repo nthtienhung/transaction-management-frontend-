@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from "react";
-import {useLocation, useNavigate} from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { verifyOtp, generateOtp } from "../Api/authService";
-import Toast from "./Toast";
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+
 
 const VerifyOtp = () => {
     const location = useLocation();
@@ -9,10 +11,9 @@ const VerifyOtp = () => {
         email: location.state?.email || "",
         otp: "",
     });
-    const [message, setMessage] = useState("");
-    const [messageType, setMessageType] = useState("");
     const [countdown, setCountdown] = useState(120);
     const [isOtpExpired, setIsOtpExpired] = useState(false);
+    const [isSubmitting, setIsSubmitting] = useState(false);
     const navigate = useNavigate();
 
     const handleChange = (e) => {
@@ -21,27 +22,38 @@ const VerifyOtp = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        setIsSubmitting(true);
+
         try {
-            const response = await verifyOtp(formData);
-            setMessage(response.data.message);
-            setMessageType("success");
-            navigate("/");
+            await verifyOtp(formData);
+            toast.success("OTP verified successfully!", {
+                position: "top-right",
+                autoClose: 3000,
+            });
+            setTimeout(() => navigate("/"), 3000);
         } catch (error) {
-            setMessage(error.response?.data?.message || "An error occurred.");
-            setMessageType("error");
+            toast.error(error.response?.data?.message || "OTP verification failed. Please try again.", {
+                position: "top-right",
+                autoClose: 5000,
+            });
+            setIsSubmitting(false);
         }
     };
 
     const handleGenerateOtp = async () => {
         try {
             await generateOtp(formData.email);
-            setMessage("A new OTP has been sent to your email.");
-            setMessageType("success");
+            toast.success("A new OTP has been sent to your email.", {
+                position: "top-right",
+                autoClose: 3000,
+            });
             setCountdown(120);
             setIsOtpExpired(false);
         } catch (error) {
-            setMessage(error.response?.data?.message || "Failed to generate OTP.");
-            setMessageType("error");
+            toast.error(error.response?.data?.message || "Failed to resend OTP. Please try again.", {
+                position: "top-right",
+                autoClose: 5000,
+            });
         }
     };
 
@@ -59,10 +71,13 @@ const VerifyOtp = () => {
 
     useEffect(() => {
         if (!formData.email) {
-            setMessage("Email is missing. Please register again.");
-            setMessageType("error");
+            toast.error("No email found. Please return to the registration page.", {
+                position: "top-right",
+                autoClose: 5000,
+            });
+            setTimeout(() => navigate("/"), 5000);
         }
-    }, [formData.email]);
+    }, [formData.email, navigate]);
 
     return (
         <div className="d-flex justify-content-center align-items-center vh-100">
@@ -76,11 +91,15 @@ const VerifyOtp = () => {
                             placeholder="OTP"
                             onChange={handleChange}
                             required
-                            disabled={isOtpExpired}
+                            disabled={isOtpExpired || isSubmitting}
                         />
                     </div>
-                    <button type="submit" className="btn btn-primary w-100" disabled={isOtpExpired}>
-                        Verify
+                    <button
+                        type="submit"
+                        className="btn btn-primary w-100"
+                        disabled={isOtpExpired || isSubmitting}
+                    >
+                        {isSubmitting ? "Verifying..." : "Verify"}
                     </button>
                 </form>
                 <div className="text-center mt-2">
@@ -92,14 +111,8 @@ const VerifyOtp = () => {
                         <p>Time left: {countdown}s</p>
                     )}
                 </div>
-                {message && (
-                    <Toast
-                        message={message}
-                        type={messageType}
-                        onClose={() => setMessage("")}
-                    />
-                )}
             </div>
+            <ToastContainer />
         </div>
     );
 };

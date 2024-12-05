@@ -1,4 +1,70 @@
+import axios from "axios";
+import { useEffect, useState } from "react";
+import Cookies from "js-cookie";
+import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
+import {jwtDecode} from "jwt-decode";
 function Header() {
+  const [users, setUsers] = useState({ firstName: "", lastName: "" });
+  const [role, setRoles] = useState();
+  const navigate = useNavigate();
+  useEffect(() => {
+    if (Cookies.get("its-cms-accessToken")) {
+      const decodeToken = jwtDecode(Cookies.get("its-cms-accessToken"));
+      const roleUser = decodeToken.role;
+      setRoles(roleUser);
+      axios
+      .get("http://localhost:8888/api/v1/user/profile", {
+        headers: {
+          Authorization: `${Cookies.get("its-cms-accessToken")}`,
+        },
+      })
+      .then((res) => {
+        setUsers(res.data.data);
+      })
+    }else{
+      toast.error("Tài khoản truy cập trái phép, xin vui lòng đăng nhập !", {
+        position: "top-right",
+        autoClose: 3000,
+        hideProgressBar: true,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+      });
+      navigate("/");
+    }
+  }, []);
+ 
+  
+  const logout = () => {
+    console.log(Cookies.get("its-cms-accessToken"))
+    axios.get("http://localhost:8888/api/v1/auth/logoutAccount", {
+      headers: {
+        Authorization: `${Cookies.get("its-cms-accessToken")}`,
+      },
+    })
+  .then(() => {
+    setTimeout(()=>{
+      toast.success("Hẹn gặp lại ❤️❤️❤️!", {
+        position: "top-right",
+        autoClose: 3000,
+        hideProgressBar: true,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+      });
+    },500)
+    setTimeout(() =>{
+      Cookies.remove("its-cms-accessToken");
+      navigate("/");
+    },1000)
+  })
+  .catch((error) => {
+    console.error("Logout thất bại:", error);
+  });
+  };
   return (
     <>
       <nav
@@ -57,8 +123,13 @@ function Header() {
                         </div>
                       </div>
                       <div class="flex-grow-1">
-                        <h6 class="mb-0">John Doe</h6>
-                        <small class="text-muted">Admin</small>
+                        {users ? (
+                          <h6 className="mb-0">
+                            {users.firstName || "Chưa có dữ liệu"}
+                          </h6>
+                        ) : (
+                          <p>Đang tải dữ liệu...</p>
+                        )}
                       </div>
                     </div>
                   </a>
@@ -67,7 +138,12 @@ function Header() {
                   <hr class="dropdown-divider" />
                 </li>
                 <li>
-                  <a class="dropdown-item" href="#">
+                  <p class="dropdown-item">
+                    <i>Quyền hạn: {role}</i> 
+                  </p>
+                </li>
+                <li>
+                  <a class="dropdown-item" href="/profile">
                     <i class="bx bx-user bx-sm me-2"></i> My Profile
                   </a>
                 </li>
@@ -78,16 +154,18 @@ function Header() {
                 </li>
                 <li>
                   <a class="dropdown-item" href="#">
-                    <i class="bx bx-credit-card bx-sm me-2"></i> Billing Plan
-                    <span class="badge bg-danger rounded-pill ms-2">4</span>
+                    <i class="bx bx-credit-card bx-sm me-2"></i> Wallet
+                    {/* <span class="badge bg-danger rounded-pill ms-2">4</span> */}
                   </a>
                 </li>
                 <li>
                   <hr class="dropdown-divider" />
                 </li>
                 <li>
-                  <a class="dropdown-item" href="javascript:void(0);">
-                    <i class="bx bx-power-off bx-sm me-2"></i> Log Out
+                  <a class="dropdown-item">
+                    <button onClick={() => logout()}>
+                      <i class="bx bx-power-off bx-sm me-2"></i> Log Out
+                    </button>
                   </a>
                 </li>
               </ul>
