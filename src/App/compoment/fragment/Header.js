@@ -39,6 +39,9 @@ function Header() {
   
   const logout = () => {
     console.log(Cookies.get("its-cms-accessToken"))
+    if(!Cookies.get("its-cms-accessToken")){
+      navigate("/");
+    }
     axios.get("http://localhost:8888/api/v1/auth/logoutAccount", {
       headers: {
         Authorization: `${Cookies.get("its-cms-accessToken")}`,
