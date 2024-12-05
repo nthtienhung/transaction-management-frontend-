@@ -1,7 +1,8 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { register, generateOtp } from "../api/authService";
-import Toast from "./Toast";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const Register = () => {
   const [formData, setFormData] = useState({
@@ -15,8 +16,7 @@ const Register = () => {
   });
   const [errors, setErrors] = useState({});
   const [showPassword, setShowPassword] = useState(false);
-  const [message, setMessage] = useState("");
-  const [messageType, setMessageType] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const navigate = useNavigate();
 
   const regexPatterns = {
@@ -64,15 +64,22 @@ const Register = () => {
       return;
     }
 
+    setIsSubmitting(true);
+
     try {
       await register(formData);
       await generateOtp(formData.email);
-      setMessage("Registration successful. OTP has been sent to your email.");
-      setMessageType("success");
-      navigate("/verify", { state: { email: formData.email } });
+      toast.success("Registration successful. OTP has been sent to your email.", {
+        position: "top-right",
+        autoClose: 5000,
+      });
+      setTimeout(() => navigate("/verify", { state: { email: formData.email } }), 1500);
     } catch (error) {
-      setMessage(error.response?.data?.message || "An error occurred.");
-      setMessageType("error");
+      toast.error(error.response?.data?.message || "An error occurred during registration.", {
+        position: "top-right",
+        autoClose: 5000,
+      });
+      setIsSubmitting(false);
     }
   };
 
@@ -94,7 +101,9 @@ const Register = () => {
                   onChange={handleChange}
                   required
               />
-              {errors.firstName && <div className="invalid-feedback">{errors.firstName}</div>}
+              {errors.firstName && (
+                  <div className="invalid-feedback">{errors.firstName}</div>
+              )}
             </div>
             <div className="mb-3">
               <label htmlFor="lastName" className="form-label">
@@ -109,7 +118,9 @@ const Register = () => {
                   onChange={handleChange}
                   required
               />
-              {errors.lastName && <div className="invalid-feedback">{errors.lastName}</div>}
+              {errors.lastName && (
+                  <div className="invalid-feedback">{errors.lastName}</div>
+              )}
             </div>
             <div className="mb-3">
               <label htmlFor="email" className="form-label">
@@ -124,7 +135,9 @@ const Register = () => {
                   onChange={handleChange}
                   required
               />
-              {errors.email && <div className="invalid-feedback">{errors.email}</div>}
+              {errors.email && (
+                  <div className="invalid-feedback">{errors.email}</div>
+              )}
             </div>
             <label htmlFor="password" className="form-label">
               Password
@@ -142,12 +155,14 @@ const Register = () => {
               <button
                   type="button"
                   className="btn btn-sm btn-outline-secondary position-absolute end-0 top-0"
-                  style={{height: "100%", width: "50px"}}
+                  style={{ height: "100%", width: "50px" }}
                   onClick={() => setShowPassword(!showPassword)}
               >
                 {showPassword ? "Hide" : "Show"}
               </button>
-              {errors.password && <div className="invalid-feedback">{errors.password}</div>}
+              {errors.password && (
+                  <div className="invalid-feedback">{errors.password}</div>
+              )}
             </div>
 
             <div className="mb-3">
@@ -190,20 +205,23 @@ const Register = () => {
                   onChange={handleChange}
                   required
               />
-              {errors.phone && <div className="invalid-feedback">{errors.phone}</div>}
+              {errors.phone && (
+                  <div className="invalid-feedback">{errors.phone}</div>
+              )}
             </div>
-            <button type="submit" className="btn btn-primary w-100 mb-2">
-              Register
+            <button
+                type="submit"
+                className="btn btn-primary w-100 mb-2"
+                disabled={isSubmitting}
+            >
+              {isSubmitting ? "Registering..." : "Register"}
             </button>
           </form>
-          <button
-              className="btn btn-link w-100"
-              onClick={() => navigate("/")}
-          >
+          <button className="btn btn-link w-100" onClick={() => navigate("/")}>
             Back to Login
           </button>
-          {message && <Toast message={message} type={messageType} onClose={() => setMessage("")} />}
         </div>
+        <ToastContainer position="bottom-right" autoClose={5000} />
       </div>
   );
 };
