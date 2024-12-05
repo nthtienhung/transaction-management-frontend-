@@ -4,6 +4,7 @@ import { register, generateOtp } from "../Api/authService";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
+// component Register
 const Register = () => {
   const [formData, setFormData] = useState({
     firstName: "",
