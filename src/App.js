@@ -10,7 +10,6 @@ import Profile from "./App/services/Business/User/Profile";
 import ForgotPassword from "./App/services/IAM/ForgotPassword";
 import VerifyOtp from "./App/services/IAM/VerifyOtp";
 
-
 function App() {
   return(
 <>
