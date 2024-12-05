@@ -13,11 +13,10 @@ function HomeAdmin(){
             </div>
             <div class="layout-page">
                 <Header></Header>
-                <Footer></Footer>
                 <div class="content-wrapper">
                     
                 </div>
-                
+                <Footer></Footer>
             </div>
         </div>
         </>

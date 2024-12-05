@@ -22322,7 +22322,7 @@ html:not(.layout-menu-fixed) .menu-inner-shadow {
   align-items: stretch;
 }
 .layout-container {
-  width: 60%;
+  width: 30%;
   display: flex;
   flex: 1 1 auto;
   align-items: stretch;
@@ -23781,4 +23781,128 @@ html:not(.layout-footer-fixed) .content-wrapper {
 }
 .menu-item:hover {
   background-color: #f1f1f1; /* Thêm hiệu ứng khi hover */
+}
+.dropdown-menu .dropdown-item:hover {
+  background-color: #f0f0f0; /* Màu nền khi hover */
+  color: #333; /* Màu chữ khi hover */
+  transition: background-color 0.3s ease, color 0.3s ease; /* Hiệu ứng mượt */
+}
+.navbar-nav .nav-link:hover .avatar img {
+  transform: scale(1.1); /* Phóng to nhẹ */
+  transition: transform 0.3s ease; /* Hiệu ứng mượt */
+}
+.dropdown-menu .dropdown-item i {
+  transition: transform 0.3s ease; /* Hiệu ứng khi hover */
+}
+
+.dropdown-menu .dropdown-item:hover i {
+  transform: translateX(5px); /* Dịch chuyển icon khi hover */
+}
+.nav-item.dropdown:hover .dropdown-menu {
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Thêm bóng đổ */
+  background-color: #fff; /* Đảm bảo menu sáng rõ hơn */
+}
+.dropdown-menu .dropdown-item:last-child:hover {
+  background-color: #ff4d4d; /* Màu đỏ */
+  color: white; /* Chữ trắng */
+  border: 1px solid #d63333; /* Đường viền */
+}
+.menu-item {
+  transition: background-color 0.3s ease, color 0.3s ease; /* Hiệu ứng mượt */
+}
+
+.menu-item:hover {
+  background-color: #f4f4f4; /* Thay đổi màu nền khi hover */
+  color: #007bff; /* Thay đổi màu chữ khi hover */
+}
+
+.menu-link {
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+  padding: 10px;
+  border-radius: 4px; /* Bo góc */
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.menu-link:hover {
+  background-color: #007bff; /* Màu nền khi hover */
+  color: #fff; /* Màu chữ khi hover */
+}
+
+.menu-sub .menu-item {
+  padding-left: 20px; /* Thụt vào cho menu con */
+}
+
+.menu-sub .menu-item:hover {
+  background-color: #e0e0e0; /* Màu nền khác cho menu con khi hover */
+}
+.menu-link:hover {
+  background-color: #007bff; /* Màu nền khi hover */
+  color: #fff; /* Màu chữ khi hover */
+  border-left: 4px solid #0056b3; /* Border bên trái */
+}
+
+.menu-icon {
+  transition: transform 0.3s ease;
+}
+
+.menu-item:hover .menu-icon {
+  transform: scale(1.2); /* Phóng to icon khi hover */
+}
+.menu-sub .menu-item:hover {
+  background-color: #ececec;
+  color: #333;
+}
+.dasboard {
+  display: flex; /* Sử dụng flexbox để sắp xếp các phần tử nằm ngang */
+  gap: 40px; /* Khoảng cách giữa các item */
+  padding-top: 10px;
+  padding-left: 180px;
+}
+.content-dashboard{
+  display: flex; /* Sử dụng flexbox để sắp xếp các phần tử nằm ngang */
+  gap: 20px; /* Khoảng cách giữa các item */
+  padding-top: 20px;
+  padding-left: 30px;
+}
+.dasboard-item {
+  width: 180px; /* Chiều rộng của item */
+  height: 100px; /* Chiều cao của item */
+  border: 2px solid var(--bs-black); /* Viền màu đen với độ dày 4px */
+  border-radius: 10px; /* Bo góc */
+  background-color: #f8f9fa; /* Màu nền tùy chọn (giúp viền nổi bật) */
+  text-align: center;
+  padding-top: 10px;
+}
+.item-value{
+  color: red;
+}
+.dasboard-table{
+  width: 3000px; /* Chiều rộng của item */
+  height: 438px; /* Chiều cao của item */
+  border: 2px solid var(--bs-black); /* Viền màu đen với độ dày 4px */
+  border-radius: 10px; /* Bo góc */
+  padding-top: 10px;
+}
+.label-dasboard{
+  color: var(--bs-black) ;
+}
+table {
+  width: 100%;
+  border-collapse: collapse;
+  border-radius: 10px; /* Bo góc */
+}
+
+td {
+  padding: 8px 15px;
+  border: 1px solid var(--bs-black);
+}
+
+tr:nth-child(odd) {
+  background-color: #777777; /* Màu xám */
+}
+
+tr:nth-child(even) {
+  background-color: #999999; /* Màu sữa nhạt */
 }

@@ -1,50 +1,118 @@
 import axios from "axios";
 import { useFormik } from "formik";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { PiPlugFill } from "react-icons/pi";
 import { FaUser } from "react-icons/fa";
 import { GrKey } from "react-icons/gr";
 import { BiHide, BiShow } from "react-icons/bi";
 import * as Yup from "yup";
-import { toast, ToastContainer } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
-import Cookies from 'js-cookie';
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import Cookies from "js-cookie";
 function Login() {
   const [showPassword, setShowPassword] = useState(false);
+  const [role, setRoles] = useState();
   const navigate = useNavigate();
   const togglePasswordVisibility = () => {
     setShowPassword((prevState) => !prevState);
   };
   const validationSchema = Yup.object({
-    email: Yup.string().required(
-      "Email không được để trống"
-    ), // Validate không null
+    email: Yup.string().required("Email không được để trống"), // Validate không null
     password: Yup.string().required("Password không được để trống"), // Validate không null
   });
   const userFormData = useFormik({
     initialValues: {
+      role: "ADMIN",
       email: "",
       password: "",
-      
     },
     validationSchema,
     onSubmit: async (value) => {
-      axios.post("http://localhost:8888/api/v1/auth/login",value).then(res =>{
-        if(res.status == 200){
-          toast.success(`Đăng nhập thành công`, {
-            position: "top-right",
-            autoClose: 3000, // Đặt thời gian autoClose là 5 giây
-            hideProgressBar: true,
-            closeOnClick: true,
-            pauseOnHover: true,
-            draggable: true,
-            progress: undefined,
-          });
-          Cookies.set('its-cms-accessToken', res.data.data.csrfToken, { expires: 7, path: '/' });
-          console.log(Cookies.get('its-cms-accessToken'));
-          navigate("/profile")
-        }else {
+      console.log(value);
+      axios
+        .post("http://localhost:8888/api/v1/auth/login", value)
+        .then((res) => {
+          if (res.status == 200) {
+            toast.success("Đăng nhập thành công", {
+              position: "top-right",
+              autoClose: 3000, // Tự động đóng sau 3 giây
+              hideProgressBar: true,
+              closeOnClick: true,
+              pauseOnHover: true,
+              draggable: true,
+              progress: undefined,
+            });
+            Cookies.remove("its-cms-accessToken");
+            Cookies.set("its-cms-accessToken", res.data.data.csrfToken, {
+              expires: 30 / (24 * 60), // 30 phút = 30 phút / (24 * 60 phút trong một ngày)
+              path: "/",
+            });
+            setTimeout(() => {
+              console.log(Cookies.get("its-cms-accessToken"));
+              axios
+                .get("http://localhost:8082/user/getRole", {
+                  headers: {
+                    Authorization: `${Cookies.get("its-cms-accessToken")}`, // Lấy JWT từ cookie
+                  },
+                })
+                .then((response) => {
+                  console.log(response.data);
+
+                  // Kiểm tra quyền của người dùng
+                  if (response.data.trim() === value.role.trim()) {
+                    if (response.data.trim() === "USER") {
+                      navigate("/homeUser");
+                    } else {
+                      navigate("/homeAdmin");
+                    }
+                  } else {
+                    toast.error(
+                      "Tài khoản không có quyền truy cập vào trang web này, xin thử lại!",
+                      {
+                        position: "top-right",
+                        autoClose: 3000,
+                        hideProgressBar: true,
+                        closeOnClick: true,
+                        pauseOnHover: true,
+                        draggable: true,
+                        progress: undefined,
+                      }
+                    );
+                  }
+                })
+                .catch((error) => {
+                  console.error("Error fetching user role:", error);
+
+                  // Hiển thị thông báo lỗi
+                  toast.error(
+                    "Đã xảy ra lỗi khi kiểm tra quyền, xin thử lại!",
+                    {
+                      position: "top-right",
+                      autoClose: 3000,
+                      hideProgressBar: true,
+                      closeOnClick: true,
+                      pauseOnHover: true,
+                      draggable: true,
+                      progress: undefined,
+                    }
+                  );
+                });
+            }, 3300); // Trì hoãn 3 giây
+          } else {
+            toast.error("Tài khoản hoặc mật khẩu sai, thử lại.", {
+              position: "top-right",
+              autoClose: 3000,
+              hideProgressBar: true,
+              closeOnClick: true,
+              pauseOnHover: true,
+              draggable: true,
+              progress: undefined,
+            });
+          }
+        })
+        .catch((error) => {
+          console.error("Error:", error);
           toast.error("Tài khoản hoặc mật khẩu sai, thử lại.", {
             position: "top-right",
             autoClose: 3000,
@@ -54,25 +122,12 @@ function Login() {
             draggable: true,
             progress: undefined,
           });
-        }
-      })
-      .catch((error) => {
-        console.error("Error:", error);
-        toast.error("Tài khoản hoặc mật khẩu sai, thử lại.", {
-          position: "top-right",
-          autoClose: 3000,
-          hideProgressBar: true,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
         });
-      });
     },
   });
   return (
-    <> 
-    <ToastContainer></ToastContainer>
+    <>
+      <ToastContainer></ToastContainer>
 
       <div class="container-xxl backgroundLayout">
         <div class="authentication-wrapper authentication-basic container-p-y">
@@ -98,9 +153,12 @@ function Login() {
                         onChange={userFormData.handleChange}
                         id="role"
                         name="role"
+                        value={userFormData.values.role}
                         className="form-control"
                       >
-                        <option value={"ADMIN"}>ADMIN</option>
+                        <option defaultValue={"ADMIN"} value={"ADMIN"}>
+                          ADMIN
+                        </option>
                         <option value={"USER"}>USER</option>
                       </select>
                     </div>
@@ -120,8 +178,7 @@ function Login() {
                       autofocus
                     />
                   </div>
-                  {userFormData.touched.email &&
-                  userFormData.errors.email ? (
+                  {userFormData.touched.email && userFormData.errors.email ? (
                     <div
                       style={{
                         color: "red",

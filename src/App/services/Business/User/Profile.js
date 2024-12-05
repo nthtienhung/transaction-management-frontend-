@@ -63,10 +63,10 @@ const Profile = () => {
                 setLoading(false);
             }
         };
-
+        
         fetchProfile();
     }, [navigate]);
-
+     
     // Validation schema for password change form
     const validationSchema = Yup.object({
         oldPassword: Yup.string().required("Old password is required"),
@@ -219,7 +219,7 @@ const Profile = () => {
                         variant="outlined"
                         color="primary"
                         sx={{ marginBottom: 2 }}
-                        onClick={() => navigate("/home")}
+                        onClick={() => navigate("/homeUser")}
                     >
                         Back to Home
                     </Button>
