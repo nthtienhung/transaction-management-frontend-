@@ -1,10 +1,7 @@
 import { useEffect, useRef, useState } from "react";
-import PerfectScrollbar from "perfect-scrollbar";
-import axios from "axios";
 import Cookies from "js-cookie";
 import {jwtDecode} from "jwt-decode";
 import { useNavigate } from "react-router-dom";
-import { toast } from "react-toastify";
 
 function Navbar({ setActiveContent }) {
     const [isDashboardOpen, setIsDashboardOpen] = useState(false); // Quản lý trạng thái mở menu Dashboard
