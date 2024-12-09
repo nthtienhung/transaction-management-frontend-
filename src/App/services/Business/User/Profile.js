@@ -53,7 +53,7 @@ const Profile = () => {
                     return;
                 }
 
-                const response = await axios.get("http://localhost:8888/api/v1/user/profile", {
+                const response = await axios.get("http://localhost:8082/user/profile", {
                     headers: { Authorization: token },
                 });
                 setUser(response.data.data);
