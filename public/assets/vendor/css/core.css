@@ -23693,9 +23693,7 @@ html:not(.layout-footer-fixed) .content-wrapper {
 .navbar.bg-light .navbar-nav > .nav > .nav-item > .nav-link.disabled {
   color: #99a0a6 !important;
 }
-.navbar.bg-light .navbar-nav .show > .nav-link,
-.navbar.bg-light .navbar-nav .active > .nav-link,
-.navbar.bg-light .navbar-nav .nav-link.show,
+.navbar.bg-light .navbar-nav,
 .navbar.bg-light .navbar-nav .nav-link.active {
   color: #384551;
 }
@@ -23905,4 +23903,44 @@ tr:nth-child(odd) {
 
 tr:nth-child(even) {
   background-color: #999999; /* Màu sữa nhạt */
+}
+.disabled {
+ pointer-events: none;
+}
+.talbe-transaction{
+  width: 90%;
+  height: 90%;
+  margin-right: 10px;
+  margin-left: 50px;
+  border: 1px solid black;
+}
+.input-search{
+  width: 200px;
+  height: 30px;
+  border: 1px solid black;
+  margin-left: 10px ;
+}
+.top-form-input{
+  padding-top: 40px;
+  padding-left: 50px;
+  display: inline-flex;
+  gap: 50px;
+}
+.bot-form-input{
+  padding-top: 40px;
+  padding-left: 50px;
+  display: inline-flex;
+  gap: 50px;
+}
+.fot-input{
+  align-items: center;
+  display: inline-flex;
+  padding-left: 40%;
+  gap: 40px;
+  padding-top: 50px;
+  padding-bottom: 10px;
+}
+.button{
+  border: 1px solid black;
+  width: 80px;
 }

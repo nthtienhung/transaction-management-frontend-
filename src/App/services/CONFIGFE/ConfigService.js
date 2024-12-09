@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import * as ConfigAPI from './../Api/configService';
+import * as ConfigAPI from '../api/configService.js';
 import './ConfigService.css';
 
 const ConfigService = () => {

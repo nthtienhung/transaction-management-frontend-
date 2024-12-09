@@ -7,7 +7,7 @@ import { FaUser } from "react-icons/fa";
 import { BiHide, BiShow } from "react-icons/bi";
 import * as Yup from "yup";
 import "react-toastify/dist/ReactToastify.css";
-import { generateOTP, resetPassword, verifyMail, verifyOTP } from "../Api/ApiRequest";
+import { generateOTP, resetPassword, verifyMail, verifyOTP } from "../api/ApiRequest";
 
 function ForgotPassword() {
     const [showPassword, setShowPassword] = useState(false);
