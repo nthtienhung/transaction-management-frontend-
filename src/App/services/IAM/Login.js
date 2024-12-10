@@ -11,7 +11,7 @@ import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import Cookies from 'js-cookie';
 import { jwtDecode } from 'jwt-decode';
-import {generateOTP} from "../api/ApiRequest"; // Cú pháp khác cho import cụ thể
+import {generateOtp} from "../api/authService";
 
 function Login() {
   const [showPassword, setShowPassword] = useState(false);
@@ -82,7 +82,7 @@ function Login() {
                       draggable: true,
                       progress: undefined,
                     });
-                    generateOTP(value.email);
+                    generateOtp(value.email);
                   setTimeout(() => navigate("/verify", { state: { email: value.email } }), 1500);
                 }
               })
