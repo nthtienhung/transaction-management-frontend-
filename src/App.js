@@ -10,7 +10,7 @@ import ConfigService from './App/services/CONFIGFE/ConfigService';
 import HomeUser from "./App/services/Business/HomePage/HomeUser";
 import TransactionListAdmin from './App/services/Business/Transaction/TransactionListAdmin';
 import TransactionListUser from './App/services/Business/Transaction/TransactionListUser';
-
+import UserManagement from './App/pages/Admin/UserManagement';
 function App() {
   return (
       <Routes>
@@ -24,6 +24,7 @@ function App() {
         <Route path="/config" element={<ConfigService />} />
         <Route path='/transactionAdmin'element={<TransactionListAdmin/>}/>
         <Route path='/transactionUser' element={<TransactionListUser/>}/>
+        <Route path="/admin/users" element={<UserManagement />} />
       </Routes>
   );
 }

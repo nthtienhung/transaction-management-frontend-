@@ -133,6 +133,11 @@ function Navbar({ setActiveContent }) {
                   </div>
                 </a>
               </li>
+              <li className="menu-item">
+                <a href="/admin/users" className="menu-link">
+                  <div className="text-truncate" data-i18n="Users">User Management</div>
+                </a>
+              </li>
             </>
           )) || <></>}
 
