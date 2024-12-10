@@ -60,6 +60,7 @@ const UserManagement = () => {
                             <TableCell>Email</TableCell>
                             <TableCell>Phone</TableCell>
                             <TableCell>Address</TableCell>
+                            <TableCell>DOB</TableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>
@@ -70,6 +71,7 @@ const UserManagement = () => {
                                 <TableCell>{user.email}</TableCell>
                                 <TableCell>{user.phone}</TableCell>
                                 <TableCell>{user.address}</TableCell>
+                                <TableCell>{user.dob}</TableCell>
                             </TableRow>
                         ))}
                     </TableBody>
