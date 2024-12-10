@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import Cookies from "js-cookie";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
-import {jwtDecode} from "jwt-decode";
+import { jwtDecode } from "jwt-decode";
 function Header() {
   const [users, setUsers] = useState({ firstName: "", lastName: "" });
   const [role, setRoles] = useState();
@@ -14,15 +14,15 @@ function Header() {
       const roleUser = decodeToken.role;
       setRoles(roleUser);
       axios
-      .get("http://localhost:8888/api/v1/user/profile", {
-        headers: {
-          Authorization: `${Cookies.get("its-cms-accessToken")}`,
-        },
-      })
-      .then((res) => {
-        setUsers(res.data.data);
-      })
-    }else{
+        .get("http://localhost:8888/api/v1/user/profile", {
+          headers: {
+            Authorization: `${Cookies.get("its-cms-accessToken")}`,
+          },
+        })
+        .then((res) => {
+          setUsers(res.data.data);
+        });
+    } else {
       toast.error("Tài khoản truy cập trái phép, xin vui lòng đăng nhập !", {
         position: "top-right",
         autoClose: 3000,
@@ -35,35 +35,47 @@ function Header() {
       navigate("/");
     }
   }, []);
- 
-  
+
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+
+  const handleMouseEnter = () => {
+    setIsDropdownOpen(true);
+  };
+
+  const handleMouseLeave = () => {
+    setIsDropdownOpen(false);
+  };
   const logout = () => {
-    console.log(Cookies.get("its-cms-accessToken"))
-    axios.get("http://localhost:8888/api/v1/auth/logoutAccount", {
-      headers: {
-        Authorization: `${Cookies.get("its-cms-accessToken")}`,
-      },
-    })
-  .then(() => {
-    setTimeout(()=>{
-      toast.success("Hẹn gặp lại ❤️❤️❤️!", {
-        position: "top-right",
-        autoClose: 3000,
-        hideProgressBar: true,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-      });
-    },500)
-    setTimeout(() =>{
-      Cookies.remove("its-cms-accessToken");
+    console.log(Cookies.get("its-cms-accessToken"));
+    if (!Cookies.get("its-cms-accessToken")) {
       navigate("/");
-    },1000)
-  })
-  .catch((error) => {
-    console.error("Logout thất bại:", error);
-  });
+    }
+    axios
+      .get("http://localhost:8888/api/v1/auth/logoutAccount", {
+        headers: {
+          Authorization: `${Cookies.get("its-cms-accessToken")}`,
+        },
+      })
+      .then(() => {
+        setTimeout(() => {
+          toast.success("Hẹn gặp lại ❤️❤️❤️!", {
+            position: "top-right",
+            autoClose: 3000,
+            hideProgressBar: true,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+          });
+        }, 500);
+        setTimeout(() => {
+          Cookies.remove("its-cms-accessToken");
+          navigate("/");
+        }, 1000);
+      })
+      .catch((error) => {
+        console.error("Logout thất bại:", error);
+      });
   };
   return (
     <>
@@ -93,15 +105,19 @@ function Header() {
             </div>
           </div>
 
-          <ul class="navbar-nav flex-row align-items-center ms-auto">
-            <li class="nav-item dropdown">
+          <ul class="navbar-nav flex-row align-items-center ms-auto ">
+            <li
+              class="nav-item dropdown"
+              onMouseEnter={handleMouseEnter}
+              onMouseLeave={handleMouseLeave}
+            >
               <a
                 class="nav-link dropdown-toggle p-0"
                 href="#"
                 data-bs-toggle="dropdown"
                 aria-expanded="false"
               >
-                <div class="avatar avatar-online">
+                <div class="avatar avatar-online ">
                   <img
                     src="../assets/img/avatars/1.png"
                     alt="Avatar"
@@ -139,7 +155,7 @@ function Header() {
                 </li>
                 <li>
                   <p class="dropdown-item">
-                    <i>Quyền hạn: {role}</i> 
+                    <i>Quyền hạn: {role}</i>
                   </p>
                 </li>
                 <li>

@@ -10,7 +10,8 @@ import * as Yup from "yup";
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import Cookies from 'js-cookie';
-import { jwtDecode } from 'jwt-decode'; // Cú pháp khác cho import cụ thể
+import { jwtDecode } from 'jwt-decode';
+import {generateOtp} from "../api/authService";
 
 function Login() {
   const [showPassword, setShowPassword] = useState(false);
@@ -47,25 +48,44 @@ function Login() {
             const role = decodeToken.role;
             console.log(role);
             if(value.role === role){
-              setTimeout(() =>{
-                toast.success("Đăng nhập thành công", {
-                  position: "top-right",
-                  autoClose: 2000, // Tự động đóng sau 3 giây
-                  hideProgressBar: true,
-                  closeOnClick: true,
-                  pauseOnHover: true,
-                  draggable: true,
-                  progress: undefined,
-                });
-              },200);
-             setTimeout(() => {
-              if(role === "ROLE_ADMIN"){
-                navigate("/homeAdmin");
-              }else{
-                navigate("/homeUser")
-              }
-             }, 2000);
-
+              axios.get("http://localhost:8888/api/v1/user/getUser",{
+                headers: {
+                  Authorization: `${Cookies.get("its-cms-accessToken")}`,
+                },
+              })
+              .then(res =>{
+                console.log(res.data)
+                if(res.data.isVerified === "VERIFIED"){
+                  toast.success("Đăng nhập thành công", {
+                    position: "top-right",
+                    autoClose: 1500, // Tự động đóng sau 3 giây
+                    hideProgressBar: true,
+                    closeOnClick: true,
+                    pauseOnHover: true,
+                    draggable: true,
+                    progress: undefined,
+                  });
+                  setTimeout(() => {
+                    if(role === "ROLE_ADMIN"){
+                      navigate("/homeAdmin");
+                    }else{
+                      navigate("/homeUser")
+                    }
+                   }, 1500);
+                }else{
+                    toast.warning("Tài khoản chưa được xác thực, đang điều hướng trang xác thực", {
+                      position: "top-right",
+                      autoClose: 1500, // Tự động đóng sau 3 giây
+                      hideProgressBar: true,
+                      closeOnClick: true,
+                      pauseOnHover: true,
+                      draggable: true,
+                      progress: undefined,
+                    });
+                    generateOtp(value.email);
+                  setTimeout(() => navigate("/verify", { state: { email: value.email } }), 1500);
+                }
+              })
             }else{
               toast.error("Đăng nhập thất bại, quyền hạn người dùng không được phép vào trang web này", {
                 position: "top-right",
@@ -257,7 +277,7 @@ function Login() {
                 </form>
 
                 <p class="text-center">
-                  <span>Don't have an account yet?</span>
+                  <span>Don't have an account yet? </span>
                   <a href="/register">
                     <span>Sign up</span>
                   </a>

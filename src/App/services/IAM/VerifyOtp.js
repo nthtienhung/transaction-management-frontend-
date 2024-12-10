@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { verifyOtp, generateOtp } from "../Api/authService";
+import { verifyOtp, generateOtp } from "../api/authService";
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
 const VerifyOtp = () => {
     const location = useLocation();
     const [formData, setFormData] = useState({
-        email: location.state?.email || "",
+        email: location.state?.email || localStorage.getItem("email") || "",
         otp: "",
     });
     const [countdown, setCountdown] = useState(120);
