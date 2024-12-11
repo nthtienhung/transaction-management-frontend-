@@ -1,7 +1,7 @@
 import axios from "axios";
 import { useFormik } from "formik";
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { PiPlugFill } from "react-icons/pi";
 import { FaUser } from "react-icons/fa";
 import { GrKey } from "react-icons/gr";
@@ -11,12 +11,38 @@ import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import Cookies from 'js-cookie';
 import { jwtDecode } from 'jwt-decode';
-import {generateOtp} from "../api/authService";
+import {generateOTP} from "../api/ApiRequest";
 
 function Login() {
   const [showPassword, setShowPassword] = useState(false);
-  const [role, setRoles] = useState();
   const navigate = useNavigate();
+  const location = useLocation();
+  const role = Cookies.get('user-role');
+  useEffect(() => {
+    axios
+        .get("http://localhost:8888/api/v1/user/profile", {
+          headers: {
+            Authorization: `${Cookies.get("its-cms-accessToken")}`,
+          },
+        })
+        .then((res) => {
+          if (role === 'ROLE_ADMIN') {
+            navigate("/homeAdmin");
+          } else {
+            navigate("/homeUser");
+          }
+        }).catch((error) =>{
+          toast.warning("Hết phiên đăng nhập, vui lòng đăng nhập lại !", {
+            position: "top-right",
+            autoClose: 3000,
+            hideProgressBar: true,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+          });
+        })
+  }, [role,navigate]);
   const togglePasswordVisibility = () => {
     setShowPassword((prevState) => !prevState);
   };
@@ -37,13 +63,10 @@ function Login() {
         .post("http://localhost:8888/api/v1/auth/login", value)
         .then((res) => {
           if (res.status == 200) {
-            Cookies.remove("its-cms-accessToken");
-            Cookies.set("its-cms-accessToken", res.data.data.csrfToken, {
-              expires: 30 / (24 * 60), // 30 phút = 30 phút / (24 * 60 phút trong một ngày)
-              path: "/",
-            });
+            Cookies.set("its-cms-accessToken", res.data.data.csrfToken);
+            Cookies.set("its-cms-refreshToken", res.data.data.refreshToken);
+            console.log(Cookies.get("its-cms-accessToken"))
             setTimeout(() => {
-            console.log(Cookies.get("its-cms-accessToken"));
             const decodeToken = jwtDecode(Cookies.get("its-cms-accessToken"));
             const role = decodeToken.role;
             console.log(role);
@@ -66,6 +89,7 @@ function Login() {
                     progress: undefined,
                   });
                   setTimeout(() => {
+                    Cookies.set('user-role', role); 
                     if(role === "ROLE_ADMIN"){
                       navigate("/homeAdmin");
                     }else{
@@ -82,8 +106,8 @@ function Login() {
                       draggable: true,
                       progress: undefined,
                     });
-                    generateOtp(value.email);
-                  setTimeout(() => navigate("/verify", { state: { email: value.email } }), 1500);
+                    generateOTP(value.email);
+                    setTimeout(() => navigate("/verify", { state: { email: value.email } }), 1500);
                 }
               })
             }else{
