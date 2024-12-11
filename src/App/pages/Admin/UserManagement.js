@@ -20,11 +20,13 @@ const UserManagement = () => {
     const [totalElements, setTotalElements] = useState(0);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [searchTerm, setSearchTerm] = useState('');
+    const [debouncedSearchTerm] = useDebounce(searchTerm, 500);
 
-    const fetchUsers = async (pageNumber) => {
+    const fetchUsers = async (pageNumber, search) => {
         try {
             const response = await axios.get(
-                `http://localhost:8888/api/v1/user/user-list?page=${pageNumber}&size=${rowsPerPage}`, 
+                `http://localhost:8888/api/v1/user/user-list?page=${pageNumber}&size=${rowsPerPage}&searchTerm=${search || ''}`, 
                 {
                     headers: {
                         'Authorization': `${Cookies.get('its-cms-accessToken')}`
@@ -41,8 +43,13 @@ const UserManagement = () => {
     };
 
     useEffect(() => {
-        fetchUsers(page);
-    }, [page, rowsPerPage]);
+        fetchUsers(page, debouncedSearchTerm);
+    }, [page, debouncedSearchTerm]);
+
+    const handleSearchChange = (event) => {
+        setSearchTerm(event.target.value);
+        setPage(0); // Reset to first page when searching
+    };
 
     const handleChangePage = (event, newPage) => {
         setPage(newPage);
@@ -56,6 +63,15 @@ const UserManagement = () => {
             <Typography variant="h4" gutterBottom>
                 User Management
             </Typography>
+            <div className="search-box">
+                    <input
+                        type="text"
+                        className="form-control"
+                        placeholder="Search by name..."
+                        value={searchTerm}
+                        onChange={handleSearchChange}
+                    />
+            </div>
             <TableContainer component={Paper}>
                 <Table>
                     <TableHead>
@@ -95,5 +111,22 @@ const UserManagement = () => {
         </Box>
     );
 };
+
+// Debounce hook to prevent too many API calls
+function useDebounce(value, delay) {
+    const [debouncedValue, setDebouncedValue] = useState(value);
+
+    useEffect(() => {
+        const handler = setTimeout(() => {
+            setDebouncedValue(value);
+        }, delay);
+
+        return () => {
+            clearTimeout(handler);
+        };
+    }, [value, delay]);
+
+    return [debouncedValue];
+}
 
 export default UserManagement;
