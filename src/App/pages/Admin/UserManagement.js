@@ -26,7 +26,7 @@ const UserManagement = () => {
                     throw new Error('No authentication token found');
                 }
 
-                const response = await axios.get('http://localhost:8888/api/v1/user/profiles', {
+                const response = await axios.get('http://localhost:8888/api/v1/user/user-list', {
                     headers: {
                         Authorization: token
                     }
@@ -61,6 +61,8 @@ const UserManagement = () => {
                             <TableCell>Phone</TableCell>
                             <TableCell>Address</TableCell>
                             <TableCell>DOB</TableCell>
+                            <TableCell>Role</TableCell>
+                            <TableCell>Status</TableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>
@@ -72,6 +74,8 @@ const UserManagement = () => {
                                 <TableCell>{user.phone}</TableCell>
                                 <TableCell>{user.address}</TableCell>
                                 <TableCell>{user.dob}</TableCell>
+                                <TableCell>{user.role}</TableCell>
+                                <TableCell>{user.status ? 'ACTIVE' : 'INACTIVE'}</TableCell>
                             </TableRow>
                         ))}
                     </TableBody>
