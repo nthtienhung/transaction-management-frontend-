@@ -22,11 +22,12 @@ const UserManagement = () => {
     const [error, setError] = useState(null);
     const [searchTerm, setSearchTerm] = useState('');
     const [debouncedSearchTerm] = useDebounce(searchTerm, 500);
-
+    const [sortDirection, setSortDirection] = useState('desc');
+    
     const fetchUsers = async (pageNumber, search) => {
         try {
             const response = await axios.get(
-                `http://localhost:8888/api/v1/user/user-list?page=${pageNumber}&size=${rowsPerPage}&searchTerm=${search || ''}`, 
+                `http://localhost:8888/api/v1/user/user-list?page=${pageNumber}&size=${rowsPerPage}&searchTerm=${search || ''}&sortBy=createDate&sortDirection=${sortDirection}`, 
                 {
                     headers: {
                         'Authorization': `${Cookies.get('its-cms-accessToken')}`
@@ -42,9 +43,44 @@ const UserManagement = () => {
         }
     };
 
+    const toggleSortDirection = () => {
+        setSortDirection(prev => prev === 'asc' ? 'desc' : 'asc');
+        // Reset to first page when sorting changes
+        setPage(0);
+    };
+
+    // Add this to your existing styles
+    const styles = {
+        header: {
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            marginBottom: '20px'
+        },
+        searchBox: {
+            display: 'flex',
+            alignItems: 'center',
+            gap: '10px',
+            maxWidth: '300px'
+        },
+        searchInput: {
+            padding: '8px 12px',
+            borderRadius: '4px',
+            border: '1px solid #ddd',
+            width: '100%'
+        },
+        sortButton: {
+            padding: '8px 12px',
+            backgroundColor: '#f0f0f0',
+            border: '1px solid #ddd',
+            borderRadius: '4px',
+            cursor: 'pointer'
+        }
+    };
+
     useEffect(() => {
         fetchUsers(page, debouncedSearchTerm);
-    }, [page, debouncedSearchTerm]);
+    }, [page, debouncedSearchTerm, sortDirection]);
 
     const handleSearchChange = (event) => {
         setSearchTerm(event.target.value);
@@ -60,18 +96,28 @@ const UserManagement = () => {
 
     return (
         <Box sx={{ p: 3 }}>
-            <Typography variant="h4" gutterBottom>
-                User Management
-            </Typography>
-            <div className="search-box">
-                    <input
-                        type="text"
-                        className="form-control"
-                        placeholder="Search by name..."
-                        value={searchTerm}
-                        onChange={handleSearchChange}
-                    />
+            <div style={styles.header}>
+                    <Typography variant="h4" gutterBottom>
+                        User Management
+                    </Typography>
+                    <div style={styles.searchBox}>
+                        <input
+                            type="text"
+                            className="form-control"
+                            placeholder="Search by name..."
+                            value={searchTerm}
+                            onChange={handleSearchChange}
+                        />
+                        <button 
+                            style={styles.sortButton}
+                            onClick={toggleSortDirection}
+                        >
+                            Sort {sortDirection === 'asc' ? '↑' : '↓'}
+                        </button>
+                    </div>
+
             </div>
+
             <TableContainer component={Paper}>
                 <Table>
                     <TableHead>
