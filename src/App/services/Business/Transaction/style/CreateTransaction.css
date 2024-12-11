@@ -1,0 +1,221 @@
+/* General Layout */
+.layout-wrapper {
+  display: flex;
+}
+
+.layout-container {
+  width: 250px;
+  background-color: #1d1f2f;
+  padding: 20px;
+}
+
+.layout-page {
+  flex-grow: 1;
+  background-color: #f4f6f9;
+  padding: 20px;
+}
+
+.content-wrapper {
+  margin-top: 20px;
+}
+
+/* Navbar Styles */
+.layout-menu {
+  width: 100%;
+  height: 100%;
+  background-color: #1d1f2f;
+}
+
+.app-brand {
+  display: flex;
+  justify-content: center;
+  padding: 20px;
+}
+
+.app-brand img {
+  width: 50%;
+}
+
+.menu-inner {
+  padding-top: 20px;
+  padding-bottom: 20px;
+}
+
+.menu-item {
+  list-style: none;
+}
+
+.menu-link {
+  display: flex;
+  align-items: center;
+  padding: 10px 15px;
+  color: #fff;
+  text-decoration: none;
+  transition: background-color 0.3s;
+}
+
+.menu-link:hover {
+  background-color: #292b3d;
+}
+
+.menu-toggle {
+  cursor: pointer;
+}
+
+.menu-sub {
+  display: none;
+  list-style: none;
+  padding-left: 20px;
+}
+
+.menu-sub.show {
+  display: block;
+}
+
+.menu-icon {
+  margin-right: 10px;
+}
+
+.menu-text {
+  font-weight: bold;
+}
+
+/* Dashboard Styles */
+.dasboard {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20px;
+}
+
+.dasboard-item {
+  background-color: #fff;
+  padding: 20px;
+  border-radius: 8px;
+  text-align: center;
+}
+
+.item-value {
+  display: block;
+  font-size: 1.2em;
+  margin-top: 10px;
+  color: #2d3a3f;
+}
+
+.content-dashboard {
+  margin-top: 30px;
+}
+
+.dasboard-table p {
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 10px;
+}
+
+.dasboard-table hr {
+  border: 0;
+  height: 2px;
+  background-color: #ececec;
+}
+
+.dasboard-table table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.dasboard-table td {
+  padding: 10px;
+  border-bottom: 1px solid #f1f1f1;
+}
+
+/* Create Transaction Styles */
+.create-transaction-form, .otp-form {
+  background-color: #fff;
+  padding: 30px;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.create-transaction-form h2, .otp-form h2 {
+  font-size: 24px;
+  margin-bottom: 20px;
+}
+
+.create-transaction-form form, .otp-form form {
+  display: flex;
+  flex-direction: column;
+}
+
+.create-transaction-form label, .otp-form label {
+  font-weight: bold;
+  margin-bottom: 8px;
+}
+
+.create-transaction-form input, .otp-form input,
+.create-transaction-form textarea {
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  margin-bottom: 15px;
+  width: 100%;
+}
+
+.create-transaction-form textarea {
+  resize: vertical;
+  height: 100px;
+}
+
+.create-transaction-form .error, .otp-form .error {
+  color: red;
+  margin-bottom: 15px;
+}
+
+button {
+  padding: 10px 15px;
+  border: none;
+  background-color: #0056b3;
+  color: #fff;
+  font-size: 16px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+button:hover {
+  background-color: #004080;
+}
+
+button[type="button"] {
+  background-color: #ccc;
+}
+
+button[type="button"]:hover {
+  background-color: #999;
+}
+
+/* Footer Styles */
+footer {
+  padding: 20px;
+  background-color: #1d1f2f;
+  color: #fff;
+  text-align: center;
+}
+
+footer p {
+  margin: 0;
+  font-size: 14px;
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 768px) {
+  .layout-wrapper {
+    flex-direction: column;
+  }
+
+  .layout-container {
+    width: 100%;
+  }
+
+  .dasboard {
+    grid-template-columns: 1fr 1fr;
+  }
+}
