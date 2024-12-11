@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import TransactionApi from "../../Api/transactionServiceApi";
+import TransactionApi from "../../api/transactionServiceApi";
 
 const ConfirmTransaction = ({ transactionData, onComplete }) => {
   const [otp, setOtp] = useState("");

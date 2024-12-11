@@ -10,9 +10,9 @@ import Navbar from "../../../compoment/fragment/Navbar";
 import './style/CreateTransaction.css';
 
 // Import services
-import { getUserById, isEmailExists } from "../../../services/Api/userServiceApi";
-import { getWalletByWalletCode, getWalletByUserId, updateWalletBalance } from "../../Api/walletServiceApi"
-import { sendOTP, confirmTransaction } from "../../../services/Api/transactionServiceApi";
+import { getUserById, isEmailExists } from "../../../services/api/userServiceApi";
+import { getWalletByWalletCode, getWalletByUserId, updateWalletBalance } from "../../../services/api/walletServiceApi"
+import { sendOTP, confirmTransaction } from "../../../services/api/transactionServiceApi";
 
 function CreateTransaction() {
   const navigate = useNavigate();
