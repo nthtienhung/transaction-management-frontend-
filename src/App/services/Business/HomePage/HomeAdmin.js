@@ -3,7 +3,7 @@ import Footer from "../../../compoment/fragment/Footer";
 import Header from "../../../compoment/fragment/Header";
 import Navbar from "../../../compoment/fragment/Navbar";
 import ConfigService from "./../../../services/CONFIGFE/ConfigService";
-
+import UserManagement from '../../../pages/Admin/UserManagement';
 function HomeAdmin() {
   const [activeContent, setActiveContent] = useState("dashboard"); // State để xác định nội dung hiển thị
 
@@ -11,6 +11,8 @@ function HomeAdmin() {
     switch (activeContent) {
       case "configuration":
         return <ConfigService />;
+      case "users":
+        return <UserManagement />;
       default:
         return <div>Welcome to the Admin Dashboard!</div>;
     }

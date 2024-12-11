@@ -134,7 +134,14 @@ function Navbar({ setActiveContent }) {
                 </a>
               </li>
               <li className="menu-item">
-                <a href="/admin/users" className="menu-link">
+                <a 
+                  href="#" 
+                  className="menu-link"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    setActiveContent("users");
+                  }}
+                >
                   <div className="text-truncate" data-i18n="Users">User Management</div>
                 </a>
               </li>

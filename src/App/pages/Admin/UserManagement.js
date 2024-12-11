@@ -1,6 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
-import Cookies from 'js-cookie';
 import {
     Table,
     TableBody,
@@ -10,47 +8,54 @@ import {
     TableRow,
     Paper,
     Typography,
-    Box
+    Box,
+    TablePagination
 } from '@mui/material';
-
+import axios from 'axios';
+import Cookies from 'js-cookie';
 const UserManagement = () => {
     const [users, setUsers] = useState([]);
+    const [page, setPage] = useState(0);
+    const [rowsPerPage] = useState(10);
+    const [totalElements, setTotalElements] = useState(0);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
-    useEffect(() => {
-        const fetchUsers = async () => {
-            try {
-                const token = Cookies.get('its-cms-accessToken');
-                if (!token) {
-                    throw new Error('No authentication token found');
-                }
-
-                const response = await axios.get('http://localhost:8888/api/v1/user/user-list', {
+    const fetchUsers = async (pageNumber) => {
+        try {
+            const response = await axios.get(
+                `http://localhost:8888/api/v1/user/user-list?page=${pageNumber}&size=${rowsPerPage}`, 
+                {
                     headers: {
-                        Authorization: token
+                        'Authorization': `${Cookies.get('its-cms-accessToken')}`
                     }
-                });
-
-                if (response.data && response.data.data) {
-                    setUsers(response.data.data);
                 }
-            } catch (err) {
-                setError(err.response?.data?.message || 'Failed to fetch users');
-            } finally {
-                setLoading(false);
-            }
-        };
+            );
+            setUsers(response.data.data.content);
+            setTotalElements(response.data.data.totalElements);
+            setLoading(false);
+        } catch (err) {
+            setError('Failed to fetch users');
+            setLoading(false);
+        }
+    };
 
-        fetchUsers();
-    }, []);
+    useEffect(() => {
+        fetchUsers(page);
+    }, [page, rowsPerPage]);
+
+    const handleChangePage = (event, newPage) => {
+        setPage(newPage);
+    };
 
     if (loading) return <div>Loading...</div>;
     if (error) return <div>{error}</div>;
 
     return (
         <Box sx={{ p: 3 }}>
-            <Typography variant="h5" sx={{ mb: 3 }}>User Management</Typography>
+            <Typography variant="h4" gutterBottom>
+                User Management
+            </Typography>
             <TableContainer component={Paper}>
                 <Table>
                     <TableHead>
@@ -60,26 +65,32 @@ const UserManagement = () => {
                             <TableCell>Email</TableCell>
                             <TableCell>Phone</TableCell>
                             <TableCell>Address</TableCell>
-                            <TableCell>DOB</TableCell>
                             <TableCell>Role</TableCell>
                             <TableCell>Status</TableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>
-                        {users.map((user) => (
-                            <TableRow key={user.profileId}>
+                        {users.map((user, index) => (
+                            <TableRow key={index}>
                                 <TableCell>{user.firstName}</TableCell>
                                 <TableCell>{user.lastName}</TableCell>
                                 <TableCell>{user.email}</TableCell>
                                 <TableCell>{user.phone}</TableCell>
                                 <TableCell>{user.address}</TableCell>
-                                <TableCell>{user.dob}</TableCell>
                                 <TableCell>{user.role}</TableCell>
-                                <TableCell>{user.status ? 'ACTIVE' : 'INACTIVE'}</TableCell>
+                                <TableCell>{user.status ? 'Active' : 'Inactive'}</TableCell>
                             </TableRow>
                         ))}
                     </TableBody>
                 </Table>
+                <TablePagination
+                    component="div"
+                    count={totalElements}
+                    page={page}
+                    onPageChange={handleChangePage}
+                    rowsPerPage={rowsPerPage}
+                    rowsPerPageOptions={[10]}
+                />
             </TableContainer>
         </Box>
     );
