@@ -8,6 +8,21 @@ function Header() {
   const [users, setUsers] = useState({ firstName: "", lastName: "" });
   const [role, setRoles] = useState();
   const navigate = useNavigate();
+  const token = Cookies.get("its-cms-accessToken");
+  useEffect(() =>{
+    if(!token){
+      toast.warning("Hết phiên đăng nhập, vui lòng đăng nhập lại !", {
+        position: "top-right",
+        autoClose: 3000,
+        hideProgressBar: true,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+      });
+      navigate("/");
+    }
+  },[token])
   useEffect(() => {
     if (Cookies.get("its-cms-accessToken")) {
       const decodeToken = jwtDecode(Cookies.get("its-cms-accessToken"));
@@ -20,7 +35,44 @@ function Header() {
           },
         })
         .then((res) => {
+          sessionStorage.setItem("userId",res.data.data.userId);
           setUsers(res.data.data);
+        }).catch((error) => {
+          if (error.response.status === 401 || error.response.status === 400) {
+            // Xử lý lỗi 400 riêng
+            axios
+            .get("http://localhost:8888/api/v1/auth/refreshTokenUser", {
+              headers: {
+                Authorization: `Bearer ${Cookies.get("its-cms-refreshToken")}`,
+              },
+            })
+            .then((res) => {
+              // Cập nhật token mới
+              Cookies.remove("its-cms-accessToken");
+              Cookies.remove("its-cms-refreshToken");
+              Cookies.set("its-cms-accessToken", res.data.data.csrfToken);
+              Cookies.set("its-cms-refreshToken", res.data.data.refreshToken);
+        
+              // Gọi lại API profile với token mới
+              axios
+                .get("http://localhost:8888/api/v1/user/profile", {
+                  headers: {
+                    Authorization: `${Cookies.get("its-cms-accessToken")}`,
+                  },
+                })
+                .then((res) => {
+                  localStorage.setItem("userId", res.data.data.userId);
+                  setUsers(res.data.data);
+                })
+            })
+          } else {
+            // Nếu lỗi khác, log ra để dễ debug
+            console.error(error);
+          }
+        
+          // Thực hiện refresh token
+          
+          
         });
     } else {
       toast.error("Tài khoản truy cập trái phép, xin vui lòng đăng nhập !", {
@@ -46,10 +98,6 @@ function Header() {
     setIsDropdownOpen(false);
   };
   const logout = () => {
-    console.log(Cookies.get("its-cms-accessToken"));
-    if (!Cookies.get("its-cms-accessToken")) {
-      navigate("/");
-    }
     axios
       .get("http://localhost:8888/api/v1/auth/logoutAccount", {
         headers: {
@@ -69,12 +117,25 @@ function Header() {
           });
         }, 500);
         setTimeout(() => {
+          localStorage.clear();
+          Cookies.remove("user-role");
           Cookies.remove("its-cms-accessToken");
+          Cookies.remove("its-cms-refreshToken");
           navigate("/");
         }, 1000);
       })
       .catch((error) => {
-        console.error("Logout thất bại:", error);
+        console.log(Cookies.get("its-cms-refreshToken"));
+          axios.get("http://localhost:8081/auth/refreshToken",{
+            headers: {
+              Authorization: `Bearer ${Cookies.get("its-cms-refreshToken")}`,
+            },
+          }).then(res =>{
+            Cookies.remove("its-cms-accessToken");
+            Cookies.remove("its-cms-refreshToken");
+            Cookies.set("its-cms-accessToken", res.data.data.csrfToken);
+            Cookies.set("its-cms-refreshToken",res.data.data.refreshToken);
+          })
       });
   };
   return (
