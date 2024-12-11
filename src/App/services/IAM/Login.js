@@ -11,7 +11,7 @@ import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import Cookies from 'js-cookie';
 import { jwtDecode } from 'jwt-decode';
-import {generateOtp} from "../api/authService";
+import {generateOtp} from "../Api/authService";
 
 function Login() {
   const [showPassword, setShowPassword] = useState(false);
