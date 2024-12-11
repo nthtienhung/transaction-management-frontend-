@@ -23897,13 +23897,6 @@ td {
   border: 1px solid var(--bs-black);
 }
 
-tr:nth-child(odd) {
-  background-color: #777777; /* Màu xám */
-}
-
-tr:nth-child(even) {
-  background-color: #999999; /* Màu sữa nhạt */
-}
 .disabled {
  pointer-events: none;
 }
