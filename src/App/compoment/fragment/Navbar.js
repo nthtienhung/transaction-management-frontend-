@@ -85,7 +85,10 @@ function Navbar({ setActiveContent }) {
             >
               <i className="menu-icon tf-icons bx bx-home-smile"></i>
               <div className="text-truncate" data-i18n="Dashboards">
-                Dashboards
+                {role === "ROLE_ADMIN" && <>
+                <a href="/homeAdmin"> Dashboards</a>
+                </> || <><a href="/homeUser"> Dashboards</a></>}
+               
               </div>
             </a>
             {isDashboardOpen && (

@@ -1,8 +1,42 @@
+import { useEffect, useState } from "react";
 import Footer from "../../../compoment/fragment/Footer";
 import Header from "../../../compoment/fragment/Header";
 import Navbar from "../../../compoment/fragment/Navbar";
-
+import axios from "axios";
+import Cookies from "js-cookie";
+import { toast } from "react-toastify";
+import { useNavigate } from "react-router-dom";
 function HoneUser() {
+  const [wallet,setWallet] = useState([]);
+  const navigate = useNavigate();
+  useEffect(() =>{
+    const userId = sessionStorage.getItem("userId");
+    console.log(userId);
+   axios.get("http://localhost:8888/api/v1/wallet/getWallet/" + userId,{
+    headers: {
+      Authorization: `${Cookies.get("its-cms-accessToken")}`,
+    },
+  }).then(res =>{
+    console.log(res.data);
+    setWallet(res.data);
+  }).catch((error) =>{
+    console.log(Cookies.get("its-cms-refreshToken"));
+          axios.get("http://localhost:8888/api/v1/auth/refreshTokenUser",{
+            headers: {
+              Authorization: `Bearer ${Cookies.get("its-cms-refreshToken")}`,
+            },
+          }).then(res =>{
+            Cookies.remove("its-cms-accessToken");
+            Cookies.remove("its-cms-refreshToken");
+            Cookies.set("its-cms-accessToken", res.data.data.csrfToken);
+            Cookies.set("its-cms-refreshToken",res.data.data.refreshToken);
+          })
+  })
+  },[])
+  const formatNumber = (number) => {
+    if (number == null || isNaN(number)) return "0"; // Handle invalid numbers
+    return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+  };
   return (
     <>
       <div class="layout-wrapper layout-content-navbar">
@@ -16,7 +50,9 @@ function HoneUser() {
             <div className="dasboard">
               <div className="dasboard-item">
                 <p>Số tiền có trong ví:</p>
-                <span className="item-value">14.000.000 đ</span>
+                <span className="item-value">
+        {wallet && wallet.balance ? formatNumber(wallet.balance) : "0"} đ
+      </span>
               </div>
               <div className="dasboard-item">
                 <p>Tổng số tiền đã gửi trong tuần:</p>

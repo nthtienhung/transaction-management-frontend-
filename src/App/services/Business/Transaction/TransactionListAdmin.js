@@ -1,8 +1,10 @@
+import { useState } from "react";
 import Footer from "../../../compoment/fragment/Footer";
 import Header from "../../../compoment/fragment/Header";
 import Navbar from "../../../compoment/fragment/Navbar";
 import { useFormik } from "formik";
 function TransactionListAdmin(){
+  const [transactions, setTransaction] = useState([]);
     const formDataTransasction = useFormik({
         initialValues: {
           transactionUUID: "",
