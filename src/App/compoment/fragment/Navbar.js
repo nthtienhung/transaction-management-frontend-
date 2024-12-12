@@ -145,4 +145,5 @@ function Navbar({ setActiveContent }) {
     </>
   );
 }
+
 export default Navbar;

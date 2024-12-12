@@ -88,6 +88,8 @@ function Login() {
                     draggable: true,
                     progress: undefined,
                   });
+
+                  sessionStorage.setItem("userId",res.data.userId);
                   setTimeout(() => {
                     sessionStorage.setItem("userId",res.data.userId);
                     Cookies.set('user-role', role); 

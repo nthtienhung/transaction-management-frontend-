@@ -94,12 +94,6 @@ General Layout
   text-align: center;
 }
 
-.item-value {
-  display: block;
-  font-size: 1.2em;
-  margin-top: 10px;
-  color: #2d3a3f;
-}
 
 .content-dashboard {
   margin-top: 30px;

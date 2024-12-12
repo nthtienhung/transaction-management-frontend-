@@ -2,151 +2,158 @@ import { useEffect, useState } from "react";
 import Footer from "../../../compoment/fragment/Footer";
 import Header from "../../../compoment/fragment/Header";
 import Navbar from "../../../compoment/fragment/Navbar";
-import axios from "axios";
+import {
+  getRecentReceivedTransactionList,
+  getRecentSentTransactionList,
+  getTotalAmountSentTransactionByUser,
+  getTotalAmountReceivedTransactionByUser,
+  getTotalTransactionByUser,
+} from "../../api/transactionServiceApi";
 import Cookies from "js-cookie";
-import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
+
 function HoneUser() {
-  const [wallet,setWallet] = useState([]);
-  const navigate = useNavigate();
-  useEffect(() =>{
-    const userId = sessionStorage.getItem("userId");
-    console.log(userId);
-   axios.get("http://localhost:8888/api/v1/wallet/getWallet/" + userId,{
-    headers: {
-      Authorization: `${Cookies.get("its-cms-accessToken")}`,
-    },
-  }).then(res =>{
-    console.log(res.data);
-    setWallet(res.data);
-  }).catch((error) =>{
-    console.log(Cookies.get("its-cms-refreshToken"));
-          axios.get("http://localhost:8888/api/v1/auth/refreshTokenUser",{
-            headers: {
-              Authorization: `Bearer ${Cookies.get("its-cms-refreshToken")}`,
-            },
-          }).then(res =>{
-            Cookies.remove("its-cms-accessToken");
-            Cookies.remove("its-cms-refreshToken");
-            Cookies.set("its-cms-accessToken", res.data.data.csrfToken);
-            Cookies.set("its-cms-refreshToken",res.data.data.refreshToken);
-          })
-  });
-     
-  },[])
+  const [wallet, setWallet] = useState(null);
+  const [sentTransactions, setSentTransactions] = useState([]);
+  const [receivedTransactions, setReceivedTransactions] = useState([]);
+  const [totalSent, setTotalSent] = useState(0);
+  const [totalReceived, setTotalReceived] = useState(0);
+  const [totalTransactions, setTotalTransactions] = useState(0);
+
+  useEffect(() => {
+    const fetchWalletData = async () => {
+      try {
+        const userId = sessionStorage.getItem("userId");
+
+        // Fetch Wallet Info
+        const walletResponse = await axios.get(
+            `http://localhost:8888/api/v1/wallet/getWallet/${userId}`,
+            {
+              headers: {
+                Authorization: `${Cookies.get("its-cms-accessToken")}`,
+              },
+            }
+        );
+        const walletData = walletResponse.data;
+        setWallet(walletData);
+
+        if (walletData && walletData.walletCode) {
+          // Fetch Sent Transactions
+          const sentResponse = await getRecentSentTransactionList(walletData.walletCode);
+          setSentTransactions(sentResponse.data.content || []);
+
+          // Fetch Received Transactions
+          const receivedResponse = await getRecentReceivedTransactionList(walletData.walletCode);
+          setReceivedTransactions(receivedResponse.data.content || []);
+
+          // Fetch Total Sent Amount
+          const totalSentResponse = await getTotalAmountSentTransactionByUser(walletData.walletCode);
+          setTotalSent(totalSentResponse.data);
+
+          // Fetch Total Received Amount
+          const totalReceivedResponse = await getTotalAmountReceivedTransactionByUser(walletData.walletCode);
+          setTotalReceived(totalReceivedResponse.data);
+
+          // Fetch Total Transactions
+          const totalTransactionsResponse = await getTotalTransactionByUser(walletData.walletCode);
+          setTotalTransactions(totalTransactionsResponse.data);
+        }
+      } catch (error) {
+        axios.get("http://localhost:8888/api/v1/auth/refreshTokenUser",{
+          headers: {
+            Authorization: `Bearer ${Cookies.get("its-cms-refreshToken")}`,
+          },
+        }).then(res =>{
+          Cookies.remove("its-cms-accessToken");
+          Cookies.remove("its-cms-refreshToken");
+          Cookies.set("its-cms-accessToken", res.data.data.csrfToken);
+          Cookies.set("its-cms-refreshToken",res.data.data.refreshToken);
+        })
+      }
+    };
+
+    fetchWalletData();
+  }, []);
   const formatNumber = (number) => {
     if (number == null || isNaN(number)) return "0"; // Handle invalid numbers
     return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
   };
-  return (
-    <>
-      <div class="layout-wrapper layout-content-navbar">
-        <div class="layout-container">
-          <Navbar></Navbar>
-        </div>
-        <div class="layout-page">
-          <Header></Header>
 
-          <div class="content-wrapper">
-            <div className="dasboard">
-              <div className="dasboard-item">
-                <p>Số tiền có trong ví:</p>
-                <span className="item-value">
-        {wallet && wallet.balance ? formatNumber(wallet.balance) : "0"} đ
-      </span>
-              </div>
-              <div className="dasboard-item">
-                <p>Tổng số tiền đã gửi trong tuần:</p>
-                <span className="item-value">119.900.000 đ</span>
-              </div>
-              <div className="dasboard-item">
-                <p>Tổng số tiền nhận theo tuần:</p>
-                <span className="item-value">15.300.000 đ</span>
-              </div>
-              <div className="dasboard-item">
-                <p>Tổng số giao dịch đã thực hiện:</p>
-                <span className="item-value">1</span>
-              </div>
-            </div>
-            <div className="content-dashboard">
-              <div className="dasboard-table">
-                <p>Lịch sử giao dịch đã gửi (10 giao dịch gần nhất) </p>
-                <hr className="label-dasboard" />
-                <table>
-                  <tr>
-                    <td>#MGD201001 biên giao dịch ngày 10/11/2024 số tiền 1.500.000 đ</td>
-                  </tr>
-                  <tr>
-                  <td>#MGD201002 biên giao dịch ngày 11/11/2024 số tiền 2.500.000 đ</td>
-                  </tr>
-                  <tr>
-                  <td>#MGD201003 biên giao dịch ngày 11/11/2024 số tiền 1.000.000 đ</td>
-                  </tr>
-                  <tr>
-                  <td>#MGD201004 biên giao dịch ngày 13/11/2024 số tiền 500.000 đ</td>
-                  </tr>
-                  <tr>
-                  <td>#MGD201005 biên giao dịch ngày 13/11/2024 số tiền 300.000 đ</td>
-                  </tr>
-                  <tr>
-                  <td>#MGD201006 biên giao dịch ngày 15/11/2024 số tiền 100.000 đ</td>
-                  </tr>
-                  <tr>
-                  <td>#MGD201007 biên giao dịch ngày 16/11/2024 số tiền 10.500.000 đ</td>
-                  </tr>
-                  <tr>
-                  <td>#MGD201008 biên giao dịch ngày 17/11/2024 số tiền 100.500.000 đ</td>
-                  </tr>
-                  <tr>
-                  <td>#MGD201009 biên giao dịch ngày 17/11/2024 số tiền 2.500.000 đ</td>
-                  </tr>
-                  <tr>
-                  <td>#MGD201010 biên giao dịch ngày 19/11/2024 số tiền 500.000 đ</td>
-                  </tr>
-                </table>
-              </div>
-              <div className="dasboard-table">
-                <p>Lịch sử giao dịch đã nhận (10 giao dịch gần nhất) </p>
-                <hr className="label-dasboard" />
-                <table>
-                  <tr>
-                    <td>#MGD301001 biên giao dịch ngày 09/11/2024 số tiền 500.000 đ</td>
-                  </tr>
-                  <tr>
-                  <td>#MGD301002 biên giao dịch ngày 11/11/2024 số tiền 500.000 đ</td>
-                  </tr>
-                  <tr>
-                  <td>#MGD301003 biên giao dịch ngày 11/11/2024 số tiền 100.000 đ</td>
-                  </tr>
-                  <tr>
-                  <td>#MGD301004 biên giao dịch ngày 20/11/2024 số tiền 200.000 đ</td>
-                  </tr>
-                  <tr>
-                  <td>#MGD301005 biên giao dịch ngày 25/11/2024 số tiền 100.000 đ</td>
-                  </tr>
-                  <tr>
-                  <td>#MGD301006 biên giao dịch ngày 25/11/2024 số tiền 200.000 đ</td>
-                  </tr>
-                  <tr>
-                  <td>#MGD301007 biên giao dịch ngày 26/11/2024 số tiền 1.500.000 đ</td>
-                  </tr>
-                  <tr>
-                  <td>#MGD301008 biên giao dịch ngày 27/11/2024 số tiền 10.500.000 đ</td>
-                  </tr>
-                  <tr>
-                  <td>#MGD301009 biên giao dịch ngày 27/11/2024 số tiền 1.500.000 đ</td>
-                  </tr>
-                  <tr>
-                  <td>#MGD301010 biên giao dịch ngày 29/11/2024 số tiền 200.000 đ</td>
-                  </tr>
-                </table>
-              </div>
-            </div>
+  const convertToLocalDate = (instant) => {
+    if (!instant) return "";
+    const date = new Date(instant);
+    return date.toLocaleDateString("vi-VN", {
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+    });
+  };
+
+  return (
+      <>
+        <div className="layout-wrapper layout-content-navbar">
+          <div className="layout-container">
+            <Navbar></Navbar>
           </div>
-          <Footer></Footer>
+          <div className="layout-page">
+            <Header></Header>
+
+            <div className="content-wrapper">
+              <div className="dasboard">
+                <div className="dasboard-item">
+                  <p>Số tiền có trong ví:</p>
+                  <span className="item-value">
+                  {wallet && wallet.balance ? formatNumber(wallet.balance) : "0"} đ
+                </span>
+                </div>
+                <div className="dasboard-item">
+                  <p>Tổng số tiền đã gửi trong tuần:</p>
+                  <span className="item-value">{formatNumber(totalSent)} đ</span>
+                </div>
+                <div className="dasboard-item">
+                  <p>Tổng số tiền nhận theo tuần:</p>
+                  <span className="item-value">{formatNumber(totalReceived)} đ</span>
+                </div>
+                <div className="dasboard-item">
+                  <p>Tổng số giao dịch đã thực hiện:</p>
+                  <span className="item-value">{totalTransactions}</span>
+                </div>
+              </div>
+              <div className="content-dashboard">
+                <div className="dasboard-table">
+                  <p>Lịch sử giao dịch đã gửi (10 giao dịch gần nhất)</p>
+                  <hr className="label-dasboard" />
+                  <table>
+                    {sentTransactions.map((transaction, index) => (
+                        <tr key={index}>
+                          <td>
+                            #{transaction.transactionCode} biên giao dịch ngày {convertToLocalDate(transaction.createdDate)} số tiền {formatNumber(transaction.amount)} đ
+                          </td>
+                        </tr>
+                    ))}
+                  </table>
+                </div>
+                <div className="dasboard-table">
+                  <p>Lịch sử giao dịch đã nhận (10 giao dịch gần nhất)</p>
+                  <hr className="label-dasboard" />
+                  <table>
+                    {receivedTransactions.map((transaction, index) => (
+                        <tr key={index}>
+                          <td>
+                            #{transaction.transactionCode} biên giao dịch ngày {transaction.createdDate} số tiền {formatNumber(transaction.amount)} đ
+                          </td>
+                        </tr>
+                    ))}
+                  </table>
+                </div>
+              </div>
+            </div>
+            <Footer></Footer>
+          </div>
         </div>
-      </div>
-    </>
+      </>
   );
 }
+
 export default HoneUser;
