@@ -88,6 +88,8 @@ function Login() {
                     draggable: true,
                     progress: undefined,
                   });
+
+                  sessionStorage.setItem("userId",res.data.userId);
                   setTimeout(() => {
                     Cookies.set('user-role', role); 
                     if(role === "ROLE_ADMIN"){
