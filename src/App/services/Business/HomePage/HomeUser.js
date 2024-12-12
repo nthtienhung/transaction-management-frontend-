@@ -31,7 +31,8 @@ function HoneUser() {
             Cookies.set("its-cms-accessToken", res.data.data.csrfToken);
             Cookies.set("its-cms-refreshToken",res.data.data.refreshToken);
           })
-  })
+  });
+     
   },[])
   const formatNumber = (number) => {
     if (number == null || isNaN(number)) return "0"; // Handle invalid numbers

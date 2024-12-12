@@ -58,7 +58,17 @@ const Profile = () => {
                 });
                 setUser(response.data.data);
             } catch (err) {
-                setError("Unable to fetch user information. Please try again later.");
+                console.log(Cookies.get("its-cms-refreshToken"));
+                axios.get("http://localhost:8888/api/v1/auth/refreshTokenUser",{
+                  headers: {
+                    Authorization: `Bearer ${Cookies.get("its-cms-refreshToken")}`,
+                  },
+                }).then(res =>{
+                  Cookies.remove("its-cms-accessToken");
+                  Cookies.remove("its-cms-refreshToken");
+                  Cookies.set("its-cms-accessToken", res.data.data.csrfToken);
+                  Cookies.set("its-cms-refreshToken",res.data.data.refreshToken);
+                })
             } finally {
                 setLoading(false);
             }

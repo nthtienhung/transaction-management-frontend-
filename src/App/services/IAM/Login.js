@@ -106,7 +106,7 @@ function Login() {
                       draggable: true,
                       progress: undefined,
                     });
-                    generateOTP(value.email);
+                    generateOtp(value.email);
                     setTimeout(() => navigate("/verify", { state: { email: value.email } }), 1500);
                 }
               })
