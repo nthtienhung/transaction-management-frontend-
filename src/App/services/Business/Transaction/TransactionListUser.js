@@ -655,7 +655,7 @@ function TransactionListUser() {
                                                 <td>{transaction.senderWalletCode}</td>
                                                 <td>{transaction.receiverWalletCode}</td>
                                                 <td>{transaction.lastName} {transaction.firstName}</td>
-                                                <td>{formatNumber(transaction.amount)}đ</td>
+                                                <td>{transaction.amount} đ</td>
                                                 <td>{transaction.description}</td>
                                                 <td>{transaction.status}</td>
                                                 <td><a href={'/'}>Detail</a></td>

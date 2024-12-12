@@ -44,17 +44,16 @@ export const getUserId = async () => {
         return response.data.data.userId; // Giả sử API trả về userId trong response.data
     } catch (error) {
         // Xử lý lỗi
-        if (error.response) {
-            // Lỗi từ phía server
-            console.error("Lỗi từ server:", error.response.data);
-        } else if (error.request) {
-            // Lỗi không nhận được response
-            console.error("Không nhận được phản hồi từ server");
-        } else {
-            // Lỗi khác
-            console.error("Lỗi:", error.message);
-        }
-        return null;
+        axios.get("http://localhost:8888/api/v1/auth/refreshTokenUser",{
+            headers: {
+              Authorization: `Bearer ${Cookies.get("its-cms-refreshToken")}`,
+            },
+          }).then(res =>{
+            Cookies.remove("its-cms-accessToken");
+            Cookies.remove("its-cms-refreshToken");
+            Cookies.set("its-cms-accessToken", res.data.data.csrfToken);
+            Cookies.set("its-cms-refreshToken",res.data.data.refreshToken);
+          })
     }
 };
 
