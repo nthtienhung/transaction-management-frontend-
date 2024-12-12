@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import * as ConfigAPI from './../api/configService';
+import * as ConfigAPI from '../api/configService';
 import './ConfigService.css';
 
 const ConfigService = () => {
@@ -72,9 +72,11 @@ const ConfigService = () => {
   const handleAddOrUpdateConfig = async () => {
     try {
       if (isUpdate) {
-        await ConfigAPI.updateConfig(newConfig.configID, newConfig);
+        const response = await ConfigAPI.updateConfig(newConfig.configID, newConfig);
+        console.log(response);
       } else {
-        await ConfigAPI.addConfig(newConfig);
+        const response = await ConfigAPI.addConfig(newConfig);
+        console.log(response);
       }
       setNewConfig({
         group: '',

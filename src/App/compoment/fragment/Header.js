@@ -35,7 +35,9 @@ function Header() {
           },
         })
         .then((res) => {
-          sessionStorage.setItem("userId",res.data.data.userId);
+          if(sessionStorage.getItem("userId") == null){
+            sessionStorage.setItem("userId",res.data.data.userId);
+          }
           setUsers(res.data.data);
         }).catch((error) => {
           if (error.response.status === 401 || error.response.status === 400) {
@@ -126,7 +128,7 @@ function Header() {
       })
       .catch((error) => {
         console.log(Cookies.get("its-cms-refreshToken"));
-          axios.get("http://localhost:8081/auth/refreshToken",{
+          axios.get("localhost:8888/api/v1/auth/refreshToken",{
             headers: {
               Authorization: `Bearer ${Cookies.get("its-cms-refreshToken")}`,
             },

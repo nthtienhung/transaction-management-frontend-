@@ -11,7 +11,7 @@ import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import Cookies from 'js-cookie';
 import { jwtDecode } from 'jwt-decode';
-import {generateOtp} from "../api/authService";
+import {generateOTP} from "../api/ApiRequest";
 
 function Login() {
   const [showPassword, setShowPassword] = useState(false);
@@ -89,6 +89,7 @@ function Login() {
                     progress: undefined,
                   });
                   setTimeout(() => {
+                    sessionStorage.setItem("userId",res.data.userId);
                     Cookies.set('user-role', role); 
                     if(role === "ROLE_ADMIN"){
                       navigate("/homeAdmin");
@@ -106,7 +107,7 @@ function Login() {
                       draggable: true,
                       progress: undefined,
                     });
-                    generateOtp(value.email);
+                    generateOTP(value.email);
                     setTimeout(() => navigate("/verify", { state: { email: value.email } }), 1500);
                 }
               })

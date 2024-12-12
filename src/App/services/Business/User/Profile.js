@@ -53,7 +53,7 @@ const Profile = () => {
                     return;
                 }
 
-                const response = await axios.get("http://localhost:8082/user/profile", {
+                const response = await axios.get("http://localhost:8888/api/v1/user/profile", {
                     headers: { Authorization: token },
                 });
                 setUser(response.data.data);
@@ -69,8 +69,6 @@ const Profile = () => {
                   Cookies.set("its-cms-accessToken", res.data.data.csrfToken);
                   Cookies.set("its-cms-refreshToken",res.data.data.refreshToken);
                 })
-            } finally {
-                setLoading(false);
             }
         };
 

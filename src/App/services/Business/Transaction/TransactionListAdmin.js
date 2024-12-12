@@ -8,12 +8,12 @@ import Cookies from 'js-cookie';
 function TransactionListAdmin(){
   const [transactions, setTransactions] = useState([]);
   const [currentPage, setCurrentPage] = useState(0);
-  const [totalPages, setTotalPages] = useState(1);
+  const [totalPages, setTotalPages] = useState(0);
   const formDataTransasction = useFormik({
     initialValues: {
       transactionId: "",
       walletCode: "",
-      status: "SUCCESS",
+      status: "",
       fromDate: "",
       toDate: "",
     },
@@ -28,17 +28,23 @@ function TransactionListAdmin(){
             status: formDataTransasction.values.status,
             firtDay: formDataTransasction.values.firtDay,
             lastDay: formDataTransasction.values.lastDay,
-            page: 0, // Trang hiện tại
-            size: 10, // Số lượng bản ghi mỗi trang
+            page: currentPage, // Trang hiện tại
+            size: 3, // Số lượng bản ghi mỗi trang
           },
           headers: {
             Authorization: `Bearer ${Cookies.get("its-cms-accessToken")}`,
           },
         }
       ).then(res =>{
-        setTransactions(res.data.content); // Lấy dữ liệu trang hiện tại
-        setTotalPages(res.data.totalPages); // Tổng số trang
-        console.log(transactions);
+        const { content, totalElements } = res.data;
+        setTransactions(content);
+    
+        // Tính tổng số trang nếu API không trả về totalPages
+        const calculatedTotalPages = Math.ceil(totalElements / 1); // Chia theo `size`
+        setTotalPages(calculatedTotalPages);
+    
+        console.log("Transactions:", content);
+        console.log("Total pages:", calculatedTotalPages);
       }).catch ((error) =>{
         axios.get("http://localhost:8081/auth/refreshToken",{
           headers: {
@@ -51,13 +57,17 @@ function TransactionListAdmin(){
           Cookies.set("its-cms-refreshToken",res.data.data.refreshToken);
         })
       }) 
-  }
+  },
+  onReset: () => {
+    console.log("Form reset to:", formDataTransasction.initialValues);
+    window.location.reload();
+  },
   });
-
   const fetchTransactions = async (page) => {
     try {
       console.log(Cookies.get("its-cms-accessToken"))
       console.log(formDataTransasction.values);
+      console.log(currentPage);
       const response = await axios.post(
         "http://localhost:8888/api/v1/transaction/getAllTransaction",
         null, // Không có body
@@ -68,17 +78,23 @@ function TransactionListAdmin(){
             status: formDataTransasction.values.status,
             firtDay: formDataTransasction.values.firtDay,
             lastDay: formDataTransasction.values.lastDay,
-            page: 0, // Trang hiện tại
-            size: 10, // Số lượng bản ghi mỗi trang
+            page: page, // Trang hiện tại
+            size: 3, // Số lượng bản ghi mỗi trang
           },
           headers: {
             Authorization: `Bearer ${Cookies.get("its-cms-accessToken")}`,
           },
         }
       );
-      setTransactions(response.data.content); // Lấy dữ liệu trang hiện tại
-      setTotalPages(response.data.totalPages); // Tổng số trang
-      console.log(transactions)
+      const { content, totalElements } = response.data;
+      setTransactions(content);
+  
+      // Tính tổng số trang nếu API không trả về totalPages
+      const calculatedTotalPages = Math.ceil(totalElements / 1); // Chia theo `size`
+      setTotalPages(calculatedTotalPages);
+  
+      console.log("Transactions:", content);
+      console.log("Total pages:", calculatedTotalPages);
     } catch (error) {
       console.error("Error fetching transactions:", error);
     }
@@ -115,7 +131,7 @@ function TransactionListAdmin(){
                   <p>Transaction Manager</p>
                   <hr></hr>
                   <div className="table-transaction-form-input">
-                    <form onClick={formDataTransasction.handleSubmit}>
+                    <form onSubmit={formDataTransasction.handleSubmit} onReset={formDataTransasction.handleReset} >
                       <div className="top-form-input">
                         <div>
                           Transaction UUID{" "}
@@ -145,7 +161,9 @@ function TransactionListAdmin(){
                             name="status"
                             onChange={formDataTransasction.handleChange}
                           >
+                            <option value={""}>-------</option>
                             <option value={"SUCCESS"}>SUCCESS</option>
+                            <option value={"PENDING"}>PENDING</option>
                             <option value={"FAILED"}>FAILED</option>
                           </select>
                         </div>
@@ -184,7 +202,7 @@ function TransactionListAdmin(){
         <thead>
           <tr>
             <th>ID</th>
-            <th>Transaction UUID</th>
+            <th>Transaction Code</th>
             <th>From Wallet</th>
             <th>From User</th>
             <th>To Wallet</th>
@@ -210,15 +228,23 @@ function TransactionListAdmin(){
         </tbody>
       </table>
                      {/* Thanh phân trang */}
-      <div className="footer-transaction-page">
-        <button className="button-page" onClick={() => handlePageChange(currentPage - 1)} disabled={currentPage === 0}>
-          Previous
-        </button>
-        <span className="button-page">Page {currentPage + 1} of {totalPages}</span>
-        <button className="button-page" onClick={() => handlePageChange(currentPage + 1)} disabled={currentPage === totalPages - 1}>
-          Next
-        </button>
-      </div>
+                     <div className="pagination">
+                                <button
+                                    onClick={() => setCurrentPage(currentPage - 1)}
+                                    disabled={currentPage === 0}
+                                >
+                                    Previous
+                                </button>
+                                <span>
+                  Page {currentPage + 1} of {totalPages}
+                </span>
+                                <button
+                                    onClick={() => setCurrentPage(currentPage + 1)}
+                                    disabled={currentPage === totalPages - 1}
+                                >
+                                    Next
+                                </button>
+                            </div>
                   </div>
                 </div>
               </div>

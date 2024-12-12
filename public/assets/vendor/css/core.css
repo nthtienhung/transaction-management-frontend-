@@ -23896,6 +23896,7 @@ td {
   padding: 8px 15px;
   border: 1px solid var(--bs-black);
 }
+
 .disabled {
  pointer-events: none;
 }
