@@ -4,8 +4,15 @@ import Cookies from "js-cookie";
 const API_BASE_URL = "http://localhost:8888/api/v1";
 
 // Fetch all transactions
-export const fetchAllTransactions = async (walletCodeByUserLogIn,page) => {
-    return axios.get(`${API_BASE_URL}/transaction/transaction-list-by-user?walletCodeByUserLogIn=${walletCodeByUserLogIn}&page=${page}&size=10`);
+export const fetchAllTransactions = async (walletCodeByUserLogIn,page,filters = {}) => {
+    // return axios.get(`${API_BASE_URL}/transaction/transaction-list-by-user?walletCodeByUserLogIn=${walletCodeByUserLogIn}&page=${page}&size=10`);
+    const query = new URLSearchParams({
+        walletCodeByUserLogIn,
+        page,
+        size: 10,
+        ...filters, // Gộp filters vào query string
+    }).toString();
+    return axios.get(`${API_BASE_URL}/transaction/transaction-list-by-user?${query}`);
 };
 
 export const getUserId = async () => {

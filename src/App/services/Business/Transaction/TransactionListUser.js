@@ -3,25 +3,29 @@ import { useFormik } from "formik";
 import Footer from "../../../compoment/fragment/Footer";
 import Header from "../../../compoment/fragment/Header";
 import Navbar from "../../../compoment/fragment/Navbar";
-import {fetchAllTransactions, getUserId, getWalletByUserId} from "../../api/TransactionApiRequest";
+import {
+    fetchAllTransactions,
+    getUserId,
+    getWalletByUserId
+} from "../../api/TransactionApiRequest";
 
 function TransactionListUser() {
     const [transactions, setTransactions] = useState([]); // Khởi tạo mặc định là mảng rỗng
     const [currentPage, setCurrentPage] = useState(0);
     const [totalPages, setTotalPages] = useState(0);
 
-    const fetchTransactions = async (page) => {
+    const fetchTransactions = async (page,filters) => {
         try {
             const userId = await getUserId();
             const walletResponse = await getWalletByUserId(userId);
-            const response = await fetchAllTransactions(walletResponse.walletCode ,page);
+            const response = await fetchAllTransactions(walletResponse.walletCode, page, filters);
             if (response.data.data.content != null) {
                 setTransactions(response.data.data.content);
-                console.log(transactions);// Giả sử dữ liệu nằm trong trường 'content'
+                console.log(transactions);
                 setTotalPages(response.data.totalPages); // Giả sử tổng số trang ở trường 'totalPages'
             } else {
                 setTransactions([]); // Xử lý trường hợp không có dữ liệu trả về
-                setTotalPages(0); // Đặt tổng số trang bằng 0 nếu không có dữ liệu
+                setTotalPages(10); // Đặt tổng số trang bằng 0 nếu không có dữ liệu
             }
         } catch (error) {
             console.error("Failed to fetch transactions:", error);
@@ -43,8 +47,10 @@ function TransactionListUser() {
             lastDay: ""
         },
         onSubmit: (values) => {
-            console.log("Form Data:", values);
-            // Thêm logic xử lý khi gửi form tại đây
+            const filters = Object.fromEntries(
+                Object.entries(values).filter(([_, value]) => value.trim() !== "")
+            );
+            fetchTransactions(0, filters); // Gọi API với filters
         },
         onReset: () => {
             console.log("Form Reset");
@@ -61,8 +67,25 @@ function TransactionListUser() {
                     <Header />
 
                     <div className="content-wrapper">
-                        <div className="table-transaction">
-                            <p>Transaction Manager</p>
+                        <div
+                            className="table-transaction"
+                            style={{
+                                border: "1px solid #007bff", // Đường viền màu xanh
+                                borderRadius: "5px", // Bo góc
+                                padding: "20px", // Thêm khoảng cách bên trong
+                                margin: "20px", // Thêm khoảng cách xung quanh
+                                boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)", // Hiệu ứng bóng đổ
+                            }}
+                        >
+                            <p
+                                style={{
+                                    fontSize: "18px",
+                                    fontWeight: "bold",
+                                    color: "#007bff",
+                                    marginBottom: "10px",
+                                }}
+                            >
+                                Transaction Manager</p>
                             <hr />
                             <div
                                 className="table-transaction-form-input"
@@ -73,183 +96,184 @@ function TransactionListUser() {
                                     padding: "20px", // Thêm padding để có không gian xung quanh form
                                 }}
                             >
-                                <form
-                                    onSubmit={formDataTransaction.handleSubmit}
-                                    onReset={formDataTransaction.handleReset}
+                                <form onSubmit={formDataTransaction.handleSubmit}
+                                      onReset={formDataTransaction.handleReset}
+                                      >
+                                <div
+                                    className="form-row"
+                                    style={{
+                                        display: "flex",
+                                        gap: "20px",
+                                        marginBottom: "20px",
+                                    }}
                                 >
-                                    <div
-                                        className="form-row"
+                                    <div className="form-group" style={{flex: 1}}>
+                                        <label htmlFor="transactionUUID">Transaction Code</label>
+                                        <input
+                                            type="text"
+                                            className="input-search"
+                                            id="transactionUUID"
+                                            name="transactionUUID"
+                                            onChange={formDataTransaction.handleChange}
+                                            value={formDataTransaction.values.transactionUUID}
+                                            style={{
+                                                padding: "10px",
+                                                border: "1px solid #ccc",
+                                                borderRadius: "5px",
+                                                width: "150px",
+                                            }}
+                                        />
+                                    </div>
+                                    <div className="form-group" style={{flex: 1}}>
+                                        <label htmlFor="wallet">Wallet</label>
+                                        <input
+                                            type="text"
+                                            className="input-search"
+                                            id="wallet"
+                                            name="wallet"
+                                            onChange={formDataTransaction.handleChange}
+                                            value={formDataTransaction.values.wallet}
+                                            style={{
+                                                padding: "10px",
+                                                border: "1px solid #ccc",
+                                                borderRadius: "5px",
+                                                width: "200px",
+                                            }}
+                                        />
+                                    </div>
+                                    <div className="form-group" style={{flex: 1}}>
+                                        <label htmlFor="status">Status</label>
+                                        <input
+                                            type="text"
+                                            className="input-search"
+                                            id="status"
+                                            name="status"
+                                            onChange={formDataTransaction.handleChange}
+                                            value={formDataTransaction.values.status}
+                                            style={{
+                                                padding: "10px",
+                                                border: "1px solid #ccc",
+                                                borderRadius: "5px",
+                                                width: "200px",
+                                            }}
+                                        />
+                                    </div>
+                                </div>
+                                <div
+                                    className="form-row"
+                                    style={{
+                                        display: "flex",
+                                        gap: "20px",
+                                    }}
+                                >
+                                    <div className="form-group" style={{flex: 1}}>
+                                        <label htmlFor="firstDay">Từ ngày</label>
+                                        <input
+                                            type="date"
+                                            className="input-search"
+                                            id="firstDay"
+                                            name="firstDay"
+                                            onChange={formDataTransaction.handleChange}
+                                            value={formDataTransaction.values.firstDay}
+                                            style={{
+                                                padding: "10px",
+                                                border: "1px solid #ccc",
+                                                borderRadius: "5px",
+                                                width: "200px",
+                                            }}
+                                        />
+                                    </div>
+                                    <div className="form-group" style={{flex: 1}}>
+                                        <label htmlFor="lastDay">Đến ngày</label>
+                                        <input
+                                            type="date"
+                                            className="input-search"
+                                            id="lastDay"
+                                            name="lastDay"
+                                            onChange={formDataTransaction.handleChange}
+                                            value={formDataTransaction.values.lastDay}
+                                            style={{
+                                                padding: "10px",
+                                                border: "1px solid #ccc",
+                                                borderRadius: "5px",
+                                                width: "200px",
+                                            }}
+                                        />
+                                    </div>
+                                </div>
+                                <div
+                                    className="form-actions"
+                                    style={{
+                                        display: "flex",
+                                        gap: "15px",
+                                        justifyContent: "center", // Căn giữa các nút
+                                        marginTop: "20px",
+                                    }}
+                                >
+                                    <button
+                                        className="button"
+                                        type="submit"
                                         style={{
-                                            display: "flex",
-                                            gap: "20px",
-                                            marginBottom: "20px",
+                                            padding: "10px 20px",
+                                            backgroundColor: "#007bff",
+                                            color: "#fff",
+                                            border: "none",
+                                            borderRadius: "5px",
+                                            cursor: "pointer",
                                         }}
                                     >
-                                        <div className="form-group" style={{ flex: 1 }}>
-                                            <label htmlFor="transactionUUID">Transaction UUID</label>
-                                            <input
-                                                type="text"
-                                                className="input-search"
-                                                id="transactionUUID"
-                                                name="transactionUUID"
-                                                onChange={formDataTransaction.handleChange}
-                                                value={formDataTransaction.values.transactionUUID}
-                                                style={{
-                                                    padding: "10px",
-                                                    border: "1px solid #ccc",
-                                                    borderRadius: "5px",
-                                                    width: "100%",
-                                                }}
-                                            />
-                                        </div>
-                                        <div className="form-group" style={{ flex: 1 }}>
-                                            <label htmlFor="wallet">Wallet</label>
-                                            <input
-                                                type="text"
-                                                className="input-search"
-                                                id="wallet"
-                                                name="wallet"
-                                                onChange={formDataTransaction.handleChange}
-                                                value={formDataTransaction.values.wallet}
-                                                style={{
-                                                    padding: "10px",
-                                                    border: "1px solid #ccc",
-                                                    borderRadius: "5px",
-                                                    width: "100%",
-                                                }}
-                                            />
-                                        </div>
-                                        <div className="form-group" style={{ flex: 1 }}>
-                                            <label htmlFor="status">Status</label>
-                                            <input
-                                                type="text"
-                                                className="input-search"
-                                                id="status"
-                                                name="status"
-                                                onChange={formDataTransaction.handleChange}
-                                                value={formDataTransaction.values.status}
-                                                style={{
-                                                    padding: "10px",
-                                                    border: "1px solid #ccc",
-                                                    borderRadius: "5px",
-                                                    width: "100%",
-                                                }}
-                                            />
-                                        </div>
-                                    </div>
-                                    <div
-                                        className="form-row"
+                                        Search
+                                    </button>
+                                    <button
+                                        className="button"
+                                        type="reset"
                                         style={{
-                                            display: "flex",
-                                            gap: "20px",
+                                            padding: "10px 20px",
+                                            backgroundColor: "#007bff",
+                                            color: "#fff",
+                                            border: "none",
+                                            borderRadius: "5px",
+                                            cursor: "pointer",
                                         }}
                                     >
-                                        <div className="form-group" style={{ flex: 1 }}>
-                                            <label htmlFor="firstDay">Từ ngày</label>
-                                            <input
-                                                type="date"
-                                                className="input-search"
-                                                id="firstDay"
-                                                name="firstDay"
-                                                onChange={formDataTransaction.handleChange}
-                                                value={formDataTransaction.values.firstDay}
-                                                style={{
-                                                    padding: "10px",
-                                                    border: "1px solid #ccc",
-                                                    borderRadius: "5px",
-                                                    width: "100%",
-                                                }}
-                                            />
-                                        </div>
-                                        <div className="form-group" style={{ flex: 1 }}>
-                                            <label htmlFor="lastDay">Đến ngày</label>
-                                            <input
-                                                type="date"
-                                                className="input-search"
-                                                id="lastDay"
-                                                name="lastDay"
-                                                onChange={formDataTransaction.handleChange}
-                                                value={formDataTransaction.values.lastDay}
-                                                style={{
-                                                    padding: "10px",
-                                                    border: "1px solid #ccc",
-                                                    borderRadius: "5px",
-                                                    width: "100%",
-                                                }}
-                                            />
-                                        </div>
-                                    </div>
-                                    <div
-                                        className="form-actions"
+                                        Reset
+                                    </button>
+                                    <button
+                                        className="button"
+                                        type="button"
                                         style={{
-                                            display: "flex",
-                                            gap: "15px",
-                                            justifyContent: "flex-start",
-                                            marginTop: "20px",
+                                            padding: "10px 20px",
+                                            backgroundColor: "#007bff",
+                                            color: "#fff",
+                                            border: "none",
+                                            borderRadius: "5px",
+                                            cursor: "pointer",
                                         }}
                                     >
-                                        <button
-                                            className="button"
-                                            type="submit"
-                                            style={{
-                                                padding: "10px 20px",
-                                                backgroundColor: "#007bff",
-                                                color: "#fff",
-                                                border: "none",
-                                                borderRadius: "5px",
-                                                cursor: "pointer",
-                                            }}
-                                        >
-                                            Submit
-                                        </button>
-                                        <button
-                                            className="button"
-                                            type="reset"
-                                            style={{
-                                                padding: "10px 20px",
-                                                backgroundColor: "#007bff",
-                                                color: "#fff",
-                                                border: "none",
-                                                borderRadius: "5px",
-                                                cursor: "pointer",
-                                            }}
-                                        >
-                                            Reset
-                                        </button>
-                                        <button
-                                            className="button"
-                                            type="button"
-                                            style={{
-                                                padding: "10px 20px",
-                                                backgroundColor: "#007bff",
-                                                color: "#fff",
-                                                border: "none",
-                                                borderRadius: "5px",
-                                                cursor: "pointer",
-                                            }}
-                                        >
-                                            Create
-                                        </button>
-                                    </div>
-                                </form>
-                            </div>
+                                        Create
+                                    </button>
+                                </div>
 
-                            <hr />
-                            <div className="table-transaction-show">
-                                <table className="transaction-table">
-                                    <thead>
-                                    <tr>
-                                        <th>Transaction UUID</th>
-                                        <th>From Wallet</th>
-                                        <th>To Wallet</th>
-                                        <th>To User</th>
-                                        <th>Amount</th>
-                                        <th>Description</th>
-                                        <th>Status</th>
-                                    </tr>
-                                    </thead>
-                                    <tbody>
-                                    {Array.isArray(transactions) &&
+                            </form>
+                        </div>
+
+                        <hr/>
+                        <div className="table-transaction-show">
+                            <table className="transaction-table">
+                                <thead>
+                                <tr>
+                                    <th>Transaction Code</th>
+                                    <th>From Wallet</th>
+                                    <th>To Wallet</th>
+                                    <th>To User</th>
+                                    <th>Amount</th>
+                                    <th>Description</th>
+                                    <th>Status</th>
+                                    <th>Operation</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                {Array.isArray(transactions) &&
                                         transactions.map((transaction, index) => (
                                             <tr key={index}>
                                                 <td>{transaction.transactionCode}</td>
@@ -259,6 +283,7 @@ function TransactionListUser() {
                                                 <td>{transaction.amount}$</td>
                                                 <td>{transaction.description}</td>
                                                 <td>{transaction.status}</td>
+                                                <td><a href={'/'}>Detail</a></td>
                                             </tr>
                                         ))}
                                     </tbody>
