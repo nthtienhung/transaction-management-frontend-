@@ -106,8 +106,7 @@ function Header() {
                 headers: {
                     Authorization: `${Cookies.get("its-cms-accessToken")}`,
                 },
-            })
-            .then(() => {
+            }).then(() => {
                 setTimeout(() => {
                     toast.success("Hẹn gặp lại ❤️❤️❤️!", {
                         position: "top-right",
@@ -129,7 +128,7 @@ function Header() {
             })
             .catch((error) => {
                 console.log(Cookies.get("its-cms-refreshToken"));
-                axios.get("http://localhost:8081/auth/refreshToken", {
+                axios.get("http://localhost:8888/api/v1/auth/refreshToken", {
                     headers: {
                         Authorization: `Bearer ${Cookies.get("its-cms-refreshToken")}`,
                     },

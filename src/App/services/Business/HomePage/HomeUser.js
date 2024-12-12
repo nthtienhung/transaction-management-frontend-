@@ -60,13 +60,21 @@ function HoneUser() {
           setTotalTransactions(totalTransactionsResponse.data);
         }
       } catch (error) {
-        console.error("Error fetching data:", error);
+        axios.get("http://localhost:8888/api/v1/auth/refreshTokenUser",{
+          headers: {
+            Authorization: `Bearer ${Cookies.get("its-cms-refreshToken")}`,
+          },
+        }).then(res =>{
+          Cookies.remove("its-cms-accessToken");
+          Cookies.remove("its-cms-refreshToken");
+          Cookies.set("its-cms-accessToken", res.data.data.csrfToken);
+          Cookies.set("its-cms-refreshToken",res.data.data.refreshToken);
+        })
       }
     };
 
     fetchWalletData();
   }, []);
-
   const formatNumber = (number) => {
     if (number == null || isNaN(number)) return "0"; // Handle invalid numbers
     return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");

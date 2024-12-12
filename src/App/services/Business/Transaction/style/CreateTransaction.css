@@ -1,5 +1,5 @@
-/* General Layout */
-.layout-wrapper {
+General Layout
+/* .layout-wrapper {
   display: flex;
 }
 
@@ -17,10 +17,10 @@
 
 .content-wrapper {
   margin-top: 20px;
-}
+} */
 
 /* Navbar Styles */
-.layout-menu {
+/* .layout-menu {
   width: 100%;
   height: 100%;
   background-color: #1d1f2f;
@@ -187,7 +187,7 @@ button[type="button"]:hover {
 }
 
 /* Footer Styles */
-footer {
+/* footer {
   padding: 20px;
   background-color: #1d1f2f;
   color: #fff;
@@ -197,7 +197,7 @@ footer {
 footer p {
   margin: 0;
   font-size: 14px;
-}
+} */
 
 /* Mobile Responsiveness */
 @media (max-width: 768px) {

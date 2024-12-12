@@ -91,6 +91,7 @@ function Login() {
 
                   sessionStorage.setItem("userId",res.data.userId);
                   setTimeout(() => {
+                    sessionStorage.setItem("userId",res.data.userId);
                     Cookies.set('user-role', role); 
                     if(role === "ROLE_ADMIN"){
                       navigate("/homeAdmin");
