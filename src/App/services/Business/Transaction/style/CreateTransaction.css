@@ -1,5 +1,26 @@
+General Layout
+/* .layout-wrapper {
+  display: flex;
+}
+
+.layout-container {
+  width: 250px;
+  background-color: #1d1f2f;
+  padding: 20px;
+}
+
+.layout-page {
+  flex-grow: 1;
+  background-color: #f4f6f9;
+  padding: 20px;
+}
+
+.content-wrapper {
+  margin-top: 20px;
+} */
+
 /* Navbar Styles */
-.layout-menu {
+/* .layout-menu {
   width: 100%;
   height: 100%;
   background-color: #1d1f2f;
@@ -164,6 +185,19 @@ button[type="button"] {
 button[type="button"]:hover {
   background-color: #999;
 }
+
+/* Footer Styles */
+/* footer {
+  padding: 20px;
+  background-color: #1d1f2f;
+  color: #fff;
+  text-align: center;
+}
+
+footer p {
+  margin: 0;
+  font-size: 14px;
+} */
 
 /* Mobile Responsiveness */
 @media (max-width: 768px) {

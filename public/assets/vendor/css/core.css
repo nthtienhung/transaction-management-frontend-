@@ -27815,12 +27815,12 @@ td {
     pointer-events: none;
 }
 
-.talbe-transaction {
-    width: 90%;
-    height: 90%;
-    margin-right: 10px;
-    margin-left: 50px;
-    border: 1px solid black;
+.talbe-transaction{
+  width: 90%;
+  height: auto;
+  margin-right: 10px;
+  margin-left: 50px;
+  border: 1px solid black;
 }
 
 .input-search {
@@ -27853,7 +27853,24 @@ td {
     padding-bottom: 10px;
 }
 
-.button {
-    border: 1px solid black;
-    width: 80px;
+.button{
+  border: 1px solid black;
+  width: 80px;
+}
+.table-transaction-show{
+  height: auto;
+}
+.footer-transaction-page{
+  align-items: center;
+  display: inline-flex;
+  padding-top: 20px;
+  padding-bottom: 20px;
+  padding-left: 40%;
+  gap: 10px;
+}
+.button-page{
+  border: 1px solid black;
+}
+.button-page:hover{
+  background-color: gray;
 }

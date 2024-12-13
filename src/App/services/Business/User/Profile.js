@@ -22,6 +22,7 @@ import { Edit, Lock, Email, Phone, Home, Cake, People, ArrowBack } from "@mui/ic
 import { Visibility, VisibilityOff } from "@mui/icons-material";
 import * as Yup from "yup";
 import { useFormik } from "formik";
+import { use } from "react";
 
 const Profile = () => {
     const navigate = useNavigate();
@@ -44,7 +45,6 @@ const Profile = () => {
 
     // Fetch user profile
     useEffect(() => {
-        const fetchProfile = async () => {
             try {
                 const token = Cookies.get("its-cms-accessToken");
                 if (!token) {
@@ -52,20 +52,36 @@ const Profile = () => {
                     navigate("/");
                     return;
                 }
-
-                const response = await axios.get("http://localhost:8888/api/v1/user/profile", {
+                axios.get("http://localhost:8888/api/v1/user/profile", {
                     headers: { Authorization: token },
+                }).then(res =>{
+                    setUser(res.data.data);
+                    setLoading(false);
+                    console.log(res.data.data);
                 });
-                setUser(response.data.data);
             } catch (err) {
-                setError("Unable to fetch user information. Please try again later.");
-            } finally {
-                setLoading(false);
+                console.log(Cookies.get("its-cms-refreshToken"));
+                axios.get("http://localhost:8888/api/v1/auth/refreshTokenUser",{
+                  headers: {
+                    Authorization: `Bearer ${Cookies.get("its-cms-refreshToken")}`,
+                  },
+                }).then(res =>{
+                  Cookies.remove("its-cms-accessToken");
+                  Cookies.remove("its-cms-refreshToken");
+                  Cookies.set("its-cms-accessToken", res.data.data.csrfToken);
+                  Cookies.set("its-cms-refreshToken",res.data.data.refreshToken);
+                axios.get("http://localhost:8888/api/v1/user/profile", {
+                    headers: { 
+                        Authorization: `${Cookies.get("its-cms-refreshToken")}`
+                    },
+                }).then(res =>{
+                    setUser(res.data.data);
+                    setLoading(false);
+                    console.log(res.data.data);
+                });
+                })
             }
-        };
-
-        fetchProfile();
-    }, [navigate]);
+    }, []);
 
     // Validation schema for password change form
     const validationSchema = Yup.object({
