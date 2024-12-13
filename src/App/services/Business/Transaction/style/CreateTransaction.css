@@ -177,7 +177,6 @@ button[type="button"]:hover {
   .layout-container {
     width: 100%;
   }
-
   .dasboard {
     grid-template-columns: 1fr 1fr;
   }
