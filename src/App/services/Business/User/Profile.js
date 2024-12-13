@@ -23,6 +23,7 @@ import { Visibility, VisibilityOff } from "@mui/icons-material";
 import * as Yup from "yup";
 import { useFormik } from "formik";
 import { use } from "react";
+import { jwtDecode } from 'jwt-decode';
 
 const Profile = () => {
     const navigate = useNavigate();
@@ -36,52 +37,41 @@ const Profile = () => {
         newPassword: false,
         confirmPassword: false,
     });
-
+    const [role,setRoles] = useState();
     const [snackbar, setSnackbar] = useState({
         open: false,
         message: "",
         severity: "info",
     });
-
+    useEffect(() =>{
+        const decodeToken = jwtDecode(Cookies.get("its-cms-accessToken"));
+        const role = decodeToken.role;
+        setRoles(role);
+        console.log(role);
+    },[])
+    useEffect(() =>{
+        const token = Cookies.get("its-cms-accessToken");
+        axios.get("http://localhost:8888/api/v1/user/profile", {
+            headers: { Authorization: token },
+        }).then(res =>{
+            setUser(res.data.data);
+            setLoading(false);
+            console.log(res.data.data);
+        }).catch((error) =>{
+            console.log(sessionStorage.getItem("its-cms-refreshToken"));
+            axios.get("http://localhost:8888/api/v1/auth/refreshTokenUser",{
+              headers: {
+                Authorization: `Bearer ${sessionStorage.getItem("its-cms-refreshToken")}`,
+              },
+            }).then(res =>{
+                Cookies.remove("its-cms-accessToken");
+                sessionStorage.removeItem("its-cms-refreshToken");
+                Cookies.set("its-cms-accessToken", res.data.data.csrfToken);
+                sessionStorage.setItem("its-cms-refreshToken",res.data.data.refreshToken);
+        })
+    })
     // Fetch user profile
-    useEffect(() => {
-            try {
-                const token = Cookies.get("its-cms-accessToken");
-                if (!token) {
-                    setError("You are not logged in. Please log in to continue.");
-                    navigate("/");
-                    return;
-                }
-                axios.get("http://localhost:8888/api/v1/user/profile", {
-                    headers: { Authorization: token },
-                }).then(res =>{
-                    setUser(res.data.data);
-                    setLoading(false);
-                    console.log(res.data.data);
-                });
-            } catch (err) {
-                console.log(Cookies.get("its-cms-refreshToken"));
-                axios.get("http://localhost:8888/api/v1/auth/refreshTokenUser",{
-                  headers: {
-                    Authorization: `Bearer ${Cookies.get("its-cms-refreshToken")}`,
-                  },
-                }).then(res =>{
-                  Cookies.remove("its-cms-accessToken");
-                  Cookies.remove("its-cms-refreshToken");
-                  Cookies.set("its-cms-accessToken", res.data.data.csrfToken);
-                  Cookies.set("its-cms-refreshToken",res.data.data.refreshToken);
-                axios.get("http://localhost:8888/api/v1/user/profile", {
-                    headers: { 
-                        Authorization: `${Cookies.get("its-cms-refreshToken")}`
-                    },
-                }).then(res =>{
-                    setUser(res.data.data);
-                    setLoading(false);
-                    console.log(res.data.data);
-                });
-                })
-            }
-    }, []);
+},[])
 
     // Validation schema for password change form
     const validationSchema = Yup.object({
@@ -235,9 +225,16 @@ return (
                         variant="outlined"
                         color="primary"
                         sx={{ marginBottom: 2 }}
-                        onClick={() => navigate("/homeUser")}
-                    >
-                        Back to Home
+                        onClick={() =>
+                            {role === "ROLE_ADMIN" &&<>
+                             {navigate("/homeAdmin")}
+                             </>
+                            ||<> {navigate("/homeUser")}</>
+                            }
+                        }
+                        
+                        >
+                            Back to home page
                     </Button>
                     <Box mb={4} textAlign="center">
                         <Typography variant="h3" fontWeight="bold">

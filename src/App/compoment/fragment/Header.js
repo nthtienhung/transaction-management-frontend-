@@ -46,15 +46,15 @@ function Header() {
                     axios
                         .get("http://localhost:8888/api/v1/auth/refreshTokenUser", {
                             headers: {
-                                Authorization: `Bearer ${Cookies.get("its-cms-refreshToken")}`,
+                                Authorization: `Bearer ${sessionStorage.getItem("its-cms-refreshToken")}`,
                             },
                         })
                         .then((res) => {
                             // Cập nhật token mới
                             Cookies.remove("its-cms-accessToken");
-                            Cookies.remove("its-cms-refreshToken");
+                            sessionStorage.removeItem("its-cms-refreshToken");
                             Cookies.set("its-cms-accessToken", res.data.data.csrfToken);
-                            Cookies.set("its-cms-refreshToken", res.data.data.refreshToken);
+                            sessionStorage.setItem("its-cms-refreshToken", res.data.data.refreshToken);
 
                             // Gọi lại API profile với token mới
                             axios
@@ -69,11 +69,8 @@ function Header() {
                                 })
                         })
                 } else {
-                    // Nếu lỗi khác, log ra để dễ debug
                     console.error(error);
                 }
-
-                // Thực hiện refresh token
 
 
             });
@@ -120,23 +117,21 @@ function Header() {
                 }, 500);
                 setTimeout(() => {
                     sessionStorage.clear();
-                    Cookies.remove("user-role");
                     Cookies.remove("its-cms-accessToken");
-                    Cookies.remove("its-cms-refreshToken");
                     navigate("/");
                 }, 1000);
             })
             .catch((error) => {
-                console.log(Cookies.get("its-cms-refreshToken"));
+                console.log(sessionStorage.get("its-cms-refreshToken"));
                 axios.get("http://localhost:8888/api/v1/auth/refreshToken", {
                     headers: {
-                        Authorization: `Bearer ${Cookies.get("its-cms-refreshToken")}`,
+                        Authorization: `Bearer ${sessionStorage.getItem("its-cms-refreshToken")}`,
                     },
                 }).then(res => {
                     Cookies.remove("its-cms-accessToken");
-                    Cookies.remove("its-cms-refreshToken");
+                    sessionStorage.removeItem("its-cms-refreshToken");
                     Cookies.set("its-cms-accessToken", res.data.data.csrfToken);
-                    Cookies.set("its-cms-refreshToken", res.data.data.refreshToken);
+                    sessionStorage.setItem("its-cms-refreshToken", res.data.data.refreshToken);
                 })
             });
     };
