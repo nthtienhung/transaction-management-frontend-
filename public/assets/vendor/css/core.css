@@ -3802,10 +3802,10 @@ textarea.form-control-lg {
     --bs-position: end;
 }
 
-.dropdown-menu-end[data-bs-popper] {
+/* .dropdown-menu-end[data-bs-popper] {
     right: 0;
     left: auto;
-}
+} */
 
 @media (min-width: 576px) {
     .dropdown-menu-sm-start {
@@ -4037,13 +4037,13 @@ textarea.form-control-lg {
 }
 
 /* Cơ chế ẩn dropdown mặc định */
-.dropdown-menu {
+/* .dropdown-menu {
     display: none;
     opacity: 0;
     margin-top: -10px;
     transform: translateY(-40px) translateX(-50px); /* Dịch chuyển dropdown menu sang trái */
     transition: opacity 0.3s ease, transform 0.3s ease;
-}
+} */
 
 /* Hiển thị dropdown khi hover */
 .nav-item.dropdown:hover .dropdown-menu {
@@ -25588,7 +25588,7 @@ body {
 }
 
 .menu-inner-shadow {
-    display: none;
+
     position: absolute;
     top: 4.225rem;
     width: 100%;
@@ -25604,6 +25604,9 @@ body {
 
 @media (max-width: 1199.98px) {
     .menu-inner-shadow {
+        height: 1.5rem;
+    }
+    .menu-inner {
         height: 1.5rem;
     }
 }
@@ -25951,7 +25954,6 @@ html:not(.layout-menu-fixed) .menu-inner-shadow {
 }
 
 .layout-container {
-    width: 30%;
     display: flex;
     flex: 1 1 auto;
     align-items: stretch;
@@ -26025,13 +26027,12 @@ html:not(.layout-menu-fixed) .menu-inner-shadow {
     z-index: 2;
 }
 
+
 .layout-navbar .navbar {
     transform: translate3d(0, 0, 0);
 }
 
-.layout-navbar .navbar-nav-right {
-    flex-basis: 100%;
-}
+
 
 .layout-navbar .navbar-search-wrapper .search-input,
 .layout-navbar .navbar-search-wrapper .input-group-text {
@@ -26065,6 +26066,7 @@ html:not(.layout-menu-fixed) .menu-inner-shadow {
         width: calc(100% - 1rem * 2) !important;
     }
 }
+
 
 .layout-navbar-fixed.layout-menu-collapsed .layout-navbar.navbar-detached {
     width: calc(100% - 1.625rem * 2 - 5.25rem);
@@ -26142,18 +26144,18 @@ html:not(.layout-menu-fixed) .menu-inner-shadow {
     }
 
     .layout-navbar .navbar-nav .nav-item.dropdown .dropdown-menu {
-        position: absolute;
-        left: 0.9rem;
+        /* position: absolute;
+        left: 0.9rem; */
         min-width: auto;
         width: 92%;
     }
 }
 
-@media (max-width: 1199.98px) {
+/* @media (max-width: 1199.98px) {
     .layout-navbar {
         z-index: 1080;
     }
-}
+} */
 
 .layout-menu {
     position: relative;
@@ -26246,6 +26248,10 @@ html:not(.layout-footer-fixed) .content-wrapper {
     .layout-menu-fixed-offcanvas.layout-navbar-fixed:not(.layout-menu-collapsed) .layout-content-navbar:not(.layout-without-menu) .layout-navbar {
         left: 16.25rem;
     }
+    #layout-navbar{
+        float: left;
+        display: block;
+    }
 }
 
 .layout-footer-fixed .content-footer {
@@ -26260,19 +26266,41 @@ html:not(.layout-footer-fixed) .content-wrapper {
         left: 16.25rem;
     }
 }
-
+.menu-hiden{
+    display: none;
+}
+@media (max-width: 550px) {
+    .fot-input{
+        display: inline-flex;
+     flex-direction: column;
+    }
+}
 @media (max-width: 1199.98px) {
     .layout-menu {
-        position: fixed !important;
-        top: 0 !important;
-        height: 100% !important;
-        left: 0 !important;
-        margin-right: 0 !important;
-        margin-left: 0 !important;
-        transform: translate3d(-100%, 0, 0);
-        will-change: transform, -webkit-transform;
+        display: none; 
     }
-
+    .top-form-input{
+     display: inline-flex;
+     flex-direction: column;
+    }
+    .bot-form-input{
+     display: inline-flex;
+     flex-direction: column;
+    }
+   
+    .menu-item{
+        background-color: ghostwhite;
+        position: relative;
+      }
+    .menu-hidden {
+        display: none;
+      }
+      
+      .menu-inner {
+        display: block;
+        transition: all 0.3s ease-in-out; /* Thêm hiệu ứng */
+        padding-bottom: 30px;
+      }
     .layout-menu-expanded .layout-menu {
         transform: translate3d(0, 0, 0) !important;
     }
@@ -27874,3 +27902,44 @@ td {
 .button-page:hover{
   background-color: gray;
 }
+.menu-hidden {
+    transform: translateX(-100%);
+    transition: transform 0.3s ease-in-out;
+  }
+  
+  /* Hiện menu toàn màn hình */
+  .menu-visible {
+    transform: translateX(0);
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8); /* Tùy chỉnh độ tối */
+    z-index: 9999;
+  }
+  .custom-button {
+    all: unset; /* Xóa kiểu mặc định của button */
+    cursor: pointer; /* Thêm con trỏ dạng nhấp chuột */
+    /* Thêm các tùy chỉnh khác nếu cần */
+  }
+  .dialog-transaction{
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+  }
+  .dialog-transaction-information{
+    background-color: white;
+    padding: 20px;
+    height: auto;
+    border-radius: 8px;
+    width: 80%;
+    text-align: center;
+  }
