@@ -74,3 +74,4 @@ export const getTotalTransactionByUser = async (walletCode) => {
     throw new Error(error.response?.data?.message || "Error fetching total transactions");
   }
 };
+

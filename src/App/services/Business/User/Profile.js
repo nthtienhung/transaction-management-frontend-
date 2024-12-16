@@ -299,7 +299,7 @@ return (
                                 <Card elevation={2} sx={{ borderRadius: "10px", textAlign: "center" }}>
                                     <CardContent>
 
-<Typography variant="h6" color="primary">
+                                        <Typography variant="h6" color="primary">
                                             Welcome Back!
                                         </Typography>
                                         <Typography variant="body2" sx={{ color: "gray" }}>
@@ -359,7 +359,7 @@ return (
                             />
                         </Grid>
 
-{/* New Password */}
+                        {/* New Password */}
                         <Grid item xs={12}>
                             <TextField
                                 fullWidth
@@ -417,7 +417,7 @@ return (
                 </form>
             </Dialog>
 
-{/* Edit Profile Dialog */}
+            {/* Edit Profile Dialog */}
             <Dialog
                 open={openEditProfileDialog}
                 onClose={() => setOpenEditProfileDialog(false)}
@@ -484,8 +484,7 @@ return (
                                     onBlur={editProfileFormik.handleBlur}
                                     fullWidth
                                     error={editProfileFormik.touched.address && Boolean(editProfileFormik.errors.address)}
-
-helperText={editProfileFormik.touched.address && editProfileFormik.errors.address}
+                                    helperText={editProfileFormik.touched.address && editProfileFormik.errors.address}
                                 />
                             </Grid>
                             <Grid item xs={12}>
