@@ -17,24 +17,24 @@ import axios from 'axios';
 import Cookies from 'js-cookie';
 // Custom styled switch with green/red colors
 const StatusSwitch = styled(Switch)(({ theme }) => ({
+    '& .MuiSwitch-switchBase': {
+        color: '#ff3e1d', // Red color for INACTIVE
+        '&:hover': {
+            backgroundColor: 'rgba(255, 62, 29, 0.08)',
+        },
+    },
     '& .MuiSwitch-switchBase.Mui-checked': {
-      color: '#71dd37',
-      '&:hover': {
-        backgroundColor: 'rgba(113, 221, 55, 0.08)',
-      },
+        color: '#71dd37', // Green color for ACTIVE
+        '&:hover': {
+            backgroundColor: 'rgba(113, 221, 55, 0.08)',
+        },
     },
     '& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track': {
-      backgroundColor: '#71dd37',
-    },
-    '& .MuiSwitch-switchBase': {
-      color: '#ff3e1d',
-      '&:hover': {
-        backgroundColor: 'rgba(255, 62, 29, 0.08)',
-      },
+        backgroundColor: '#71dd37', // Green track when active
     },
     '& .MuiSwitch-track': {
-      backgroundColor: '#ff3e1d',
-    },
+        backgroundColor: '#ff3e1d', // Red track when inactive
+    }
 }));
 const UserManagement = () => {
     const [users, setUsers] = useState([]);
@@ -199,16 +199,16 @@ const UserManagement = () => {
                                 <TableCell>{user.role}</TableCell>
                                 <TableCell align="center">
                                     <StatusSwitch
-                                        checked={user.status === 'ACTIVE'}
+                                        checked={user.status === true} // Use boolean comparison
                                         onChange={(e) => handleStatusChange(user.userId, e.target.checked)}
                                         inputProps={{ 'aria-label': 'status toggle' }}
                                     />
                                     <span style={{
-                                        color: user.status === 'ACTIVE' ? '#71dd37' : '#ff3e1d',
+                                        color: user.status === true ? '#71dd37' : '#ff3e1d',
                                         marginLeft: '8px',
                                         fontSize: '0.875rem'
                                     }}>
-                                        {user.status}
+                                        {user.status ? 'ACTIVE' : 'INACTIVE'}
                                     </span>
                                 </TableCell>
                             </TableRow>
