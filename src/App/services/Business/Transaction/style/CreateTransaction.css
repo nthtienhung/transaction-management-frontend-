@@ -200,7 +200,7 @@ footer p {
 } */
 
 /* Mobile Responsiveness */
-@media (max-width: 768px) {
+/* @media (max-width: 768px) {
   .layout-wrapper {
     flex-direction: column;
   }
@@ -212,4 +212,4 @@ footer p {
   .dasboard {
     grid-template-columns: 1fr 1fr;
   }
-}
+} */

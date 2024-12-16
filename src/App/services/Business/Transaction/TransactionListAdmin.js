@@ -5,10 +5,15 @@ import Navbar from "../../../compoment/fragment/Navbar";
 import { useFormik } from "formik";
 import axios from "axios";
 import Cookies from "js-cookie";
+import ConfigService from "./../../../services/CONFIGFE/ConfigService";
+import { CiSearch } from "react-icons/ci";
 function TransactionListAdmin() {
   const [transactions, setTransactions] = useState([]);
+  const [activeContent, setActiveContent] = useState("dashboard"); // State để xác định nội dung hiển thị
   const [currentPage, setCurrentPage] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+
   const formDataTransasction = useFormik({
     initialValues: {
       transactionId: "",
@@ -146,12 +151,19 @@ function TransactionListAdmin() {
     if (number == null || isNaN(number)) return "0"; // Handle invalid numbers
     return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
   };
+  // show Detail
+  const openDialog = () => {
+    setIsDialogOpen(true);
+  };
 
+  const closeDialog = () => {
+    setIsDialogOpen(false);
+  };
   return (
     <>
       <div class="layout-wrapper layout-content-navbar">
         <div class="layout-container">
-        <Navbar setActiveContent={setActiveContent} />
+          <Navbar setActiveContent={setActiveContent} />
         </div>
         <div class="layout-page">
           <Header></Header>
@@ -239,35 +251,68 @@ function TransactionListAdmin() {
               </div>
               <hr></hr>
               <div className="table-transaction-show">
-                <table>
-                  <thead>
-                    <tr>
-                      <th>ID</th>
-                      <th>Transaction Code</th>
-                      <th>From Wallet</th>
-                      <th>From User</th>
-                      <th>To Wallet</th>
-                      <th>Amount</th>
-                      <th>Descripsion</th>
-                      <th>Status</th>
-                      <th>Operator</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {transactions.map((transaction, index) => (
-                      <tr key={transaction.id}>
-                        <td>{index}</td>
-                        <td>{transaction.transactionCode}</td>
-                        <td>{transaction.senderWalletCode}</td>
-                        <td>{transaction.fromUser}</td>
-                        <td>{transaction.receiverWalletCode}</td>
-                        <td>{formatNumber(transaction.amount)}</td>
-                        <td>{transaction.description}</td>
-                        <td>{transaction.status}</td>
+                <div style={{ overflowX: "auto", whiteSpace: "nowrap" }}>
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>ID</th>
+                        <th>Transaction Code</th>
+                        <th>From Wallet</th>
+                        <th>From User</th>
+                        <th>To Wallet</th>
+                        <th>To User</th>
+                        <th>Amount</th>
+                        <th>Description</th>
+                        <th>Status</th>
+                        <th>Operator</th>
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
+                    </thead>
+                    <tbody>
+                      {transactions.map((transaction, index) => (
+                        <tr key={transaction.id}>
+                          <td>{index}</td>
+                          <td>{transaction.transactionCode}</td>
+                          <td>{transaction.senderWalletCode}</td>
+                          <td>{transaction.fromUser}</td>
+                          <td>{transaction.receiverWalletCode}</td>
+                          <td>{transaction.toUser}</td>
+                          <td>{formatNumber(transaction.amount)} đ</td>
+                          <td>{transaction.description}</td>
+                          <td>{transaction.status}</td>
+                          <td style={{ width: "50%", height: "50%" }}>
+                            <div onClick={openDialog}>
+                              <CiSearch style={{ cursor: "pointer" }} />
+                            </div>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+                {/* {information transaction detail} */}
+                {isDialogOpen && (
+                  <div className="dialog-transaction">
+                    <div className="dialog-transaction-information">
+                      <h1 style={{ fontSize: "30px" }}>Thông tin giao dịch</h1>
+                      <div className="">
+                        <div className="">
+                          <div className=""></div>
+                          <div className=""></div>
+                          <div className=""></div>
+                        </div>
+                        <div className="">
+                        
+                        </div>
+                      </div>
+                      <button
+                        onClick={closeDialog}
+                        style={{ marginTop: "10px" }}
+                      >
+                        Đóng
+                      </button>
+                    </div>
+                  </div>
+                )}
                 {/* Thanh phân trang */}
                 <div className="pagination">
                   <button
@@ -276,9 +321,7 @@ function TransactionListAdmin() {
                   >
                     Previous
                   </button>
-                  <span>
-                    Page {currentPage + 1}
-                  </span>
+                  <span>Page {currentPage + 1}</span>
                   <button
                     onClick={() => setCurrentPage(currentPage + 1)}
                     disabled={
