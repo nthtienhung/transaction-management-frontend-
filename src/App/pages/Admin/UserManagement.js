@@ -9,10 +9,33 @@ import {
     Paper,
     Typography,
     Box,
-    TablePagination
+    TablePagination,
+    Switch,
+    styled
 } from '@mui/material';
 import axios from 'axios';
 import Cookies from 'js-cookie';
+// Custom styled switch with green/red colors
+const StatusSwitch = styled(Switch)(({ theme }) => ({
+    '& .MuiSwitch-switchBase.Mui-checked': {
+      color: '#71dd37',
+      '&:hover': {
+        backgroundColor: 'rgba(113, 221, 55, 0.08)',
+      },
+    },
+    '& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track': {
+      backgroundColor: '#71dd37',
+    },
+    '& .MuiSwitch-switchBase': {
+      color: '#ff3e1d',
+      '&:hover': {
+        backgroundColor: 'rgba(255, 62, 29, 0.08)',
+      },
+    },
+    '& .MuiSwitch-track': {
+      backgroundColor: '#ff3e1d',
+    },
+}));
 const UserManagement = () => {
     const [users, setUsers] = useState([]);
     const [page, setPage] = useState(0);
@@ -34,10 +57,14 @@ const UserManagement = () => {
                     }
                 }
             );
+            // Log the response to see the user data structure
+            console.log('Users data:', response.data.data.content);
+            console.log('API response:', response.data); 
             setUsers(response.data.data.content);
             setTotalElements(response.data.data.totalElements);
             setLoading(false);
         } catch (err) {
+            console.error('Error fetching users:', err);
             setError('Failed to fetch users');
             setLoading(false);
         }
@@ -91,6 +118,36 @@ const UserManagement = () => {
         setPage(newPage);
     };
 
+    const handleStatusChange = async ( userId, newStatus) => {
+        try {
+            // const userId = sessionStorage.getItem('userId');
+            if (!userId) {
+                console.error('User ID is undefined',userId);
+                return;
+            }
+            console.log('Updating status for user:', userId, newStatus);
+
+
+            
+            await axios.put(
+                // `http://localhost:8888/api/v1/user/user-list/${userId}/status`,
+                // { status: newStatus ? 'ACTIVE' : 'INACTIVE' },
+                `http://localhost:8081/auth/update-status/${userId}`,  // Changed URL to call IAM service
+                newStatus ? 'ACTIVE' : 'INACTIVE',  // Send status directly
+                {
+                    headers: {
+                        'Authorization': `${Cookies.get('its-cms-accessToken')}`,
+                        'Content-Type': 'application/json'
+                    }
+                }
+            );
+            // Refresh user list after status update
+            fetchUsers(page, debouncedSearchTerm);
+        } catch (err) {
+            console.error('Error updating status:', err);
+        }
+    };
+
     if (loading) return <div>Loading...</div>;
     if (error) return <div>{error}</div>;
 
@@ -128,19 +185,32 @@ const UserManagement = () => {
                             <TableCell>Phone</TableCell>
                             <TableCell>Address</TableCell>
                             <TableCell>Role</TableCell>
-                            <TableCell>Status</TableCell>
+                            <TableCell align="center">Status</TableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>
-                        {users.map((user, index) => (
-                            <TableRow key={index}>
+                        {users.map((user) => (
+                            <TableRow key={user.userId}>
                                 <TableCell>{user.firstName}</TableCell>
                                 <TableCell>{user.lastName}</TableCell>
                                 <TableCell>{user.email}</TableCell>
                                 <TableCell>{user.phone}</TableCell>
                                 <TableCell>{user.address}</TableCell>
                                 <TableCell>{user.role}</TableCell>
-                                <TableCell>{user.status ? 'Active' : 'Inactive'}</TableCell>
+                                <TableCell align="center">
+                                    <StatusSwitch
+                                        checked={user.status === 'ACTIVE'}
+                                        onChange={(e) => handleStatusChange(user.userId, e.target.checked)}
+                                        inputProps={{ 'aria-label': 'status toggle' }}
+                                    />
+                                    <span style={{
+                                        color: user.status === 'ACTIVE' ? '#71dd37' : '#ff3e1d',
+                                        marginLeft: '8px',
+                                        fontSize: '0.875rem'
+                                    }}>
+                                        {user.status}
+                                    </span>
+                                </TableCell>
                             </TableRow>
                         ))}
                     </TableBody>
