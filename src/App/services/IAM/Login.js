@@ -16,9 +16,11 @@ import {generateOTP} from "../api/ApiRequest";
 function Login() {
   const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
-  const location = useLocation();
-  const role = Cookies.get('user-role');
+
   useEffect(() => {
+    if(Cookies.get("its-cms-accessToken")){
+    const decodeToken = jwtDecode(Cookies.get("its-cms-accessToken"));
+    const role = decodeToken.role;
     axios
         .get("http://localhost:8888/api/v1/user/profile", {
           headers: {
@@ -42,7 +44,8 @@ function Login() {
             progress: undefined,
           });
         })
-  }, [role,navigate]);
+      }
+  }, [navigate]);
   const togglePasswordVisibility = () => {
     setShowPassword((prevState) => !prevState);
   };
@@ -64,8 +67,7 @@ function Login() {
         .then((res) => {
           if (res.status == 200) {
             Cookies.set("its-cms-accessToken", res.data.data.csrfToken);
-            Cookies.set("its-cms-refreshToken", res.data.data.refreshToken);
-            console.log(Cookies.get("its-cms-accessToken"))
+            sessionStorage.setItem("its-cms-refreshToken", res.data.data.refreshToken);
             setTimeout(() => {
             const decodeToken = jwtDecode(Cookies.get("its-cms-accessToken"));
             const role = decodeToken.role;
@@ -88,11 +90,8 @@ function Login() {
                     draggable: true,
                     progress: undefined,
                   });
-
-                  sessionStorage.setItem("userId",res.data.userId);
                   setTimeout(() => {
                     sessionStorage.setItem("userId",res.data.userId);
-                    Cookies.set('user-role', role); 
                     if(role === "ROLE_ADMIN"){
                       navigate("/homeAdmin");
                     }else{
@@ -154,7 +153,6 @@ function Login() {
 
          }else if(messageError === "Account has been temporarily locked"){
           toast.error("Tài khoản đã bị khóa do đăng nhập sai quá 5 lần, thử lại sau", {
-
             position: "top-right",
             autoClose: 3000,
             hideProgressBar: true,
