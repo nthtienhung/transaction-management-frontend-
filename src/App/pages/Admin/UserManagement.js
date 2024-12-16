@@ -208,7 +208,8 @@ const UserManagement = () => {
                                         marginLeft: '8px',
                                         fontSize: '0.875rem'
                                     }}>
-                                        {user.status ? 'ACTIVE' : 'INACTIVE'}
+                                        {/* add text "active" "inactive" */}
+                                        {/* {user.status ? 'ACTIVE' : 'INACTIVE'} */}
                                     </span>
                                 </TableCell>
                             </TableRow>
