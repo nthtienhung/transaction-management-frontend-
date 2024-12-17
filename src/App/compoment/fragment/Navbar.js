@@ -3,7 +3,7 @@ import Cookies from "js-cookie";
 import { jwtDecode } from "jwt-decode";
 import { useNavigate } from "react-router-dom";
 
-function Navbar({ setActiveContent }) {
+function Navbar({ setActiveContent}) {
   const [isDashboardOpen, setIsDashboardOpen] = useState(false); // Quản lý trạng thái mở menu Dashboard
   const [isConfigurationOpen, setIsConfigurationOpen] = useState(false); // Trạng thái mở cho Configuration
   const menuRef = useRef(null);
@@ -50,7 +50,11 @@ function Navbar({ setActiveContent }) {
   const handleConfigurationToggle = () => {
     setIsConfigurationOpen((prevState) => !prevState);
   };
-
+ // open menu
+ const [isMenuOpen, setIsMenuOpen] = useState(false);
+ const toggleMenu = () => {
+  setIsMenuOpen(!isMenuOpen);
+};
   return (
     <>
       <aside
