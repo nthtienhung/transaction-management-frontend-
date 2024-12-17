@@ -4,12 +4,19 @@ import Cookies from "js-cookie";
 import {useNavigate} from "react-router-dom";
 import {toast} from "react-toastify";
 import {jwtDecode} from "jwt-decode";
+import WalletInfoModal from '../WalletInfoModal';
 
 function Header() {
     const [users, setUsers] = useState({firstName: "", lastName: ""});
     const [role, setRoles] = useState();
     const navigate = useNavigate();
     const token = Cookies.get("its-cms-accessToken");
+
+    //wallet
+    const [walletInfo, setWalletInfo] = useState(null);
+    const [showWalletModal, setShowWalletModal] = useState(false);
+    const [error, setError] = useState(null);
+
     useEffect(() => {
         if (!token) {
             toast.warning("Hết phiên đăng nhập, vui lòng đăng nhập lại !", {
@@ -140,6 +147,44 @@ function Header() {
                 })
             });
     };
+
+    const fetchWalletInfo = async () => {
+        try {
+            const userId = sessionStorage.getItem('userId');
+            
+            // Get user profile
+            const userResponse = await axios.get(
+                `http://localhost:8888/api/v1/user/profile`,
+                {
+                    headers: {
+                        'Authorization': `${Cookies.get('its-cms-accessToken')}`
+                    }
+                }
+            );
+
+            // Get wallet info
+            const walletResponse = await axios.get(
+                `http://localhost:8888/api/v1/wallet/getWallet/${userId}`,
+                {
+                    headers: {
+                        'Authorization': `${Cookies.get('its-cms-accessToken')}`
+                    }
+                }
+            );
+
+            setWalletInfo({
+                firstName: userResponse.data.data.firstName,
+                lastName: userResponse.data.data.lastName,
+                walletCode: walletResponse.data.walletCode,
+                balance: walletResponse.data.balance
+            });
+        } catch (err) {
+            setError('Failed to fetch wallet information');
+            console.error(err);
+        }
+    };
+
+    
     return (
         <>
             <nav
@@ -232,10 +277,26 @@ function Header() {
                                     </a>
                                 </li>
                                 <li>
-                                    <a class="dropdown-item" href="#">
-                                        <i class="bx bx-credit-card bx-sm me-2"></i> Wallet
-                                        {/* <span class="badge bg-danger rounded-pill ms-2">4</span> */}
+                                    <a 
+                                        className="dropdown-item" 
+                                        href="#"
+                                        onClick={(e) => {
+                                            e.preventDefault();
+                                            if (role === 'ROLE_USER') {
+                                                fetchWalletInfo();
+                                                setShowWalletModal(true);
+                                            }
+                                        }}
+                                        style={{ display: role === 'ROLE_ADMIN' ? 'none' : 'block' }}
+                                    >
+                                        <i className="bx bx-credit-card bx-sm me-2"></i> Wallet
                                     </a>
+                                    
+                                    <WalletInfoModal 
+                                        open={showWalletModal}
+                                        onClose={() => setShowWalletModal(false)}
+                                        walletData={walletInfo}
+                                    />
                                 </li>
                                 <li>
                                     <hr class="dropdown-divider"/>
