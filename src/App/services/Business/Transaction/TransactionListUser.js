@@ -18,14 +18,21 @@ function TransactionListUser() {
     const [currentPage, setCurrentPage] = useState(0);
     const [totalPages, setTotalPages] = useState(0);
     const [userWalletCode, setUserWalletCode] = useState("");
+    const [filters, setFilters] = useState({
+        transactionCode: "",
+        walletCodeByUserSearch: "",
+        status: "",
+        fromDate: "",
+        toDate: ""
+    });
 
 
-    const fetchTransactions = async (page) => {
+    const fetchTransactions = async (page,currentFilters) => {
         try {
             const userId = await getUserId();
             const walletResponse = await getWalletByUserId(userId);
             setUserWalletCode(walletResponse.walletCode);
-            const response = await fetchAllTransactions(walletResponse.walletCode, page);
+            const response = await fetchAllTransactions(walletResponse.walletCode, page, currentFilters);
             if (response.data.data.content) {
                 setTransactions(response.data.data.content);
                 setTotalPages(response.data.data.totalPages || 0);
@@ -45,7 +52,7 @@ function TransactionListUser() {
     };
 
     useEffect(() => {
-        fetchTransactions(currentPage);
+        fetchTransactions(currentPage,filters);
     }, [currentPage]);
 
     const formDataTransaction = useFormik({
@@ -57,45 +64,30 @@ function TransactionListUser() {
             toDate: ""
         },
         onSubmit: async (values) => {
-            try {
-                const userId = await getUserId();
-                const walletResponse = await getWalletByUserId(userId);
 
-                const filters = {
-
-                    walletCodeByUserLogIn: walletResponse.walletCode, // User's own wallet code
-                    walletCodeByUserSearch: values.walletCodeByUserSearch || '',
-                    transactionCode: values.transactionCode || '',
-                    status: values.status || '',
-                    fromDate: values.fromDate ? new Date(values.fromDate).toISOString() : '',
-                    toDate: values.toDate ? new Date(values.toDate).toISOString() : '',
-                    page: currentPage,
-                    size: 10, // Match backend pagination
-
-                };
-                const response = await fetchAllTransactions(walletResponse.walletCode, currentPage, filters);
-
-                if (response.data.data.content) {
-                    setTransactions(response.data.data.content);
-                    setTotalPages(response.data.data.totalPages || 0);
-                } else {
-                    setTransactions([]);
-                    setTotalPages(0);
-                }
-            } catch (error) {
-                console.error("Error fetching transactions:", error);
-                setTransactions([]);
-                setTotalPages(0);
-            }
+            setFilters(values);
+            setCurrentPage(0);
+            await fetchTransactions(0, values);
         },
         onReset: () => {
-            // setTransactions([]);
-            // fetchTransactions(0);
-            // setCurrentPage(0);
-            console.log("Form reset to:", formDataTransaction.initialValues);
-            window.location.reload();
+            // console.log("Form reset to:", formDataTransaction.initialValues);
+            // window.location.reload();
+            const initialFilters = {
+                transactionCode: "",
+                walletCodeByUserSearch: "",
+                status: "",
+                fromDate: "",
+                toDate: ""
+            };
+            setFilters(initialFilters);
+            fetchTransactions(0, initialFilters);
         },
     });
+
+    const handlePageChange = (newPage) => {
+        setCurrentPage(newPage);
+        fetchTransactions(newPage, filters);
+    };
 
     const formatNumber = (number) => {
         if (number == null || isNaN(number)) return "0";
@@ -103,6 +95,7 @@ function TransactionListUser() {
     };
 
     return (
+
         <>
             <div className="layout-wrapper layout-content-navbar">
                 <div className="layout-container">
@@ -166,8 +159,9 @@ function TransactionListUser() {
                                                     padding: "10px",
                                                     border: "1px solid #ccc",
                                                     borderRadius: "5px",
-                                                    width: "150px",
-                                                }}
+                                                    width: "100%",
+                                                    boxSizing: "border-box",
+                                                  }}
                                             />
                                         </div>
                                         <div className="form-group" style={{ flex: 1 }}>
@@ -182,13 +176,14 @@ function TransactionListUser() {
                                                     padding: "10px",
                                                     border: "1px solid #ccc",
                                                     borderRadius: "5px",
-                                                    width: "200px",
-                                                }}
+                                                    width: "100%",
+                                                    boxSizing: "border-box",
+                                                  }}
                                             />
                                         </div>
                                         <div className="form-group" style={{ flex: 1 }}>
                                             <label htmlFor="status">Status</label>
-                                            <input
+                                            <select
                                                 type="text"
                                                 id="status"
                                                 name="status"
@@ -198,9 +193,15 @@ function TransactionListUser() {
                                                     padding: "10px",
                                                     border: "1px solid #ccc",
                                                     borderRadius: "5px",
-                                                    width: "200px",
-                                                }}
-                                            />
+                                                    width: "100%",
+                                                    boxSizing: "border-box",
+                                                  }}
+                                            >
+                                                <option value={""}>-------</option>
+                                                <option value={"SUCCESS"}>SUCCESS</option>
+                                                <option value={"PENDING"}>PENDING</option>
+                                                <option value={"FAILED"}>FAILED</option>
+                                            </select>
                                         </div>
                                     </div>
                                     <div
@@ -222,8 +223,9 @@ function TransactionListUser() {
                                                     padding: "10px",
                                                     border: "1px solid #ccc",
                                                     borderRadius: "5px",
-                                                    width: "200px",
-                                                }}
+                                                    width: "100%",
+                                                    boxSizing: "border-box",
+                                                  }}
                                             />
                                         </div>
                                         <div className="form-group" style={{ flex: 1 }}>
@@ -238,8 +240,9 @@ function TransactionListUser() {
                                                     padding: "10px",
                                                     border: "1px solid #ccc",
                                                     borderRadius: "5px",
-                                                    width: "200px",
-                                                }}
+                                                    width: "100%",
+                                                    boxSizing: "border-box",
+                                                  }}
                                             />
                                         </div>
                                     </div>
@@ -360,7 +363,8 @@ function TransactionListUser() {
                                     Page {currentPage + 1} of {totalPages}
                                 </span>
                                 <button
-                                    onClick={() => setCurrentPage((prevPage) => prevPage + 1)}
+                                    // onClick={() => setCurrentPage((prevPage) => prevPage + 1)}
+                                    onClick={() => handlePageChange(currentPage + 1)}
                                     disabled={transactions.length === 0 || currentPage === totalPages - 1}
                                 >
                                     Next
