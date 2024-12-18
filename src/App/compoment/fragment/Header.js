@@ -303,7 +303,7 @@ function Header({ setActiveContent }) {
                 </li>
                 <li>
                   <p class="dropdown-item">
-                    <i>Quyền hạn: {role}</i>
+                    <i>Role: {role}</i>
                   </p>
                 </li>
                 <li>
