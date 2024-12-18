@@ -300,9 +300,7 @@ function TransactionListAdmin() {
                           <div className=""></div>
                           <div className=""></div>
                         </div>
-                        <div className="">
-                        
-                        </div>
+                        <div className=""></div>
                       </div>
                       <button
                         onClick={closeDialog}

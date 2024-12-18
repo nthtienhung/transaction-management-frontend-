@@ -52,9 +52,9 @@ button.ant-btn-primary:hover {
     white-space: nowrap;
 }
 
+/* Style cho phần chuyển đổi biểu đồ */
 .chart-switcher .ant-radio-button-wrapper {
     background-color: #f0f0f0;
-    color: #1890FF;
 }
 
 .chart-switcher .ant-radio-button-wrapper-checked {
@@ -87,4 +87,33 @@ button.ant-btn-primary:hover {
 .ant-input-search {
     width: 100%;
     margin-bottom: 20px;
+}
+
+/* Thêm màu sắc cho phần filter */
+.filter-card .ant-radio-button-wrapper {
+    background-color: #f5f5f5;
+    color: #1890FF;
+}
+
+.filter-card .ant-radio-button-wrapper-checked {
+    background-color: #1890FF;
+    color: #fff;
+}
+
+.filter-card .ant-btn {
+    margin-left: 10px;
+}
+
+/* Màu nền cho phần biểu đồ và báo cáo */
+.dashboard-container {
+    background-color: #f7f7f7;  /* Màu nền nhẹ cho toàn bộ container */
+    padding: 20px;
+}
+
+.dashboard-container .ant-card-body {
+    padding: 15px;  /* Giảm khoảng cách trong các thẻ */
+}
+
+.chart-container .ant-card-body {
+    padding: 0;  /* Xóa padding trong biểu đồ để tận dụng tối đa không gian */
 }
