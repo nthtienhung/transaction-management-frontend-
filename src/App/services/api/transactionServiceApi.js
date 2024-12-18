@@ -74,3 +74,12 @@ export const getTotalTransactionByUser = async (walletCode) => {
     throw new Error(error.response?.data?.message || "Error fetching total transactions");
   }
 };
+
+export const getTransactionDetail = async (transactionCode) => {
+  try {
+    const response = await axios.get(`${API_BASE_URL}/${transactionCode}`);
+    return response.data;
+  } catch (error) {
+    throw new Error(error.response?.data?.message || "Error fetching transactions");
+  }
+}

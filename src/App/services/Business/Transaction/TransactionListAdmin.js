@@ -7,12 +7,16 @@ import axios from "axios";
 import Cookies from "js-cookie";
 import ConfigService from "./../../../services/CONFIGFE/ConfigService";
 import { CiSearch } from "react-icons/ci";
+import TransactionDetail from "./TransactionDetail";
+import {getTransactionDetail} from "../../api/transactionServiceApi";
+import './style/TransactionDetail.css';
 function TransactionListAdmin() {
   const [transactions, setTransactions] = useState([]);
   const [activeContent, setActiveContent] = useState("dashboard"); // State để xác định nội dung hiển thị
   const [currentPage, setCurrentPage] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [transactionDetail, setTransactionDetail] = useState(null);
 
   const formDataTransasction = useFormik({
     initialValues: {
@@ -152,8 +156,14 @@ function TransactionListAdmin() {
     return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
   };
   // show Detail
-  const openDialog = () => {
-    setIsDialogOpen(true);
+  const openDialog = async (transactionCode) => {
+    try {
+      const details = await getTransactionDetail(transactionCode);
+      setTransactionDetail(details.data);
+      setIsDialogOpen(true);
+    } catch (error) {
+      console.error("Error fetching transaction details:", error);
+    }
   };
 
   const closeDialog = () => {
@@ -280,7 +290,7 @@ function TransactionListAdmin() {
                           <td>{transaction.description}</td>
                           <td>{transaction.status}</td>
                           <td style={{ width: "50%", height: "50%" }}>
-                            <div onClick={openDialog}>
+                            <div onClick={() => openDialog(transaction.transactionCode)}>
                               <CiSearch style={{ cursor: "pointer" }} />
                             </div>
                           </td>
@@ -290,28 +300,11 @@ function TransactionListAdmin() {
                   </table>
                 </div>
                 {/* {information transaction detail} */}
-                {isDialogOpen && (
-                  <div className="dialog-transaction">
-                    <div className="dialog-transaction-information">
-                      <h1 style={{ fontSize: "30px" }}>Thông tin giao dịch</h1>
-                      <div className="">
-                        <div className="">
-                          <div className=""></div>
-                          <div className=""></div>
-                          <div className=""></div>
-                        </div>
-                        <div className="">
-                        
-                        </div>
-                      </div>
-                      <button
-                        onClick={closeDialog}
-                        style={{ marginTop: "10px" }}
-                      >
-                        Đóng
-                      </button>
-                    </div>
-                  </div>
+                {isDialogOpen && transactionDetail && (
+                    <TransactionDetail
+                        transactionDetail={transactionDetail}
+                        onClose={closeDialog}
+                    />
                 )}
                 {/* Thanh phân trang */}
                 <div className="pagination">
