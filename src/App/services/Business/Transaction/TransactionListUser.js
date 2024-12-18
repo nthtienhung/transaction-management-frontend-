@@ -5,6 +5,8 @@ import { useNavigate } from "react-router-dom";
 import Footer from "../../../compoment/fragment/Footer";
 import Header from "../../../compoment/fragment/Header";
 import Navbar from "../../../compoment/fragment/Navbar";
+import { formatISO, parseISO } from "date-fns";
+
 import {
     fetchAllTransactions,
     getUserId,
@@ -65,9 +67,15 @@ function TransactionListUser() {
         },
         onSubmit: async (values) => {
 
-            setFilters(values);
+            const convertedValues = {
+                ...values,
+                fromDate: values.fromDate ? formatISO(parseISO(values.fromDate), { representation: "complete" }) : null,
+                toDate: values.toDate ? formatISO(parseISO(values.toDate), { representation: "complete" }) : null,
+            }
+
+            setFilters(convertedValues);
             setCurrentPage(0);
-            await fetchTransactions(0, values);
+            await fetchTransactions(0, convertedValues);
         },
         onReset: () => {
             // console.log("Form reset to:", formDataTransaction.initialValues);
@@ -309,6 +317,7 @@ function TransactionListUser() {
                                     <tr>
                                         <th>Transaction Code</th>
                                         <th>From Wallet</th>
+                                        <th>From User</th>
                                         <th>To Wallet</th>
                                         <th>To User</th>
                                         <th>Amount</th>
@@ -339,6 +348,7 @@ function TransactionListUser() {
                                                 <tr key={index}>
                                                     <td>{transaction.transactionCode}</td>
                                                     <td>{transaction.senderWalletCode}</td>
+                                                    <td>{transaction.firstNameSender} {transaction.lastNameSender}</td>
                                                     <td>{transaction.receiverWalletCode}</td>
                                                     <td>{transaction.lastName} {transaction.firstName}</td>
                                                     <td style={amountStyle}>{amountDisplay}</td>
