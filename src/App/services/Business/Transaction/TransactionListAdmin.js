@@ -8,13 +8,10 @@ import Cookies from "js-cookie";
 import ConfigService from "./../../../services/CONFIGFE/ConfigService";
 import {CiSearch} from "react-icons/ci";
 import TransactionDetail from "./TransactionDetail";
-import {getTransactionDetail} from "../../api/transactionServiceApi";
-import './style/TransactionDetail.css';
-
 
 function TransactionListAdmin() {
-
     const [transactions, setTransactions] = useState([]);
+    const [activeContent, setActiveContent] = useState("dashboard"); // State để xác định nội dung hiển thị
     const [currentPage, setCurrentPage] = useState(0);
     const [totalPages, setTotalPages] = useState(0);
     const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -29,45 +26,82 @@ function TransactionListAdmin() {
             toDate: "",
         },
         onSubmit: async (values) => {
-            axios.post(
-                "http://localhost:8888/api/v1/transaction/getAllTransaction",
-                null, // Không có body
-                {
-                    params: {
-                        transactionId: formDataTransasction.values.transactionId,
-                        wallet: formDataTransasction.values.wallet,
-                        status: formDataTransasction.values.status,
-                        firtDay: formDataTransasction.values.firtDay,
-                        lastDay: formDataTransasction.values.lastDay,
-                        page: currentPage, // Trang hiện tại
-                        size: 5, // Số lượng bản ghi mỗi trang
-                    },
-                    headers: {
-                        Authorization: `Bearer ${Cookies.get("its-cms-accessToken")}`,
-                    },
-                }
-            ).then(res => {
-                const {content, totalElements} = res.data;
-                setTransactions(content);
+            console.log(values);
+            const params = new URLSearchParams();
+            params.append("transactionId", values.transactionId || "");
+            params.append("walletCode", values.walletCode || "");
+            params.append("status", values.status || "");
+            params.append("fromDate", values.fromDate || "");
+            params.append("toDate", values.toDate || "");
+            console.log(params);
+            axios
+                .post(
+                    "http://localhost:8888/api/v1/transaction/getAllTransaction",
+                    params, // Không có body
+                    {
+                        params: {
+                            page: currentPage, // Trang hiện tại
+                            size: 5, // Số lượng bản ghi mỗi trang
+                        },
+                        headers: {
+                            Authorization: `Bearer ${Cookies.get("its-cms-accessToken")}`,
+                        },
+                    }
+                )
+                .then((res) => {
+                    console.log(res.data)
+                    if (res.data.empty === true) {
+                        axios.post("http://localhost:8888/api/v1/transaction/getAllTransaction", params, // Không có body
+                            {
+                                params: {
+                                    page: currentPage + 1, // Trang hiện tại
+                                    size: 5, // Số lượng bản ghi mỗi trang
+                                },
+                                headers: {
+                                    Authorization: `Bearer ${Cookies.get("its-cms-accessToken")}`,
+                                },
+                            }
+                        ).then(res => {
+                            const {content, totalElements} = res.data;
+                            setTransactions(content);
 
-                // Tính tổng số trang nếu API không trả về totalPages
-                const calculatedTotalPages = Math.ceil(totalElements / 1); // Chia theo `size`
-                setTotalPages(calculatedTotalPages);
+                            // Tính tổng số trang nếu API không trả về totalPages
+                            const calculatedTotalPages = Math.ceil(totalElements / 1); // Chia theo `size`
+                            setTotalPages(calculatedTotalPages);
 
-                console.log("Transactions:", content);
-                console.log("Total pages:", calculatedTotalPages);
-            }).catch((error) => {
-                axios.get("http://localhost:8081/auth/refreshToken", {
-                    headers: {
-                        Authorization: `Bearer ${Cookies.get("its-cms-refreshToken")}`,
-                    },
-                }).then(res => {
-                    Cookies.remove("its-cms-accessToken");
-                    Cookies.remove("its-cms-refreshToken");
-                    Cookies.set("its-cms-accessToken", res.data.data.csrfToken);
-                    Cookies.set("its-cms-refreshToken", res.data.data.refreshToken);
+                            console.log("Transactions:", content);
+                            console.log("Total pages:", calculatedTotalPages);
+                        })
+                    }
+                    const {content, totalElements} = res.data;
+                    setTransactions(content);
+
+                    // Tính tổng số trang nếu API không trả về totalPages
+                    const calculatedTotalPages = Math.ceil(totalElements / 1); // Chia theo `size`
+                    setTotalPages(calculatedTotalPages);
+
+                    console.log("Transactions:", content);
+                    console.log("Total pages:", calculatedTotalPages);
                 })
-            })
+                .catch((error) => {
+                    axios
+                        .get("http://localhost:8888/api/v1/auth/refreshToken", {
+                            headers: {
+                                Authorization: `Bearer ${sessionStorage.getItem(
+                                    "its-cms-refreshToken"
+                                )}`,
+                            },
+                        })
+                        .then((res) => {
+                            Cookies.remove("its-cms-accessToken");
+                            sessionStorage.removeItem("its-cms-refreshToken");
+                            Cookies.set("its-cms-accessToken", res.data.data.csrfToken);
+                            sessionStorage.setItem(
+                                "its-cms-refreshToken",
+                                res.data.data.refreshToken
+                            );
+                        });
+                });
         },
         onReset: () => {
             console.log("Form reset to:", formDataTransasction.initialValues);
@@ -76,19 +110,14 @@ function TransactionListAdmin() {
     });
     const fetchTransactions = async (page) => {
         try {
-            console.log(Cookies.get("its-cms-accessToken"))
+            console.log(Cookies.get("its-cms-accessToken"));
             console.log(formDataTransasction.values);
             console.log(currentPage);
             const response = await axios.post(
                 "http://localhost:8888/api/v1/transaction/getAllTransaction",
-                null, // Không có body
+                formDataTransasction.values, // Không có body
                 {
                     params: {
-                        transactionId: formDataTransasction.values.transactionId,
-                        wallet: formDataTransasction.values.wallet,
-                        status: formDataTransasction.values.status,
-                        firtDay: formDataTransasction.values.firtDay,
-                        lastDay: formDataTransasction.values.lastDay,
                         page: page, // Trang hiện tại
                         size: 5, // Số lượng bản ghi mỗi trang
                     },
@@ -107,10 +136,33 @@ function TransactionListAdmin() {
             console.log("Transactions:", content);
             console.log("Total pages:", calculatedTotalPages);
         } catch (error) {
-            console.error("Error fetching transactions:", error);
+            axios
+                .get("http://localhost:8888/api/v1/auth/refreshToken", {
+                    headers: {
+                        Authorization: `Bearer ${sessionStorage.getItem(
+                            "its-cms-refreshToken"
+                        )}`,
+                    },
+                })
+                .then((res) => {
+                    Cookies.remove("its-cms-accessToken");
+                    sessionStorage.removeItem("its-cms-refreshToken");
+                    Cookies.set("its-cms-accessToken", res.data.data.csrfToken);
+                    sessionStorage.setItem(
+                        "its-cms-refreshToken",
+                        res.data.data.refreshToken
+                    );
+                });
         }
     };
-
+    const renderContent = () => {
+        switch (activeContent) {
+            case "configuration":
+                return <ConfigService/>;
+            default:
+                return <div>Welcome to the Admin Dashboard!</div>;
+        }
+    };
     // Gọi API khi trang thay đổi
     useEffect(() => {
         fetchTransactions(currentPage);
@@ -127,17 +179,9 @@ function TransactionListAdmin() {
         return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
     };
     // show Detail
-    const openDialog = async (transactionCode
-        ) => {
-            try {
-                const details = await getTransactionDetail(transactionCode);
-                setTransactionDetail(details.data);
-                setIsDialogOpen(true);
-            } catch (error) {
-                console.error("Error fetching transaction details:", error);
-            }
-        }
-    ;
+    const openDialog = () => {
+        setIsDialogOpen(true);
+    };
 
     const closeDialog = () => {
         setIsDialogOpen(false);
@@ -146,7 +190,7 @@ function TransactionListAdmin() {
         <>
             <div class="layout-wrapper layout-content-navbar">
                 <div class="layout-container">
-                    <Navbar></Navbar>
+                    <Navbar setActiveContent={setActiveContent}/>
                 </div>
                 <div class="layout-page">
                     <Header></Header>
@@ -263,7 +307,7 @@ function TransactionListAdmin() {
                                                 <td>{transaction.description}</td>
                                                 <td>{transaction.status}</td>
                                                 <td style={{width: "50%", height: "50%"}}>
-                                                    <div onClick={() => openDialog(transaction.transactionCode)}>
+                                                    <div onClick={openDialog}>
                                                         <CiSearch style={{cursor: "pointer"}}/>
                                                     </div>
                                                 </td>
@@ -272,6 +316,7 @@ function TransactionListAdmin() {
                                         </tbody>
                                     </table>
                                 </div>
+                                {/* {information transaction detail} */}
                                 {/* {information transaction detail} */}
                                 {isDialogOpen && transactionDetail && (
                                     <TransactionDetail
@@ -287,12 +332,13 @@ function TransactionListAdmin() {
                                     >
                                         Previous
                                     </button>
-                                    <span>
-                  Page {currentPage + 1} of {totalPages}
-                </span>
+                                    <span>Page {currentPage + 1}</span>
                                     <button
                                         onClick={() => setCurrentPage(currentPage + 1)}
-                                        disabled={currentPage === totalPages - 1}
+                                        disabled={
+                                            currentPage === totalPages || // Đã đến trang cuối
+                                            transactions.length < 5 // Số phần tử ít hơn độ dài trang cho phép
+                                        }
                                     >
                                         Next
                                     </button>
@@ -304,7 +350,7 @@ function TransactionListAdmin() {
                 </div>
             </div>
         </>
-    )
+    );
 }
 
 export default TransactionListAdmin;
