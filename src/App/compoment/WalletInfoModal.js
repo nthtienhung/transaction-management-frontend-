@@ -1,15 +1,33 @@
 import React from 'react';
-import { Modal, Table } from '@mui/material';
+import { Modal, Table, styled } from '@mui/material';
 import { formatNumber } from '../utils/formatNumber';
+
+// Custom styled modal component
+const StyledModal = styled(Modal)({
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center'
+});
+
+const modalContentStyle = {
+    position: 'absolute',
+    top: '50%',
+    left: '50%',
+    transform: 'translate(-50%, -50%)',
+    width: 400,
+    backgroundColor: 'white',
+    borderRadius: '8px',
+    boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
+};
 
 const WalletInfoModal = ({ open, onClose, walletData }) => {
     return (
-        <Modal
+        <StyledModal
             open={open}
             onClose={onClose}
             aria-labelledby="wallet-info-modal"
         >
-            <div className="modal-dialog">
+            <div className="modal-dialog" style={modalContentStyle}>
                 <div className="modal-content">
                     <div className="modal-header">
                         <h5 className="modal-title">Wallet Information</h5>
@@ -43,7 +61,7 @@ const WalletInfoModal = ({ open, onClose, walletData }) => {
                     </div>
                 </div>
             </div>
-        </Modal>
+        </StyledModal>
     );
 };
 

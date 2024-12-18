@@ -355,6 +355,7 @@ import {
     getUserId,
     getWalletByUserId
 } from "../../api/TransactionApiRequest";
+import './style/TransactionListUser.css';
 
 function TransactionListUser() {
     const navigate = useNavigate();
@@ -487,7 +488,9 @@ function TransactionListUser() {
                                             marginBottom: "20px",
                                         }}
                                     >
-                                        <div className="form-group" style={{ flex: 1 }}>
+                                        <div className="form-group" 
+                                        // style={{ flex: 1 }}
+                                        >
                                             <label htmlFor="transactionUUID">Transaction Code</label>
                                             <input
                                                 type="text"
@@ -499,7 +502,7 @@ function TransactionListUser() {
                                                     padding: "10px",
                                                     border: "1px solid #ccc",
                                                     borderRadius: "5px",
-                                                    width: "150px",
+                                                    width: "200px",
                                                 }}
                                             />
                                         </div>
@@ -651,14 +654,14 @@ function TransactionListUser() {
                                     {Array.isArray(transactions) &&
                                         transactions.map((transaction, index) => (
                                             <tr key={index}>
-                                                <td>{transaction.transactionCode}</td>
-                                                <td>{transaction.senderWalletCode}</td>
-                                                <td>{transaction.receiverWalletCode}</td>
-                                                <td>{transaction.lastName} {transaction.firstName}</td>
-                                                <td>{transaction.amount} đ</td>
-                                                <td>{transaction.description}</td>
-                                                <td>{transaction.status}</td>
-                                                <td><a href={'/'}>Detail</a></td>
+                                                <td data-label="Transaction Code">{transaction.transactionCode}</td>
+                                                <td data-label="From Wallet">{transaction.senderWalletCode}</td>
+                                                <td data-label="To Wallet">{transaction.receiverWalletCode}</td>
+                                                <td data-label="To User">{transaction.lastName} {transaction.firstName}</td>
+                                                <td data-label="Amount">{transaction.amount} đ</td>
+                                                <td data-label="Description">{transaction.description}</td>
+                                                <td data-label="Status">{transaction.status}</td>
+                                                <td data-label="Operation"><a href={'/'}>Detail</a></td>
                                             </tr>
                                         ))}
                                     </tbody>
