@@ -46,9 +46,33 @@ function TransactionListAdmin() {
           }
         )
         .then((res) => {
+          console.log(res.data)
+          if(res.data.empty === true ){
+            axios.post("http://localhost:8888/api/v1/transaction/getAllTransaction",params, // Không có body
+              {
+                params: {
+                  page: currentPage + 1, // Trang hiện tại
+                  size: 5, // Số lượng bản ghi mỗi trang
+                },
+                headers: {
+                  Authorization: `Bearer ${Cookies.get("its-cms-accessToken")}`,
+                },
+              }
+            ).then(res =>{
+              const { content, totalElements } = res.data;
+          setTransactions(content);
+        
+          // Tính tổng số trang nếu API không trả về totalPages
+          const calculatedTotalPages = Math.ceil(totalElements / 1); // Chia theo `size`
+          setTotalPages(calculatedTotalPages);
+
+          console.log("Transactions:", content);
+          console.log("Total pages:", calculatedTotalPages);
+            })
+          }
           const { content, totalElements } = res.data;
           setTransactions(content);
-
+        
           // Tính tổng số trang nếu API không trả về totalPages
           const calculatedTotalPages = Math.ceil(totalElements / 1); // Chia theo `size`
           setTotalPages(calculatedTotalPages);
