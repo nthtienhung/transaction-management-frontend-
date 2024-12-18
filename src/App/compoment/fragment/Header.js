@@ -136,7 +136,7 @@ function Header({ setActiveContent }) {
         }, 1000);
       })
       .catch((error) => {
-        console.log(sessionStorage.get("its-cms-refreshToken"));
+        console.log(sessionStorage.getItem("its-cms-refreshToken"));
         axios
           .get("http://localhost:8888/api/v1/auth/refreshToken", {
             headers: {

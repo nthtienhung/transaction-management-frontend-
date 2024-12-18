@@ -3,10 +3,9 @@ import { DatePicker, Button, message, Card, Col, Row, Radio } from "antd";
 import moment from "moment";
 import axios from "axios";
 import Cookies from "js-cookie";
-import { Column, Pie } from '@ant-design/charts';
 import { writeFileXLSX, utils } from 'xlsx';
 import './style/AdminDashboard.css';
-
+import { Column,Pie } from "@ant-design/plots";
 const { RangePicker } = DatePicker;
 
 const AdminDashboard = () => {
