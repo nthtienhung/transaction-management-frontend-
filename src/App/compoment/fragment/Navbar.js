@@ -143,12 +143,13 @@ function Navbar({ setActiveContent}) {
               <li className="menu-item">
                 <a 
                   href="#" 
-                  className="menu-link"
+                  className="menu-link menu-toggle"
                   onClick={(e) => {
                     e.preventDefault();
                     setActiveContent("users");
                   }}
                 >
+                  <i className="menu-icon tf-icons bx bx-user"></i>
                   <div className="text-truncate" data-i18n="Users">User Management</div>
                 </a>
               </li>
