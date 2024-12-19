@@ -34,6 +34,11 @@ function Login() {
             navigate("/homeUser");
           }
         }).catch((error) =>{
+          localStorage.removeItem("userId");
+          sessionStorage.removeItem("its-cms-refreshToken");
+          sessionStorage.removeItem("userId");
+          sessionStorage.clear();
+          Cookies.remove("its-cms-accessToken");
           toast.warning("Hết phiên đăng nhập, vui lòng đăng nhập lại !", {
             position: "top-right",
             autoClose: 3000,
@@ -44,6 +49,21 @@ function Login() {
             progress: undefined,
           });
         })
+      }else{
+        localStorage.removeItem("userId");
+        sessionStorage.removeItem("its-cms-refreshToken");
+        sessionStorage.removeItem("userId");
+        sessionStorage.clear();
+        Cookies.remove("its-cms-accessToken");
+        toast.warning("Hết phiên đăng nhập, vui lòng đăng nhập lại !", {
+          position: "top-right",
+          autoClose: 3000,
+          hideProgressBar: true,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+        });
       }
   }, [navigate]);
   const togglePasswordVisibility = () => {
