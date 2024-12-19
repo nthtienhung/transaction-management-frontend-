@@ -41,7 +41,7 @@ function Header({ setActiveContent }) {
       axios
         .get("http://localhost:8888/api/v1/user/profile", {
           headers: {
-            Authorization: `${Cookies.get("its-cms-accessToken")}`,
+            Authorization: `Bearer ${Cookies.get("its-cms-accessToken")}`,
           },
         })
         .then((res) => {
@@ -75,7 +75,7 @@ function Header({ setActiveContent }) {
                 axios
                   .get("http://localhost:8888/api/v1/user/profile", {
                     headers: {
-                      Authorization: `${Cookies.get("its-cms-accessToken")}`,
+                      Authorization: `Bearer ${Cookies.get("its-cms-accessToken")}`,
                     },
                   })
                   .then((res) => {
@@ -114,7 +114,7 @@ function Header({ setActiveContent }) {
     axios
       .get("http://localhost:8888/api/v1/auth/logoutAccount", {
         headers: {
-          Authorization: `${Cookies.get("its-cms-accessToken")}`,
+          Authorization: `Bearer ${Cookies.get("its-cms-accessToken")}`,
         },
       })
       .then(() => {

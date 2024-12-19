@@ -16,7 +16,11 @@ export const fetchAllTransactions = async (walletCodeByUserLogIn, page, filters 
         ...cleanedFilters
     }).toString();
 
-    return axios.get(`${API_BASE_URL}/transaction/transaction-list-by-user?${query}`);
+    return axios.get(`${API_BASE_URL}/transaction/transaction-list-by-user?${query}`, {
+        headers: {
+            Authorization: `Bearer ${Cookies.get("its-cms-accessToken")}`,
+        }
+    });
 };
 
 
@@ -30,7 +34,7 @@ export const getUserId = async () => {
         }
 
         const response = await axios.get("http://localhost:8888/api/v1/user/profile", {
-            headers: { Authorization: token },
+            headers: {Authorization: `Bearer ${token}`},
         });
 
         console.log(response.data.data.userId);
@@ -38,16 +42,16 @@ export const getUserId = async () => {
         return response.data.data.userId; // Giả sử API trả về userId trong response.data
     } catch (error) {
         // Xử lý lỗi
-        axios.get("http://localhost:8888/api/v1/auth/refreshTokenUser",{
+        axios.get("http://localhost:8888/api/v1/auth/refreshTokenUser", {
             headers: {
-              Authorization: `Bearer ${Cookies.get("its-cms-refreshToken")}`,
+                Authorization: `Bearer ${Cookies.get("its-cms-refreshToken")}`,
             },
-          }).then(res =>{
+        }).then(res => {
             Cookies.remove("its-cms-accessToken");
             Cookies.remove("its-cms-refreshToken");
             Cookies.set("its-cms-accessToken", res.data.data.csrfToken);
-            Cookies.set("its-cms-refreshToken",res.data.data.refreshToken);
-          })
+            Cookies.set("its-cms-refreshToken", res.data.data.refreshToken);
+        })
     }
 };
 
