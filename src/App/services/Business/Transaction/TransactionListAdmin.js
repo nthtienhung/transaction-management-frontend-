@@ -7,6 +7,7 @@ import axios from "axios";
 import Cookies from "js-cookie";
 import ConfigService from "./../../../services/CONFIGFE/ConfigService";
 import { CiSearch } from "react-icons/ci";
+
 function TransactionListAdmin() {
   const [transactions, setTransactions] = useState([]);
   const [activeContent, setActiveContent] = useState("dashboard"); // State để xác định nội dung hiển thị
@@ -82,7 +83,7 @@ function TransactionListAdmin() {
         })
         .catch((error) => {
           axios
-            .get("http://localhost:8888/api/v1/auth/refreshToken", {
+            .get("http://localhost:8888/api/v1/auth/refreshTokenUser", {
               headers: {
                 Authorization: `Bearer ${sessionStorage.getItem(
                   "its-cms-refreshToken"
@@ -134,7 +135,7 @@ function TransactionListAdmin() {
       console.log("Total pages:", calculatedTotalPages);
     } catch (error) {
       axios
-        .get("http://localhost:8888/api/v1/auth/refreshToken", {
+        .get("http://localhost:8888/api/v1/auth/refreshTokenUser", {
           headers: {
             Authorization: `Bearer ${sessionStorage.getItem(
               "its-cms-refreshToken"
