@@ -8,6 +8,7 @@ import Cookies from "js-cookie";
 import ConfigService from "./../../../services/CONFIGFE/ConfigService";
 import {CiSearch} from "react-icons/ci";
 import TransactionDetail from "./TransactionDetail";
+import {getTransactionDetail} from "../../api/transactionServiceApi";
 
 function TransactionListAdmin() {
     const [transactions, setTransactions] = useState([]);
@@ -179,8 +180,15 @@ function TransactionListAdmin() {
         return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
     };
     // show Detail
-    const openDialog = () => {
-        setIsDialogOpen(true);
+    const openDialog = async (transactionCode) => {
+        try {
+            const response = await getTransactionDetail(transactionCode);
+            setTransactionDetail(response);
+            setIsDialogOpen(true);
+        } catch (error) {
+            console.error("Error fetching transaction details:", error.message);
+            alert("Failed to fetch transaction details. Please try again.");
+        }
     };
 
     const closeDialog = () => {
@@ -307,7 +315,7 @@ function TransactionListAdmin() {
                                                 <td>{transaction.description}</td>
                                                 <td>{transaction.status}</td>
                                                 <td style={{width: "50%", height: "50%"}}>
-                                                    <div onClick={openDialog}>
+                                                    <div onClick={() => openDialog(transaction.transactionCode)}>
                                                         <CiSearch style={{cursor: "pointer"}}/>
                                                     </div>
                                                 </td>
@@ -316,7 +324,6 @@ function TransactionListAdmin() {
                                         </tbody>
                                     </table>
                                 </div>
-                                {/* {information transaction detail} */}
                                 {/* {information transaction detail} */}
                                 {isDialogOpen && transactionDetail && (
                                     <TransactionDetail

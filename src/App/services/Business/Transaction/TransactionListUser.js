@@ -11,6 +11,9 @@ import {
     getWalletByUserId
 } from "../../api/TransactionApiRequest";
 import axios from "axios";
+import {getTransactionDetail} from "../../api/transactionServiceApi";
+import {CiSearch} from "react-icons/ci";
+import TransactionDetail from "./TransactionDetail";
 
 function TransactionListUser() {
     const navigate = useNavigate();
@@ -25,7 +28,8 @@ function TransactionListUser() {
         fromDate: "",
         toDate: ""
     });
-
+    const [isDialogOpen, setIsDialogOpen] = useState(false);
+    const [transactionDetail, setTransactionDetail] = useState(null);
 
     const fetchTransactions = async (page,currentFilters) => {
         try {
@@ -92,6 +96,21 @@ function TransactionListUser() {
     const formatNumber = (number) => {
         if (number == null || isNaN(number)) return "0";
         return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+    };
+
+    const openDialog = async (transactionCode) => {
+        try {
+            const response = await getTransactionDetail(transactionCode);
+            setTransactionDetail(response);
+            setIsDialogOpen(true);
+        } catch (error) {
+            console.error("Error fetching transaction details:", error.message);
+            alert("Failed to fetch transaction details. Please try again.");
+        }
+    };
+
+    const closeDialog = () => {
+        setIsDialogOpen(false);
     };
 
     return (
@@ -344,14 +363,23 @@ function TransactionListUser() {
                                                     <td style={amountStyle}>{amountDisplay}</td>
                                                     <td>{transaction.description}</td>
                                                     <td>{transaction.status}</td>
-                                                    <td><a href="/">Detail</a></td>
+                                                    <td>
+                                                        <div onClick={() => openDialog(transaction.transactionCode)}>
+                                                            <CiSearch style={{cursor: "pointer"}}/>
+                                                        </div>
+                                                    </td>
                                                 </tr>
                                             );
                                         })}
                                     </tbody>
                                 </table>
                             </div>
-
+                            {isDialogOpen && transactionDetail && (
+                                <TransactionDetail
+                                    transactionDetail={transactionDetail}
+                                    onClose={closeDialog}
+                                />
+                            )}
                             <div className="pagination">
                                 <button
                                     onClick={() => setCurrentPage((prevPage) => Math.max(prevPage - 1, 0))}
