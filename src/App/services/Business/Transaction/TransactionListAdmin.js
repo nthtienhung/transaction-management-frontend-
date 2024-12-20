@@ -139,7 +139,7 @@ function TransactionListAdmin() {
             console.log("Total pages:", calculatedTotalPages);
         } catch (error) {
             axios
-                .get("http://localhost:8888/api/v1/auth/refreshToken", {
+                .get("http://localhost:8888/api/v1/auth/refreshTokenUser", {
                     headers: {
                         Authorization: `Bearer ${sessionStorage.getItem(
                             "its-cms-refreshToken"

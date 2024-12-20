@@ -63,6 +63,15 @@ const TransactionDetailDialog = ({ transactionDetail, onClose }) => {
         borderRadius: '5px',
         cursor: 'pointer',
     };
+    const convertToLocalDate = (instant) => {
+        if (!instant) return "";
+        const date = new Date(instant);
+        return date.toLocaleDateString("vi-VN", {
+            year: "numeric",
+            month: "2-digit",
+            day: "2-digit",
+        });
+    };
 
     return (
         <div className="dialog-transaction" style={dialogContainerStyle}>
@@ -103,11 +112,11 @@ const TransactionDetailDialog = ({ transactionDetail, onClose }) => {
                     </div>
                     <div style={transactionRowStyle}>
                         <p style={labelStyle}><strong>Sending Time:</strong></p>
-                        <p style={valueStyle}>{transactionDetail.createdDate}</p>
+                        <p style={valueStyle}>{convertToLocalDate(transactionDetail.createdDate)}</p>
                     </div>
                     <div style={transactionRowStyle}>
                         <p style={labelStyle}><strong>Receiving Time:</strong></p>
-                        <p style={valueStyle}>{transactionDetail.updatedDate}</p>
+                        <p style={valueStyle}>{convertToLocalDate(transactionDetail.updatedDate)}</p>
                     </div>
                 </div>
                 <button onClick={onClose} style={closeButtonStyle}>

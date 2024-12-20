@@ -12,6 +12,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import Cookies from 'js-cookie';
 import { jwtDecode } from 'jwt-decode';
 import {generateOTP} from "../api/ApiRequest";
+import {generateOtp} from "../api/authService";
 
 function Login() {
   const [showPassword, setShowPassword] = useState(false);
@@ -75,7 +76,7 @@ function Login() {
             if(value.role === role){
               axios.get("http://localhost:8888/api/v1/user/getUser",{
                 headers: {
-                  Authorization: `${Cookies.get("its-cms-accessToken")}`,
+                  Authorization: `Bearer ${Cookies.get("its-cms-accessToken")}`,
                 },
               })
               .then(res =>{
@@ -108,7 +109,7 @@ function Login() {
                       draggable: true,
                       progress: undefined,
                     });
-                    generateOTP(value.email);
+                    generateOtp(value.email);
                     setTimeout(() => navigate("/verify", { state: { email: value.email } }), 1500);
                 }
               })

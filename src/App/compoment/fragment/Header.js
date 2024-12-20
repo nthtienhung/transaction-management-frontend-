@@ -75,7 +75,7 @@ function Header({ setActiveContent }) {
                 axios
                   .get("http://localhost:8888/api/v1/user/profile", {
                     headers: {
-                      Authorization: `${Cookies.get("its-cms-accessToken")}`,
+                      Authorization: `Bearer ${Cookies.get("its-cms-accessToken")}`,
                     },
                   })
                   .then((res) => {
@@ -114,7 +114,7 @@ function Header({ setActiveContent }) {
     axios
       .get("http://localhost:8888/api/v1/auth/logoutAccount", {
         headers: {
-          Authorization: `Bearer ${Cookies.get("its-cms-accessToken")}`,
+          Authorization: `${Cookies.get("its-cms-accessToken")}`,
         },
       })
       .then(() => {
@@ -138,7 +138,7 @@ function Header({ setActiveContent }) {
       .catch((error) => {
         console.log(sessionStorage.getItem("its-cms-refreshToken"));
         axios
-          .get("http://localhost:8888/api/v1/auth/refreshToken", {
+          .get("http://localhost:8888/api/v1/auth/refreshTokenUser", {
             headers: {
               Authorization: `Bearer ${sessionStorage.getItem(
                 "its-cms-refreshToken"
