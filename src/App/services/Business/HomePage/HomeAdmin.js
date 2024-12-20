@@ -3,6 +3,7 @@ import Footer from "../../../compoment/fragment/Footer";
 import Header from "../../../compoment/fragment/Header";
 import Navbar from "../../../compoment/fragment/Navbar";
 import ConfigService from "./../../../services/CONFIGFE/ConfigService";
+import UserManagement from '../../../pages/Admin/UserManagement';
 import AdminDashboard from './../Transaction/AdminDashboard'; // Import AdminDashboard
 
 function HomeAdmin() {
@@ -12,6 +13,8 @@ function HomeAdmin() {
     switch (activeContent) {
       case "configuration":
         return <ConfigService />;
+      case "users":
+        return <UserManagement />;
       case "dashboard":
         return <AdminDashboard />; // Hiển thị AdminDashboard khi activeContent là "dashboard"
       default:

@@ -10,6 +10,7 @@ import {
     getUserId,
     getWalletByUserId
 } from "../../api/TransactionApiRequest";
+import './style/TransactionListUser.css';
 import axios from "axios";
 import {getTransactionDetail} from "../../api/transactionServiceApi";
 import {CiSearch} from "react-icons/ci";
