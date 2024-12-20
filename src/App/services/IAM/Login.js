@@ -72,14 +72,15 @@ function Login() {
             const decodeToken = jwtDecode(Cookies.get("its-cms-accessToken"));
             const role = decodeToken.role;
             console.log(role);
+            console.log(Cookies.get("its-cms-accessToken"))
             if(value.role === role){
               axios.get("http://localhost:8888/api/v1/user/getUser",{
                 headers: {
-                  Authorization: `${Cookies.get("its-cms-accessToken")}`,
+                  Authorization: `Bearer ${Cookies.get("its-cms-accessToken")}`,
                 },
               })
               .then(res =>{
-                console.log(res.data)
+                console.log(res)
                 if(res.data.isVerified === "VERIFIED"){
                   toast.success("Đăng nhập thành công", {
                     position: "top-right",

@@ -31,7 +31,7 @@ function HoneUser() {
             `http://localhost:8888/api/v1/wallet/getWallet/${userId}`,
             {
               headers: {
-                Authorization: `${Cookies.get("its-cms-accessToken")}`,
+                Authorization: `Bearer ${Cookies.get("its-cms-accessToken")}`,
               },
             }
         );
