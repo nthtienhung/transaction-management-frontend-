@@ -91,3 +91,16 @@ export const getTotalTransactionByUser = async (walletCode) => {
   }
 };
 
+export const getTransactionDetail = async (transactionCode) => {
+  try {
+    const response = await axios.get(`${API_BASE_URL}/${transactionCode}`, {
+      headers: {
+        Authorization: `Bearer ${Cookies.get("its-cms-accessToken")}`,
+      }
+    });
+    return response.data.data;
+  } catch (error) {
+    throw new Error(error.response?.data?.message || "Error fetching transactions");
+  }
+}
+

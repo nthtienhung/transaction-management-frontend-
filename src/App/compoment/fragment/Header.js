@@ -75,7 +75,7 @@ function Header({ setActiveContent }) {
                 axios
                   .get("http://localhost:8888/api/v1/user/profile", {
                     headers: {
-                      Authorization: `Bearer ${Cookies.get("its-cms-accessToken")}`,
+                      Authorization: `${Cookies.get("its-cms-accessToken")}`,
                     },
                   })
                   .then((res) => {

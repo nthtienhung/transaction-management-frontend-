@@ -34,7 +34,9 @@ export const getUserId = async () => {
         }
 
         const response = await axios.get("http://localhost:8888/api/v1/user/profile", {
-            headers: {Authorization: `Bearer ${token}`},
+            headers: {
+                Authorization: `Bearer ${Cookies.get("its-cms-refreshToken")}`,
+            }
         });
 
         console.log(response.data.data.userId);
@@ -57,7 +59,11 @@ export const getUserId = async () => {
 
 export const getWalletByUserId = async (userId) => {
     try {
-        const response = await axios.get(`${API_BASE_URL}/wallet/code/${userId}`);
+        const response = await axios.get(`${API_BASE_URL}/wallet/code/${userId}`,{
+            headers: {
+                Authorization: `Bearer ${Cookies.get("its-cms-accessToken")}`,
+            }
+        });
         return response.data;
     } catch (error) {
         console.error("Error fetching wallet details:", error);
