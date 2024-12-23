@@ -132,11 +132,11 @@ const UserManagement = () => {
             await axios.put(
                 // `http://localhost:8888/api/v1/user/user-list/${userId}/status`,
                 // { status: newStatus ? 'ACTIVE' : 'INACTIVE' },
-                `http://localhost:8081/auth/update-status/${userId}`,  // Changed URL to call IAM service
-                newStatus ? 'ACTIVE' : 'INACTIVE',  // Send status directly
+                `http://localhost:8888/api/v1/auth/update-status/${userId}`,  // Changed URL to call IAM service
+                { status: newStatus ? 'ACTIVE' : 'INACTIVE' },  // Send status directly
                 {
                     headers: {
-                        'Authorization': `${Cookies.get('its-cms-accessToken')}`,
+                        'Authorization': `Bearer ${Cookies.get('its-cms-accessToken')}`,
                         'Content-Type': 'application/json'
                     }
                 }

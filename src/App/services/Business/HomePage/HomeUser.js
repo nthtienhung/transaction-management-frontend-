@@ -62,7 +62,7 @@ function HoneUser() {
       } catch (error) {
         axios.get("http://localhost:8888/api/v1/auth/refreshTokenUser",{
           headers: {
-            Authorization: `Bearer ${sessionStorage.getItem("its-cms-refreshToken")}`,
+            Authorization: `${sessionStorage.getItem("its-cms-refreshToken")}`,
           },
         }).then(res =>{
           Cookies.remove("its-cms-accessToken");
