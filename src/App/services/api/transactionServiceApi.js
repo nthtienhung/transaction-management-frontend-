@@ -5,7 +5,11 @@ const API_BASE_URL = "http://localhost:8888/api/v1/transaction"; // URL của ba
 
 export const sendOTP = async (payload) => {
   try {
-    const response = await axios.post(`${API_BASE_URL}/send-otp`, payload);
+    const response = await axios.post(`${API_BASE_URL}/send-otp`, payload, {
+      headers: {
+        Authorization: `Bearer ${Cookies.get("its-cms-accessToken")}`,
+      }
+    });
     return response.data;
   } catch (error) {
     throw new Error(error.response?.data?.message || "Error sending OTP");
@@ -14,7 +18,11 @@ export const sendOTP = async (payload) => {
 
 export const confirmTransaction = async (payload) => {
   try {
-    const response = await axios.post(`${API_BASE_URL}/confirm`, payload);
+    const response = await axios.post(`${API_BASE_URL}/confirm`, payload, {
+      headers: {
+        Authorization: `Bearer ${Cookies.get("its-cms-accessToken")}`,
+      }
+    });
     return response.data;
   } catch (error) {
     throw new Error(error.response?.data?.message || "Error confirming transaction");

@@ -53,7 +53,7 @@ const UserManagement = () => {
                 `http://localhost:8888/api/v1/user/user-list?page=${pageNumber}&size=${rowsPerPage}&searchTerm=${search || ''}&sortBy=createDate&sortDirection=${sortDirection}`, 
                 {
                     headers: {
-                        'Authorization': `${Cookies.get('its-cms-accessToken')}`
+                        'Authorization': `Bearer ${Cookies.get('its-cms-accessToken')}`
                     }
                 }
             );

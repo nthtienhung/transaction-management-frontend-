@@ -56,7 +56,7 @@ function Login() {
   });
   const userFormData = useFormik({
     initialValues: {
-      role: "ROLE_ADMIN",
+      role: "ADMIN",
       email: "",
       password: "",
     },
@@ -74,7 +74,7 @@ function Login() {
             const role = decodeToken.role;
             console.log(role);
             console.log(Cookies.get("its-cms-accessToken"))
-            if(value.role === role){
+            if("ROLE_" + value.role === role){
               axios.get("http://localhost:8888/api/v1/user/getUser",{
                 headers: {
                   Authorization: `Bearer ${Cookies.get("its-cms-accessToken")}`,
@@ -94,6 +94,7 @@ function Login() {
                   });
                   setTimeout(() => {
                     sessionStorage.setItem("userId",res.data.userId);
+                    console.log(role)
                     if(role === "ROLE_ADMIN"){
                       navigate("/homeAdmin");
                     }else{
@@ -153,7 +154,17 @@ function Login() {
             progress: undefined,
           });
 
-         }else if(messageError === "Account has been temporarily locked"){
+         }else if(messageError === "You have no permission to access") {
+            toast.error("Tài khoản không có quyền truy cập.", {
+              position: "top-right",
+              autoClose: 2000,
+              hideProgressBar: true,
+              closeOnClick: true,
+              pauseOnHover: true,
+              draggable: true,
+              progress: undefined,
+            });
+          }else if(messageError === "Account has been temporarily locked"){
           toast.error("Tài khoản đã bị khóa do đăng nhập sai quá 5 lần, thử lại sau", {
             position: "top-right",
             autoClose: 3000,
@@ -218,10 +229,10 @@ function Login() {
                         value={userFormData.values.role}
                         className="form-control"
                       >
-                        <option defaultValue={"ROLE_ADMIN"} value={"ROLE_ADMIN"}>
+                        <option defaultValue={"ADMIN"} value={"ADMIN"}>
                           ADMIN
                         </option>
-                        <option value={"ROLE_USER"}>USER</option>
+                        <option value={"USER"}>USER</option>
                       </select>
                     </div>
                   </div>

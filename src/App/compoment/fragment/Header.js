@@ -58,8 +58,6 @@ function Header({ setActiveContent }) {
           setUsers(res.data.data);
         })
         .catch((error) => {
-          if (error.response.status === 401 || error.response.status === 400) {
-            // Xử lý lỗi 400 riêng
             axios
               .get("http://localhost:8888/api/v1/auth/refreshTokenUser", {
                 headers: {
@@ -77,6 +75,7 @@ function Header({ setActiveContent }) {
                   "its-cms-refreshToken",
                   res.data.data.refreshToken
                 );
+                window.location.reload();
 
                 // Gọi lại API profile với token mới
                 axios
@@ -89,10 +88,20 @@ function Header({ setActiveContent }) {
                     sessionStorage.setItem("userId", res.data.data.userId);
                     setUsers(res.data.data);
                   });
+                window.location.reload();
+              }).catch((error) =>{
+              toast.warning("Hết phiên đăng nhập, vui lòng đăng nhập lại !", {
+                position: "top-right",
+                autoClose: 3000,
+                hideProgressBar: true,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
               });
-          } else {
-            console.error(error);
-          }
+              navigate("/");
+            });
+
         });
     } else {
       toast.error("Tài khoản truy cập trái phép, xin vui lòng đăng nhập !", {
@@ -160,6 +169,7 @@ function Header({ setActiveContent }) {
               "its-cms-refreshToken",
               res.data.data.refreshToken
             );
+            window.location.reload();
           });
       });
   };
@@ -179,7 +189,7 @@ function Header({ setActiveContent }) {
               `http://localhost:8888/api/v1/user/profile`,
               {
                   headers: {
-                      'Authorization': `${Cookies.get('its-cms-accessToken')}`
+                      'Authorization': `Bearer ${Cookies.get('its-cms-accessToken')}`
                   }
               }
           );
@@ -189,7 +199,7 @@ function Header({ setActiveContent }) {
               `http://localhost:8888/api/v1/wallet/getWallet/${userId}`,
               {
                   headers: {
-                      'Authorization': `${Cookies.get('its-cms-accessToken')}`
+                      'Authorization': `Bearer ${Cookies.get('its-cms-accessToken')}`
                   }
               }
           );

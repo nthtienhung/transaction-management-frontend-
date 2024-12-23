@@ -35,7 +35,7 @@ export const getUserId = async () => {
 
         const response = await axios.get("http://localhost:8888/api/v1/user/profile", {
             headers: {
-                Authorization: `Bearer ${Cookies.get("its-cms-refreshToken")}`,
+                Authorization: `Bearer ${Cookies.get("its-cms-accessToken")}`,
             }
         });
 
@@ -50,9 +50,9 @@ export const getUserId = async () => {
             },
         }).then(res => {
             Cookies.remove("its-cms-accessToken");
-            Cookies.remove("its-cms-refreshToken");
+            sessionStorage.removeItem("its-cms-refreshToken");
             Cookies.set("its-cms-accessToken", res.data.data.csrfToken);
-            Cookies.set("its-cms-refreshToken", res.data.data.refreshToken);
+            sessionStorage.setItem("its-cms-refreshToken", res.data.data.refreshToken);
         })
     }
 };
