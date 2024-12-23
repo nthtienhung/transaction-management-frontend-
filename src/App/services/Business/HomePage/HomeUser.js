@@ -31,7 +31,7 @@ function HoneUser() {
             `http://localhost:8888/api/v1/wallet/getWallet/${userId}`,
             {
               headers: {
-                Authorization: `${Cookies.get("its-cms-accessToken")}`,
+                Authorization: `Bearer ${Cookies.get("its-cms-accessToken")}`,
               },
             }
         );
@@ -141,7 +141,7 @@ function HoneUser() {
                     {receivedTransactions.map((transaction, index) => (
                         <tr key={index}>
                           <td>
-                            #{transaction.transactionCode} biên giao dịch ngày {transaction.createdDate} số tiền {formatNumber(transaction.amount)} đ
+                            #{transaction.transactionCode} biên giao dịch ngày {convertToLocalDate(transaction.createdDate)} số tiền {formatNumber(transaction.amount)} đ
                           </td>
                         </tr>
                     ))}

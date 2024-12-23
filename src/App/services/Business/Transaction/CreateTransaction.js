@@ -79,6 +79,7 @@ function CreateTransaction() {
 
         // Call API to get wallet info by wallet code
         const walletInfo = await getWalletByWalletCode(values.recipientWalletCode);
+        console.log(walletInfo);
 
         if (!walletInfo || !walletInfo.userId) {
           throw new Error("Wallet information is invalid or userId is missing.");
@@ -235,6 +236,7 @@ function CreateTransaction() {
     try {
       // Gọi API để lấy thông tin ví
       const walletInfo = await getWalletByWalletCode(walletCode);
+      console.log(walletInfo)
       if (!walletInfo || !walletInfo.userId) {
         setRecipientName("");
         throw new Error("Không tìm thấy thông tin ví hoặc thông tin không hợp lệ.");

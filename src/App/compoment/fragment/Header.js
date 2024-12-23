@@ -81,6 +81,7 @@ function Header({ setActiveContent }) {
                   .then((res) => {
                     sessionStorage.setItem("userId", res.data.data.userId);
                     setUsers(res.data.data);
+                    window.location.reload();
                   });
               });
           } else {

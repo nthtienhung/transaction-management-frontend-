@@ -16,7 +16,29 @@ export const fetchAllTransactions = async (walletCodeByUserLogIn, page, filters 
         ...cleanedFilters
     }).toString();
 
-    return axios.get(`${API_BASE_URL}/transaction/transaction-list-by-user?${query}`);
+    return axios.get(`${API_BASE_URL}/transaction/transaction-list-by-user?${query}`,{
+         headers: 
+                    { Authorization: `Bearer ${Cookies.get("its-cms-accessToken")}` 
+                   }  
+    }).catch((error) => {
+                        axios
+                          .get("http://localhost:8888/api/v1/auth/refreshTokenUser", {
+                            headers: {
+                              Authorization: `Bearer ${sessionStorage.getItem(
+                                "its-cms-refreshToken"
+                              )}`,
+                            },
+                          })
+                          .then((res) => {
+                            Cookies.remove("its-cms-accessToken");
+                            sessionStorage.removeItem("its-cms-refreshToken");
+                            Cookies.set("its-cms-accessToken", res.data.data.csrfToken);
+                            sessionStorage.setItem(
+                              "its-cms-refreshToken",
+                              res.data.data.refreshToken
+                            );
+                          });
+                      });
 };
 
 
@@ -30,7 +52,9 @@ export const getUserId = async () => {
         }
 
         const response = await axios.get("http://localhost:8888/api/v1/user/profile", {
-            headers: { Authorization: token },
+             headers: 
+                       { Authorization: `${Cookies.get("its-cms-accessToken")}` 
+                      }  
         });
 
         console.log(response.data.data.userId);
@@ -40,20 +64,25 @@ export const getUserId = async () => {
         // Xử lý lỗi
         axios.get("http://localhost:8888/api/v1/auth/refreshTokenUser",{
             headers: {
-              Authorization: `Bearer ${Cookies.get("its-cms-refreshToken")}`,
+              Authorization: `Bearer ${sessionStorage.getItem("its-cms-refreshToken")}`,
             },
           }).then(res =>{
             Cookies.remove("its-cms-accessToken");
-            Cookies.remove("its-cms-refreshToken");
+            sessionStorage.removeItem("its-cms-refreshToken");
             Cookies.set("its-cms-accessToken", res.data.data.csrfToken);
-            Cookies.set("its-cms-refreshToken",res.data.data.refreshToken);
+            sessionStorage.setItem("its-cms-refreshToken",res.data.data.refreshToken);
           })
     }
 };
 
 export const getWalletByUserId = async (userId) => {
     try {
-        const response = await axios.get(`${API_BASE_URL}/wallet/code/${userId}`);
+        const response = await axios.get(`${API_BASE_URL}/wallet/code/${userId}`,{
+           headers: 
+                     { Authorization: `Bearer ${Cookies.get("its-cms-accessToken")}` 
+                    }  
+                  }
+        );
         return response.data;
     } catch (error) {
         console.error("Error fetching wallet details:", error);

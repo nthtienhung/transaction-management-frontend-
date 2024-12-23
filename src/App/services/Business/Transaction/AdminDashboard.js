@@ -74,6 +74,8 @@ const AdminDashboard = () => {
                     );
                   });
               });
+   
+
 
       const userResponse = await axios.get(
           "http://localhost:8888/api/v1/transaction/users",
@@ -81,6 +83,7 @@ const AdminDashboard = () => {
             params: { startDate, endDate },
             headers: { Authorization: `Bearer ${Cookies.get("its-cms-accessToken")}` },
           }
+
       ).catch((error) => {
                 axios
                   .get("http://localhost:8888/api/v1/auth/refreshTokenUser", {
@@ -101,12 +104,15 @@ const AdminDashboard = () => {
                   });
               });
 
+
+
       const transactionResponse = await axios.get(
           "http://localhost:8888/api/v1/transaction/transactions",
           {
             params: { startDate, endDate },
             headers: { Authorization: `Bearer ${Cookies.get("its-cms-accessToken")}` },
           }
+
       ).catch((error) => {
                 axios
                   .get("http://localhost:8888/api/v1/auth/refreshTokenUser", {
@@ -126,6 +132,7 @@ const AdminDashboard = () => {
                     );
                   });
               });
+
 
       setGeneralReport(generalResponse.data);
       setUserReports(userResponse.data);
