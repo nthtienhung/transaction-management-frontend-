@@ -108,7 +108,7 @@ export const getTransactionDetail = async (transactionCode) => {
     });
     return response.data.data;
   } catch (error) {
-    throw new Error(error.response?.data?.message || "Error fetching transactions");
+    window.location.reload();
   }
 }
 
