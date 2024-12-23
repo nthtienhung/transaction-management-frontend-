@@ -59,7 +59,7 @@ const AdminDashboard = () => {
         axios
             .get("http://localhost:8888/api/v1/auth/refreshTokenUser", {
               headers: {
-                Authorization: `Bearer ${sessionStorage.getItem(
+                Authorization: `${sessionStorage.getItem(
                     "its-cms-refreshToken"
                 )}`,
               },
@@ -72,6 +72,7 @@ const AdminDashboard = () => {
                   "its-cms-refreshToken",
                   res.data.data.refreshToken
               );
+              window.location.reload()
             });
       }));
 
@@ -85,7 +86,7 @@ const AdminDashboard = () => {
         axios
             .get("http://localhost:8888/api/v1/auth/refreshTokenUser", {
               headers: {
-                Authorization: `Bearer ${sessionStorage.getItem(
+                Authorization: `${sessionStorage.getItem(
                     "its-cms-refreshToken"
                 )}`,
               },
@@ -114,7 +115,7 @@ const AdminDashboard = () => {
         axios
             .get("http://localhost:8888/api/v1/auth/refreshTokenUser", {
               headers: {
-                Authorization: `Bearer ${sessionStorage.getItem(
+                Authorization: `${sessionStorage.getItem(
                     "its-cms-refreshToken"
                 )}`,
               },

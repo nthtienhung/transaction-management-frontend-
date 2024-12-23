@@ -2,7 +2,7 @@ import axios from "axios";
 import { useEffect, useState } from "react";
 import Cookies from "js-cookie";
 import { useNavigate } from "react-router-dom";
-import { toast } from "react-toastify";
+import { toast, ToastContainer } from "react-toastify";
 import { jwtDecode } from "jwt-decode";
 import WalletInfoModal from '../WalletInfoModal';
 import { formatNumber } from '../../utils/formatNumber'; 
@@ -26,20 +26,7 @@ function Header({ setActiveContent }) {
   const handleConfigurationToggle = () => {
     setIsConfigurationOpen((prevState) => !prevState);
   };
-  useEffect(() => {
-    if (!token) {
-      toast.warning("Hết phiên đăng nhập, vui lòng đăng nhập lại !", {
-        position: "top-right",
-        autoClose: 3000,
-        hideProgressBar: true,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-      });
-      navigate("/");
-    }
-  }, [token]);
+
   useEffect(() => {
     if (Cookies.get("its-cms-accessToken")) {
       const decodeToken = jwtDecode(Cookies.get("its-cms-accessToken"));
@@ -192,6 +179,7 @@ function Header({ setActiveContent }) {
 
   return (
     <>
+    <ToastContainer/>
       <nav
         class="layout-navbar container-xxl navbar navbar-expand-xl navbar-detached align-items-center bg-navbar-theme"
         id="layout-navbar"
