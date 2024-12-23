@@ -13,7 +13,7 @@ import {
     getWalletByUserId
 } from "../../api/TransactionApiRequest";
 import axios from "axios";
-import {Dayjs as Instant} from "dayjs";
+import {Dayjs as dayjs, Dayjs as Instant} from "dayjs";
 
 function TransactionListUser() {
     const navigate = useNavigate();
@@ -71,10 +71,10 @@ function TransactionListUser() {
             const convertedValues = {
                 ...values,
                 fromDate: values.fromDate
-                    ? new Instant(values.fromDate).toISOString() // Đảm bảo chuyển sang ISO 8601
+                    ? dayjs(`${values.fromDate}T00:00:00`).toISOString() // Định dạng ngày bắt đầu
                     : null,
                 toDate: values.toDate
-                    ? new Instant(values.toDate).toISOString()
+                    ? dayjs(`${values.toDate}T23:59:59`).toISOString() // Định dạng ngày kết thúc
                     : null,
             }
 
