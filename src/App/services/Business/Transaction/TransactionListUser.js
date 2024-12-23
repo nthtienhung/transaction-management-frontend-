@@ -12,7 +12,7 @@ import {
 } from "../../api/TransactionApiRequest";
 import './style/TransactionListUser.css';
 import axios from "axios";
-import {getTransactionDetail} from "../../api/transactionServiceApi";
+import {getTransactionDetailByUser} from "../../api/transactionServiceApi";
 import {CiSearch} from "react-icons/ci";
 import TransactionDetail from "./TransactionDetail";
 
@@ -101,7 +101,7 @@ function TransactionListUser() {
 
     const openDialog = async (transactionCode) => {
         try {
-            const response = await getTransactionDetail(transactionCode);
+            const response = await getTransactionDetailByUser(transactionCode);
             setTransactionDetail(response);
             setIsDialogOpen(true);
         } catch (error) {

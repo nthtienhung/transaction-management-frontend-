@@ -8,7 +8,7 @@ import Cookies from "js-cookie";
 import ConfigService from "./../../../services/CONFIGFE/ConfigService";
 import {CiSearch} from "react-icons/ci";
 import TransactionDetail from "./TransactionDetail";
-import {getTransactionDetail} from "../../api/transactionServiceApi";
+import {getTransactionDetailByAdmin} from "../../api/transactionServiceApi";
 
 
 function TransactionListAdmin() {
@@ -183,7 +183,7 @@ function TransactionListAdmin() {
     // show Detail
     const openDialog = async (transactionCode) => {
         try {
-            const response = await getTransactionDetail(transactionCode);
+            const response = await getTransactionDetailByAdmin(transactionCode);
             setTransactionDetail(response);
             setIsDialogOpen(true);
         } catch (error) {

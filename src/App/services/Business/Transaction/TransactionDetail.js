@@ -1,7 +1,6 @@
 import React from 'react';
 
 const TransactionDetailDialog = ({ transactionDetail, onClose }) => {
-
     const dialogContainerStyle = {
         position: 'fixed',
         top: 0,
@@ -17,17 +16,19 @@ const TransactionDetailDialog = ({ transactionDetail, onClose }) => {
 
     const dialogContentStyle = {
         background: '#fff',
-        borderRadius: '8px',
+        borderRadius: '10px',
         padding: '20px',
-        width: '80%',
-        maxWidth: '800px',
+        width: '90%',
+        maxWidth: '600px',
         boxShadow: '0 4px 10px rgba(0, 0, 0, 0.2)',
+        fontFamily: 'Arial, sans-serif',
     };
 
     const dialogTitleStyle = {
         textAlign: 'center',
-        fontSize: '24px',
+        fontSize: '20px',
         marginBottom: '20px',
+        fontWeight: 'bold',
         color: '#333',
     };
 
@@ -36,21 +37,29 @@ const TransactionDetailDialog = ({ transactionDetail, onClose }) => {
         flexDirection: 'column',
     };
 
+    const sectionTitleStyle = {
+        fontSize: '18px',
+        fontWeight: 'bold',
+        color: '#007BFF',
+        marginBottom: '10px',
+    };
+
     const transactionRowStyle = {
         display: 'flex',
         justifyContent: 'space-between',
         marginBottom: '10px',
+        fontSize: '14px',
+        color: '#333',
     };
 
     const labelStyle = {
-        color: '#333',
         fontWeight: 'bold',
-        width: '45%',  // Ensure labels have a fixed width
+        color: '#555',
     };
 
     const valueStyle = {
-        color: '#555',
-        width: '45%',  // Ensure values are aligned properly
+        textAlign: 'right',
+        color: '#000',
     };
 
     const closeButtonStyle = {
@@ -63,6 +72,11 @@ const TransactionDetailDialog = ({ transactionDetail, onClose }) => {
         borderRadius: '5px',
         cursor: 'pointer',
     };
+
+    const formatCurrency = (amount) => {
+        return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(amount);
+    };
+
     const convertToLocalDate = (instant) => {
         if (!instant) return "";
         const date = new Date(instant);
@@ -74,53 +88,57 @@ const TransactionDetailDialog = ({ transactionDetail, onClose }) => {
     };
 
     return (
-        <div className="dialog-transaction" style={dialogContainerStyle}>
-            <div className="dialog-transaction-information" style={dialogContentStyle}>
-                <h1 style={dialogTitleStyle}>Transaction Details</h1>
+        <div style={dialogContainerStyle}>
+            <div style={dialogContentStyle}>
+                <h1 style={dialogTitleStyle}>Chi tiết giao dịch</h1>
+                <h2 style={{ fontSize: '28px', textAlign: 'center', color: '#007BFF', marginBottom: '20px' }}>
+                    {formatCurrency(transactionDetail.amount)}
+                </h2>
                 <div style={transactionDetailsStyle}>
-                    {/* Sender and Receiver Information - Two Column Layout */}
-                    <div style={transactionRowStyle}>
-                        <div style={{ width: '50%' }}>
-                            <p style={labelStyle}><strong>Sender Wallet:</strong></p>
-                            <p style={valueStyle}>{transactionDetail.senderWalletCode}</p>
-                            <p style={labelStyle}><strong>Sender Name:</strong></p>
-                            <p style={valueStyle}>{transactionDetail.nameOfSender}</p>
+                    {/* Chuyển khoản từ */}
+                    <div style={{ marginBottom: '20px' }}>
+                        <h3 style={sectionTitleStyle}>Chuyển khoản từ</h3>
+                        <div style={transactionRowStyle}>
+                            <span style={labelStyle}>Tên tài khoản:</span>
+                            <span style={valueStyle}>{transactionDetail.nameOfSender}</span>
                         </div>
-                        <div style={{ width: '50%' }}>
-                            <p style={labelStyle}><strong>Receiver Wallet:</strong></p>
-                            <p style={valueStyle}>{transactionDetail.recipientWalletCode}</p>
-                            <p style={labelStyle}><strong>Receiver Name:</strong></p>
-                            <p style={valueStyle}>{transactionDetail.nameOfRecipient}</p>
+                        <div style={transactionRowStyle}>
+                            <span style={labelStyle}>Số tài khoản:</span>
+                            <span style={valueStyle}>{transactionDetail.senderWalletCode}</span>
                         </div>
                     </div>
-                    {/* Other Details - Single Column Layout */}
-                    <div style={transactionRowStyle}>
-                        <p style={labelStyle}><strong>Transaction Code:</strong></p>
-                        <p style={valueStyle}>{transactionDetail.transactionCode}</p>
+
+                    {/* Chuyển khoản đến */}
+                    <div style={{ marginBottom: '20px' }}>
+                        <h3 style={sectionTitleStyle}>Chuyển khoản đến</h3>
+                        <div style={transactionRowStyle}>
+                            <span style={labelStyle}>Tên tài khoản:</span>
+                            <span style={valueStyle}>{transactionDetail.nameOfRecipient}</span>
+                        </div>
+                        <div style={transactionRowStyle}>
+                            <span style={labelStyle}>Số tài khoản:</span>
+                            <span style={valueStyle}>{transactionDetail.recipientWalletCode}</span>
+                        </div>
+                        <div style={transactionRowStyle}>
+                            <span style={labelStyle}>Nội dung:</span>
+                            <span style={valueStyle}>{transactionDetail.description}</span>
+                        </div>
                     </div>
-                    <div style={transactionRowStyle}>
-                        <p style={labelStyle}><strong>Amount:</strong></p>
-                        <p style={valueStyle}>{transactionDetail.amount} đ</p>
-                    </div>
-                    <div style={transactionRowStyle}>
-                        <p style={labelStyle}><strong>Status:</strong></p>
-                        <p style={valueStyle}>{transactionDetail.status}</p>
-                    </div>
-                    <div style={transactionRowStyle}>
-                        <p style={labelStyle}><strong>Description:</strong></p>
-                        <p style={valueStyle}>{transactionDetail.description}</p>
-                    </div>
-                    <div style={transactionRowStyle}>
-                        <p style={labelStyle}><strong>Sending Time:</strong></p>
-                        <p style={valueStyle}>{convertToLocalDate(transactionDetail.createdDate)}</p>
-                    </div>
-                    <div style={transactionRowStyle}>
-                        <p style={labelStyle}><strong>Receiving Time:</strong></p>
-                        <p style={valueStyle}>{convertToLocalDate(transactionDetail.updatedDate)}</p>
+
+                    {/* Thông tin giao dịch */}
+                    <div>
+                        <div style={transactionRowStyle}>
+                            <span style={labelStyle}>Thời gian:</span>
+                            <span style={valueStyle}>{convertToLocalDate(transactionDetail.createdDate)}</span>
+                        </div>
+                        <div style={transactionRowStyle}>
+                            <span style={labelStyle}>Mã giao dịch:</span>
+                            <span style={valueStyle}>{transactionDetail.transactionCode}</span>
+                        </div>
                     </div>
                 </div>
                 <button onClick={onClose} style={closeButtonStyle}>
-                    Close
+                    Đóng
                 </button>
             </div>
         </div>
