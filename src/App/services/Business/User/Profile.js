@@ -52,7 +52,7 @@ const Profile = () => {
     useEffect(() =>{
         const token = Cookies.get("its-cms-accessToken");
         axios.get("http://localhost:8888/api/v1/user/profile", {
-            headers: { Authorization: token },
+            headers: { Authorization: `Bearer ${token}` },
         }).then(res =>{
             setUser(res.data.data);
             setLoading(false);
@@ -187,7 +187,7 @@ const changePasswordFormik = useFormik({
                     {
                         headers: {
                             "Content-Type": "application/json",
-                            Authorization: token,
+                            Authorization: `Bearer ${token}`,
                         },
                     }
                 );

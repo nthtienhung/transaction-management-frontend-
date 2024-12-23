@@ -3,6 +3,7 @@ import { useFormik } from "formik";
 import * as Yup from "yup";
 import Cookies from "js-cookie";
 import axios from "axios";
+import { toast, ToastContainer } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 import Footer from "../../../compoment/fragment/Footer";
 import Header from "../../../compoment/fragment/Header";
@@ -46,7 +47,8 @@ function CreateTransaction() {
         Cookies.remove("its-cms-accessToken");
         sessionStorage.removeItem("its-cms-refreshToken");
         Cookies.set("its-cms-accessToken", res.data.data.csrfToken);
-        sessionStorage.setItem("its-cms-refreshToken",res.data.data.refreshToken);
+        sessionStorage.setItem("its-cms-refreshToken", res.data.data.refreshToken);
+
       })
     }
   };
@@ -96,13 +98,20 @@ function CreateTransaction() {
         console.log(senderWalletCode);
 
         // Send OTP
-        await sendOTP({
+        const response = await sendOTP({
           walletCode: senderWalletCode.walletCode,
           amount: values.amount,
         });
 
+        if (response.status === 200) {
+          toast.success(response.message, {
+            position: "top-right",
+            autoClose: 3000,
+          });
+
         // Move to OTP step
         setStep(2);
+        }
       } catch (err) {
         setError("Failed to validate recipient or send OTP. Please try again.");
       }
@@ -122,7 +131,7 @@ function CreateTransaction() {
         const senderWalletCode = await getWalletByUserId(await getUserId());
 
         // Confirm transaction
-        await confirmTransaction({
+        const response = await confirmTransaction({
           senderWalletCode: senderWalletCode.walletCode, // Replace with actual sender wallet code from context/auth
           recipientWalletCode: formikCreateTransaction.values.recipientWalletCode,
           amount: formikCreateTransaction.values.amount,
@@ -130,8 +139,16 @@ function CreateTransaction() {
           otp: values.otp,
         });
 
-        // Navigate to transaction list on success
-        navigate("/transactionUser");
+        if (response.status === 200) {
+          console.log("test")
+          toast.success(response.message, {
+            position: "top-right",
+            autoClose: 3000,
+          });
+          // Navigate to transaction list on success
+          // navigate("/transactionUser");
+          setTimeout(() => navigate("/transactionUser"), 2000); // Delay 100ms để toast được render
+        }
       } catch (err) {
         setError("Transaction failed. Please verify OTP and try again.");
       }
@@ -206,6 +223,26 @@ function CreateTransaction() {
       <h2>Confirm Transaction</h2>
       <p>OTP has been sent to your registered email</p>
       {error && <div className="error">{error}</div>}
+
+
+<div className="transaction-summary">
+        <h3>Transaction Details</h3>
+        <p>
+          <strong>Recipient:</strong> {recipientName || "N/A"}
+        </p>
+        <p>
+          <strong>Recipient Wallet Code:</strong> {formikCreateTransaction.values.recipientWalletCode}
+        </p>
+        <p>
+          <strong>Amount:</strong> {formikCreateTransaction.values.amount} USD
+        </p>
+        <p>
+          <strong>Description:</strong> {formikCreateTransaction.values.description || "N/A"}
+        </p>
+        <br></br>
+      </div>      
+
+
       <form onSubmit={formikOTP.handleSubmit}>
         <div>
           <label>Enter OTP</label>
@@ -253,6 +290,8 @@ function CreateTransaction() {
 
   // Main Render
   return (
+    <>
+    <ToastContainer/>
     <div className="layout-wrapper layout-content-navbar">
       <div className="layout-container">
         <Navbar />
@@ -265,6 +304,7 @@ function CreateTransaction() {
         <Footer />
       </div>
     </div>
+    </>
   );
 }
 

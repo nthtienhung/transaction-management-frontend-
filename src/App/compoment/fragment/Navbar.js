@@ -126,18 +126,33 @@ function Navbar({ setActiveContent}) {
                   isConfigurationOpen ? "active open" : ""
                 }`}
               >
-                <a
-                  href="javascript:void(0);"
+                {role === "ROLE_ADMIN" && <>
+                  <a
+                      href="javascript:void(0);"
+                      className="menu-link menu-toggle"
+                      onClick={() => {
+                        setActiveContent("configuration"); // Cập nhật nội dung hiển thị
+                        handleConfigurationToggle(); // Đổi trạng thái mở menu
+                      }}
+                  >
+                    <i className="menu-icon tf-icons bx bx-cog"></i>
+                    <div className="text-truncate" data-i18n="Configuration">
+                      Configuration
+                    </div>
+                  </a>
+                </> || <></>}
+              </li>
+              <li className="menu-item">
+                <a 
+                  href="#" 
                   className="menu-link menu-toggle"
-                  onClick={() => {
-                    setActiveContent("configuration"); // Cập nhật nội dung hiển thị
-                    handleConfigurationToggle(); // Đổi trạng thái mở menu
+                  onClick={(e) => {
+                    e.preventDefault();
+                    setActiveContent("users");
                   }}
                 >
-                  <i className="menu-icon tf-icons bx bx-cog"></i>
-                  <div className="text-truncate" data-i18n="Configuration">
-                    Configuration
-                  </div>
+                  <i className="menu-icon tf-icons bx bx-user"></i>
+                  <div className="text-truncate" data-i18n="Users">User Management</div>
                 </a>
               </li>
             </>
