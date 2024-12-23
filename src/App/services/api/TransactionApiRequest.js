@@ -46,7 +46,7 @@ export const getUserId = async () => {
         // Xử lý lỗi
         axios.get("http://localhost:8888/api/v1/auth/refreshTokenUser", {
             headers: {
-                Authorization: `Bearer ${Cookies.get("its-cms-refreshToken")}`,
+                Authorization: `${sessionStorage.getItem("its-cms-refreshToken")}`,
             },
         }).then(res => {
             Cookies.remove("its-cms-accessToken");

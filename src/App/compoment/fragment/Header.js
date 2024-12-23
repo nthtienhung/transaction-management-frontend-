@@ -52,16 +52,17 @@ function Header({ setActiveContent }) {
           },
         })
         .then((res) => {
-          if (sessionStorage.getItem("userId") == null) {
+          if (sessionStorage.getItem("userId") === null) {
             sessionStorage.setItem("userId", res.data.data.userId);
           }
+          console.log(res.data);
           setUsers(res.data.data);
         })
         .catch((error) => {
             axios
               .get("http://localhost:8888/api/v1/auth/refreshTokenUser", {
                 headers: {
-                  Authorization: `Bearer ${sessionStorage.getItem(
+                  Authorization: `${sessionStorage.getItem(
                     "its-cms-refreshToken"
                   )}`,
                 },
@@ -71,36 +72,9 @@ function Header({ setActiveContent }) {
                 Cookies.remove("its-cms-accessToken");
                 sessionStorage.removeItem("its-cms-refreshToken");
                 Cookies.set("its-cms-accessToken", res.data.data.csrfToken);
-                sessionStorage.setItem(
-                  "its-cms-refreshToken",
-                  res.data.data.refreshToken
-                );
+                sessionStorage.setItem("its-cms-refreshToken", res.data.data.refreshToken);
                 window.location.reload();
-
-                // Gọi lại API profile với token mới
-                axios
-                  .get("http://localhost:8888/api/v1/user/profile", {
-                    headers: {
-                      Authorization: `Bearer ${Cookies.get("its-cms-accessToken")}`,
-                    },
-                  })
-                  .then((res) => {
-                    sessionStorage.setItem("userId", res.data.data.userId);
-                    setUsers(res.data.data);
-                  });
-                window.location.reload();
-              }).catch((error) =>{
-              toast.warning("Hết phiên đăng nhập, vui lòng đăng nhập lại !", {
-                position: "top-right",
-                autoClose: 3000,
-                hideProgressBar: true,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-                progress: undefined,
-              });
-              navigate("/");
-            });
+              })
 
         });
     } else {
@@ -156,7 +130,7 @@ function Header({ setActiveContent }) {
         axios
           .get("http://localhost:8888/api/v1/auth/refreshTokenUser", {
             headers: {
-              Authorization: `Bearer ${sessionStorage.getItem(
+              Authorization: `${sessionStorage.getItem(
                 "its-cms-refreshToken"
               )}`,
             },

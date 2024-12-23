@@ -11,7 +11,7 @@ const BASE_URL = "http://localhost:8888/api/v1/wallet"; // Update with the corre
 const refreshToken = () => {
     axios.get("http://localhost:8888/api/v1/auth/refreshTokenUser", {
         headers: {
-            Authorization: `Bearer ${sessionStorage.getItem("its-cms-refreshToken")}`,
+            Authorization: `${sessionStorage.getItem("its-cms-refreshToken")}`,
         },
     }).then(res => {
         Cookies.remove("its-cms-accessToken");
@@ -27,6 +27,8 @@ export const getWalletByWalletCode = async (walletCode) => {
                 Authorization: `Bearer ${Cookies.get("its-cms-accessToken")}`,
             }
         });
+
+        console.log(response.data);
         return response.data;
     } catch (error) {
         axios.get("http://localhost:8888/api/v1/auth/refreshTokenUser", {
