@@ -31,7 +31,7 @@ function CreateTransaction() {
       }
 
       const response = await axios.get("http://localhost:8888/api/v1/user/profile", {
-        headers: { Authorization: token },
+        headers: { Authorization: `Bearer ${token}` },
       });
 
       console.log(response.data.userId);
@@ -41,7 +41,7 @@ function CreateTransaction() {
       // Xử lý lỗi
       axios.get("http://localhost:8888/api/v1/auth/refreshTokenUser",{
         headers: {
-          Authorization: `Bearer ${sessionStorage.getItem("its-cms-refreshToken")}`,
+          Authorization: `${sessionStorage.getItem("its-cms-refreshToken")}`,
         },
       }).then(res =>{
         Cookies.remove("its-cms-accessToken");

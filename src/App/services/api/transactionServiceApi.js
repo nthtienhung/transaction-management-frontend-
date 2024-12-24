@@ -99,9 +99,9 @@ export const getTotalTransactionByUser = async (walletCode) => {
   }
 };
 
-export const getTransactionDetail = async (transactionCode) => {
+export const getTransactionDetailByUser = async (transactionCode) => {
   try {
-    const response = await axios.get(`${API_BASE_URL}/${transactionCode}`, {
+    const response = await axios.get(`${API_BASE_URL}/transaction-detail-by-user/${transactionCode}`, {
       headers: {
         Authorization: `Bearer ${Cookies.get("its-cms-accessToken")}`,
       }
@@ -109,6 +109,19 @@ export const getTransactionDetail = async (transactionCode) => {
     return response.data.data;
   } catch (error) {
     throw new Error(error.response?.data?.message || "Error fetching transactions");
+  }
+}
+
+export const getTransactionDetailByAdmin = async (transactionCode) => {
+  try {
+    const response = await axios.get(`${API_BASE_URL}/transaction-detail-by-admin/${transactionCode}`, {
+      headers: {
+        Authorization: `Bearer ${Cookies.get("its-cms-accessToken")}`,
+      }
+    });
+    return response.data.data;
+  } catch (error) {
+    window.location.reload();
   }
 }
 

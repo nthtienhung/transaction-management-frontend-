@@ -13,9 +13,6 @@ const getAuthToken = () => {
 // Hàm tạo headers với token
 const getAuthHeaders = (customHeaders = {}) => {
     const token = getAuthToken();
-  if (!token) {
-    throw new Error('Token not found');
-  }
   const decoded = decodeToken(token);
   return {
     Authorization: `Bearer ${token}`,
@@ -39,7 +36,24 @@ const decodeToken = (token) => {
       `${API_BASE_URL}/config/`,
       configRequest,
       { headers: getAuthHeaders() }
-    );
+    ).catch((error) =>{
+      axios
+              .get("http://localhost:8888/api/v1/auth/refreshTokenUser", {
+                headers: {
+                  Authorization: `${sessionStorage.getItem(
+                    "its-cms-refreshToken"
+                  )}`,
+                },
+              })
+              .then((res) => {
+                // Cập nhật token mới
+                Cookies.remove("its-cms-accessToken");
+                sessionStorage.removeItem("its-cms-refreshToken");
+                Cookies.set("its-cms-accessToken", res.data.data.csrfToken);
+                sessionStorage.setItem("its-cms-refreshToken", res.data.data.refreshToken);
+            
+              })
+    });
   };
   
   export const updateConfig = async (configId, configRequest) => {
@@ -55,5 +69,21 @@ const decodeToken = (token) => {
     return axios.get(`${API_BASE_URL}/config/getconfig`, {
       params: { group, type, configKey, status, ...pageable },
       headers: getAuthHeaders(),
+    }).catch((error) =>{
+      axios
+              .get("http://localhost:8888/api/v1/auth/refreshTokenUser", {
+                headers: {
+                  Authorization: `${sessionStorage.getItem(
+                    "its-cms-refreshToken"
+                  )}`,
+                },
+              })
+              .then((res) => {
+                // Cập nhật token mới
+                Cookies.remove("its-cms-accessToken");
+                sessionStorage.removeItem("its-cms-refreshToken");
+                Cookies.set("its-cms-accessToken", res.data.data.csrfToken);
+                sessionStorage.setItem("its-cms-refreshToken", res.data.data.refreshToken);
+              })
     });
   };
