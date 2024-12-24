@@ -197,47 +197,97 @@ const AdminDashboard = () => {
       transaction.recipientWalletCode.includes(searchText)
   );
 
-  const exportToExcel = () => {
-    const data = filteredTransactions.map((transaction) => ({
-      "Transaction Code": transaction.transactionCode,
-      Amount: transaction.amount.toLocaleString("en-US", { style: "currency", currency: "VND" }),
-      "Sender Wallet": transaction.senderWalletCode,
-      "Recipient Wallet": transaction.recipientWalletCode,
-      Status: transaction.status,
-      "Created Date": moment(transaction.date).format("YYYY-MM-DD HH:mm:ss"),
-    }));
+  const exportToExcel = async () => {
+    setLoading(true);
+    try {
+      let startDate, endDate;
 
-    const ws = utils.json_to_sheet(data);
+      // Xác định khoảng thời gian theo filter type
+      if (filterType === 'day') {
+        startDate = moment().startOf("day").toISOString();
+        endDate = moment().endOf("day").toISOString();
+      } else if (filterType === 'week') {
+        startDate = moment().startOf("week").toISOString();
+        endDate = moment().endOf("week").toISOString();
+      } else if (filterType === 'month') {
+        startDate = moment().startOf("month").toISOString();
+        endDate = moment().endOf("month").toISOString();
+      } else if (filterType === 'custom' && dateRange) {
+        startDate = dateRange[0].toISOString();
+        endDate = dateRange[1].toISOString();
+      }
 
-    const getMaxColumnWidth = (data, header) => {
-      return Math.max(
-          header.length,
-          ...data.map((row) => (row[header] ? row[header].toString().length : 0))
-      );
-    };
+      const response = await axios.get("http://localhost:8888/api/v1/transaction/transactions", {
+        params: { startDate, endDate },
+        headers: { Authorization: `Bearer ${Cookies.get("its-cms-accessToken")}` },
+      }).catch((error =>{
+        console.log(sessionStorage.getItem(
+            "its-cms-refreshToken"
+        ))
+        axios
+            .get("http://localhost:8888/api/v1/auth/refreshTokenUser", {
+              headers: {
+                Authorization: `${sessionStorage.getItem(
+                    "its-cms-refreshToken"
+                )}`,
+              },
+            })
+            .then((res) => {
+              Cookies.remove("its-cms-accessToken");
+              sessionStorage.removeItem("its-cms-refreshToken");
+              Cookies.set("its-cms-accessToken", res.data.data.csrfToken);
+              sessionStorage.setItem(
+                  "its-cms-refreshToken",
+                  res.data.data.refreshToken
+              );
+            });
+      }));
 
-    const headers = Object.keys(data[0] || {});
-    const columnWidths = headers.map((header) => ({
-      wch: Math.max(getMaxColumnWidth(data, header) + 2, 2),
-    }));
+      const data = response.data.map((transaction) => ({
+        "Transaction Code": transaction.transactionCode,
+        Amount: transaction.amount.toLocaleString("en-US", { style: "currency", currency: "VND" }),
+        "Sender Wallet": transaction.senderWalletCode,
+        "Recipient Wallet": transaction.recipientWalletCode,
+        Status: transaction.status,
+        "Created Date": moment(transaction.date).format("YYYY-MM-DD HH:mm:ss"),
+      }));
 
-    const title = [["Transaction Report"]];
-    const subtitle = [[`Generated on: ${moment().format("YYYY-MM-DD HH:mm:ss")}`]];
+      // Tạo file Excel
+      const ws = utils.json_to_sheet(data);
 
-    const titleWs = utils.aoa_to_sheet(title);
-    utils.sheet_add_aoa(titleWs, subtitle, { origin: "A2" });
-    utils.sheet_add_json(titleWs, data, { origin: "A4" });
+      const getMaxColumnWidth = (data, header) => {
+        return Math.max(
+            header.length,
+            ...data.map((row) => (row[header] ? row[header].toString().length : 0))
+        );
+      };
 
-    titleWs["A1"].s = { font: { bold: true, sz: 16, color: { rgb: "0070C0" } } };
-    titleWs["A2"].s = { font: { italic: true, sz: 12, color: { rgb: "808080" } } };
+      const headers = Object.keys(data[0] || {});
+      const columnWidths = headers.map((header) => ({
+        wch: Math.max(getMaxColumnWidth(data, header) + 2, 2),
+      }));
 
-    titleWs["!cols"] = columnWidths;
+      const title = [["Transaction Report"]];
+      const subtitle = [[`Generated on: ${moment().format("YYYY-MM-DD HH:mm:ss")}`]];
 
-    const wb = utils.book_new();
-    utils.book_append_sheet(wb, titleWs, "Transactions");
+      const titleWs = utils.aoa_to_sheet(title);
+      utils.sheet_add_aoa(titleWs, subtitle, { origin: "A2" });
+      utils.sheet_add_json(titleWs, data, { origin: "A4" });
 
-    writeFileXLSX(wb, "Transactions_Report.xlsx");
+      titleWs["!cols"] = columnWidths;
+
+      const wb = utils.book_new();
+      utils.book_append_sheet(wb, titleWs, "Transactions");
+
+      writeFileXLSX(wb, "Transactions_Report.xlsx");
+      message.success("Export to Excel successfully!");
+    } catch (error) {
+      message.error("Failed to export data");
+    } finally {
+      setLoading(false);
+    }
   };
+
 
   const statusCounts = transactionDetails.reduce((acc, transaction) => {
     acc[transaction.status] = (acc[transaction.status] || 0) + 1;
