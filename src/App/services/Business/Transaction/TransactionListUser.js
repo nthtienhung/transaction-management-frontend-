@@ -14,7 +14,7 @@ import {
 } from "../../api/TransactionApiRequest";
 import './style/TransactionListUser.css';
 
-import {Dayjs as dayjs, Dayjs as Instant} from "dayjs";
+import {Dayjs as dayjs} from "dayjs";
 import {getTransactionDetail} from "../../api/transactionServiceApi";
 import {CiSearch} from "react-icons/ci";
 import TransactionDetail from "./TransactionDetail";
@@ -74,19 +74,19 @@ function TransactionListUser() {
         },
         onSubmit: async (values) => {
 
-            const convertedValues = {
-                ...values,
-                fromDate: values.fromDate
-                    ? dayjs(`${values.fromDate}T00:00:00`).toISOString() // Định dạng ngày bắt đầu
-                    : null,
-                toDate: values.toDate
-                    ? dayjs(`${values.toDate}T23:59:59`).toISOString() // Định dạng ngày kết thúc
-                    : null,
-            }
+            // const convertedValues = {
+            //     ...values,
+            //     fromDate: values.fromDate
+            //         ? dayjs(`${values.fromDate}T00:00:00`).toISOString() // Định dạng ngày bắt đầu
+            //         : null,
+            //     toDate: values.toDate
+            //         ? dayjs(`${values.toDate}T23:59:59`).toISOString() // Định dạng ngày kết thúc
+            //         : null,
+            // }
 
-            setFilters(convertedValues);
+            setFilters(values);
             setCurrentPage(0);
-            await fetchTransactions(0, convertedValues);
+            await fetchTransactions(0, values);
         },
         onReset: () => {
             // console.log("Form reset to:", formDataTransaction.initialValues);
@@ -249,6 +249,7 @@ function TransactionListUser() {
                                             <label htmlFor="fromDate">Từ ngày</label>
                                             <input
                                                 type="date"
+                                                className="input-search"
                                                 id="fromDate"
                                                 name="fromDate"
                                                 onChange={formDataTransaction.handleChange}
@@ -266,6 +267,7 @@ function TransactionListUser() {
                                             <label htmlFor="toDate">Đến ngày</label>
                                             <input
                                                 type="date"
+                                                className="input-search"
                                                 id="toDate"
                                                 name="toDate"
                                                 onChange={formDataTransaction.handleChange}
