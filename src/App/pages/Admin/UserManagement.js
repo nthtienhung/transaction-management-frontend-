@@ -160,7 +160,7 @@ const UserManagement = () => {
     //             }
     //         );
     //         // Refresh user list after status update
-    //         // fetchUsers(page, debouncedSearchTerm);
+    //         fetchUsers(page, debouncedSearchTerm);
     //     } catch (err) {
 
     //         // Handle token refresh here too
@@ -177,7 +177,7 @@ const UserManagement = () => {
     //                 "its-cms-refreshToken",
     //                 res.data.data.refreshToken
     //             );
-    //             window.location.reload();
+    //             // window.location.reload();
     //         });
 
     //         console.error('Error updating status:', err);
@@ -274,6 +274,7 @@ const UserManagement = () => {
                             <TableCell>Phone</TableCell>
                             <TableCell>Address</TableCell>
                             <TableCell>Role</TableCell>
+                            <TableCell>Verification State</TableCell>
                             <TableCell align="center">Status</TableCell>
                         </TableRow>
                     </TableHead>
@@ -286,6 +287,9 @@ const UserManagement = () => {
                                 <TableCell>{user.phone}</TableCell>
                                 <TableCell>{user.address}</TableCell>
                                 <TableCell>{user.role}</TableCell>
+                                <TableCell>
+                                    {user.isVerified === 'NOT_VERIFIED' ? 'NOT VERIFIED' : 'VERIFIED'}
+                                </TableCell>
                                 <TableCell align="center">
                                     <StatusSwitch
                                         checked={user.status === true} // Use boolean comparison

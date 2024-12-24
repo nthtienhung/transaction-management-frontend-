@@ -6,6 +6,7 @@ import { useNavigate } from "react-router-dom";
 function Navbar({ setActiveContent}) {
   const [isDashboardOpen, setIsDashboardOpen] = useState(false); // Quản lý trạng thái mở menu Dashboard
   const [isConfigurationOpen, setIsConfigurationOpen] = useState(false); // Trạng thái mở cho Configuration
+  const [isUserManagementOpen, setIsUserManagementOpen] = useState(false); // Trạng thái mở cho Configuration
   const menuRef = useRef(null);
   const [role, setRoles] = useState();
   const navigate = useNavigate();
@@ -48,7 +49,17 @@ function Navbar({ setActiveContent}) {
   };
 
   const handleConfigurationToggle = () => {
+    if (!isConfigurationOpen) {
+      setIsUserManagementOpen(false); // Disable User Management if Configuration is toggled
+    }
     setIsConfigurationOpen((prevState) => !prevState);
+  };
+
+  const handleUserManagementToggle = () => {
+    if (!isUserManagementOpen) {
+      setIsConfigurationOpen(false); // Disable Configuration if User Management is toggled
+    }
+    setIsUserManagementOpen((prev) => !prev);
   };
  // open menu
  const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -129,7 +140,7 @@ function Navbar({ setActiveContent}) {
                 {role === "ROLE_ADMIN" && <>
                   <a
                       href="javascript:void(0);"
-                      className="menu-link menu-toggle"
+                      className="menu-link"
                       onClick={() => {
                         setActiveContent("configuration"); // Cập nhật nội dung hiển thị
                         handleConfigurationToggle(); // Đổi trạng thái mở menu
@@ -142,13 +153,18 @@ function Navbar({ setActiveContent}) {
                   </a>
                 </> || <></>}
               </li>
-              <li className="menu-item">
+              <li 
+                className={`menu-item ${
+                  isUserManagementOpen ? "active open" : ""
+                }`}
+              >
                 <a 
                   href="#" 
-                  className="menu-link menu-toggle"
+                  className="menu-link"
                   onClick={(e) => {
                     e.preventDefault();
                     setActiveContent("users");
+                    handleUserManagementToggle();
                   }}
                 >
                   <i className="menu-icon tf-icons bx bx-user"></i>

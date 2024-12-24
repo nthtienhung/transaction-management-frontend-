@@ -357,14 +357,14 @@ function TransactionListUser() {
 
                                             return (
                                                 <tr key={index}>
-                                                    <td>{transaction.transactionCode}</td>
-                                                    <td>{transaction.senderWalletCode}</td>
-                                                    <td>{transaction.receiverWalletCode}</td>
-                                                    <td>{transaction.lastName} {transaction.firstName}</td>
-                                                    <td style={amountStyle}>{amountDisplay}</td>
-                                                    <td>{transaction.description}</td>
-                                                    <td>{transaction.status}</td>
-                                                    <td>
+                                                    <td data-label="Transaction Code">{transaction.transactionCode}</td>
+                                                    <td data-label="From Wallet">{transaction.senderWalletCode}</td>
+                                                    <td data-label="To Wallet">{transaction.receiverWalletCode}</td>
+                                                    <td data-label="To User">{transaction.lastName} {transaction.firstName}</td>
+                                                    <td data-label="Amount" style={amountStyle}>{amountDisplay}</td>
+                                                    <td data-label="Description">{transaction.description}</td>
+                                                    <td data-label="Status">{transaction.status}</td>
+                                                    <td data-label="Operation">
                                                         <div onClick={() => openDialog(transaction.transactionCode)}>
                                                             <CiSearch style={{cursor: "pointer"}}/>
                                                         </div>
