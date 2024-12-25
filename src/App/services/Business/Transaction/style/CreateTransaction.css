@@ -210,7 +210,7 @@ button:hover {
 }
 
 /* Mobile Responsiveness */
-@media (max-width: 768px) {
+/* @media (max-width: 768px) {
   .layout-wrapper {
     flex-direction: column;
   }
@@ -221,4 +221,4 @@ button:hover {
   .dasboard {
     grid-template-columns: 1fr 1fr;
   }
-}
+} */

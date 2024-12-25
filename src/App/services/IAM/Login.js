@@ -12,13 +12,16 @@ import 'react-toastify/dist/ReactToastify.css';
 import Cookies from 'js-cookie';
 import { jwtDecode } from 'jwt-decode';
 import {generateOTP} from "../api/ApiRequest";
+import {generateOtp} from "../api/authService";
 
 function Login() {
   const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
-  const location = useLocation();
-  const role = Cookies.get('user-role');
+
   useEffect(() => {
+    if(Cookies.get("its-cms-accessToken")){
+    const decodeToken = jwtDecode(Cookies.get("its-cms-accessToken"));
+    const role = decodeToken.role;
     axios
         .get("http://localhost:8888/api/v1/user/profile", {
           headers: {
@@ -42,7 +45,8 @@ function Login() {
             progress: undefined,
           });
         })
-  }, [role,navigate]);
+      }
+  }, [navigate]);
   const togglePasswordVisibility = () => {
     setShowPassword((prevState) => !prevState);
   };
@@ -52,7 +56,7 @@ function Login() {
   });
   const userFormData = useFormik({
     initialValues: {
-      role: "ROLE_ADMIN",
+      role: "ADMIN",
       email: "",
       password: "",
     },
@@ -64,20 +68,20 @@ function Login() {
         .then((res) => {
           if (res.status == 200) {
             Cookies.set("its-cms-accessToken", res.data.data.csrfToken);
-            Cookies.set("its-cms-refreshToken", res.data.data.refreshToken);
-            console.log(Cookies.get("its-cms-accessToken"))
+            sessionStorage.setItem("its-cms-refreshToken", res.data.data.refreshToken);
             setTimeout(() => {
             const decodeToken = jwtDecode(Cookies.get("its-cms-accessToken"));
             const role = decodeToken.role;
             console.log(role);
-            if(value.role === role){
+            console.log(Cookies.get("its-cms-accessToken"))
+            if("ROLE_" + value.role === role){
               axios.get("http://localhost:8888/api/v1/user/getUser",{
                 headers: {
-                  Authorization: `${Cookies.get("its-cms-accessToken")}`,
+                  Authorization: `Bearer ${Cookies.get("its-cms-accessToken")}`,
                 },
               })
               .then(res =>{
-                console.log(res.data)
+                console.log(res)
                 if(res.data.isVerified === "VERIFIED"){
                   toast.success("Đăng nhập thành công", {
                     position: "top-right",
@@ -88,11 +92,9 @@ function Login() {
                     draggable: true,
                     progress: undefined,
                   });
-
-                  sessionStorage.setItem("userId",res.data.userId);
                   setTimeout(() => {
                     sessionStorage.setItem("userId",res.data.userId);
-                    Cookies.set('user-role', role); 
+                    console.log(role)
                     if(role === "ROLE_ADMIN"){
                       navigate("/homeAdmin");
                     }else{
@@ -109,7 +111,7 @@ function Login() {
                       draggable: true,
                       progress: undefined,
                     });
-                    generateOTP(value.email);
+                    generateOtp(value.email);
                     setTimeout(() => navigate("/verify", { state: { email: value.email } }), 1500);
                 }
               })
@@ -141,7 +143,7 @@ function Login() {
         .catch((error) => {
           const messageError = error.response.data.message;
           console.error("Error:", error.response.data.message);
-         if(messageError === "Email or password is wrong"){
+          if(messageError === "Email or password is wrong"){
           toast.error("Tài khoản hoặc mật khẩu sai, thử lại.", {
             position: "top-right",
             autoClose: 2000,
@@ -152,9 +154,18 @@ function Login() {
             progress: undefined,
           });
 
-         }else if(messageError === "Account has been temporarily locked"){
+         }else if(messageError === "You have no permission to access") {
+            toast.error("Tài khoản không có quyền truy cập.", {
+              position: "top-right",
+              autoClose: 2000,
+              hideProgressBar: true,
+              closeOnClick: true,
+              pauseOnHover: true,
+              draggable: true,
+              progress: undefined,
+            });
+          }else if(messageError === "Account has been temporarily locked"){
           toast.error("Tài khoản đã bị khóa do đăng nhập sai quá 5 lần, thử lại sau", {
-
             position: "top-right",
             autoClose: 3000,
             hideProgressBar: true,
@@ -218,10 +229,10 @@ function Login() {
                         value={userFormData.values.role}
                         className="form-control"
                       >
-                        <option defaultValue={"ROLE_ADMIN"} value={"ROLE_ADMIN"}>
+                        <option defaultValue={"ADMIN"} value={"ADMIN"}>
                           ADMIN
                         </option>
-                        <option value={"ROLE_USER"}>USER</option>
+                        <option value={"USER"}>USER</option>
                       </select>
                     </div>
                   </div>

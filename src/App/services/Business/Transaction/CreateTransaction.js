@@ -4,6 +4,7 @@ import * as Yup from "yup";
 import Cookies from "js-cookie";
 import { toast, ToastContainer } from "react-toastify";
 import axios from "axios";
+import { toast, ToastContainer } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 import Footer from "../../../compoment/fragment/Footer";
 import Header from "../../../compoment/fragment/Header";
@@ -39,7 +40,7 @@ function CreateTransaction() {
       }
 
       const response = await axios.get("http://localhost:8888/api/v1/user/profile", {
-        headers: { Authorization: token },
+        headers: { Authorization: `Bearer ${token}` },
       });
 
       console.log(response.data.data.userId);
@@ -49,13 +50,13 @@ function CreateTransaction() {
       // Xử lý lỗi
       axios.get("http://localhost:8888/api/v1/auth/refreshTokenUser", {
         headers: {
-          Authorization: `Bearer ${Cookies.get("its-cms-refreshToken")}`,
+          Authorization: `${sessionStorage.getItem("its-cms-refreshToken")}`,
         },
       }).then(res => {
         Cookies.remove("its-cms-accessToken");
-        Cookies.remove("its-cms-refreshToken");
+        sessionStorage.removeItem("its-cms-refreshToken");
         Cookies.set("its-cms-accessToken", res.data.data.csrfToken);
-        Cookies.set("its-cms-refreshToken", res.data.data.refreshToken);
+        sessionStorage.setItem("its-cms-refreshToken", res.data.data.refreshToken);
       })
     }
   };
@@ -148,6 +149,7 @@ function CreateTransaction() {
             position: "top-right",
             autoClose: 3000,
           });
+
           // Move to OTP step
           setStep(2);
         }
@@ -177,9 +179,6 @@ function CreateTransaction() {
           description: formikCreateTransaction.values.description,
           otp: values.otp,
         });
-
-        console.log(response);
-
         if (response.status === 200) {
           console.log("test")
           toast.success(response.message, {
@@ -190,7 +189,6 @@ function CreateTransaction() {
           // navigate("/transactionUser");
           setTimeout(() => navigate("/transactionUser"), 2000); // Delay 100ms để toast được render
         }
-
       } catch (err) {
         setOtpAttempts(prev => prev + 1);
 
@@ -291,7 +289,6 @@ function CreateTransaction() {
       <h2>Confirm Transaction</h2>
       <p>OTP has been sent to your registered email</p>
       {error && <div className="error">{error}</div>}
-
       {/* Transaction Summary */}
       <div className="transaction-summary">
         <h3>Transaction Details</h3>
@@ -309,7 +306,6 @@ function CreateTransaction() {
         </p>
         <br></br>
       </div>
-
       <form onSubmit={formikOTP.handleSubmit}>
         <div>
           <label>Enter OTP</label>
