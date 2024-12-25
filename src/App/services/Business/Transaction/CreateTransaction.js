@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import Cookies from "js-cookie";
@@ -20,7 +20,14 @@ function CreateTransaction() {
   const navigate = useNavigate();
   const [step, setStep] = useState(1);
   const [recipientName, setRecipientName] = useState("");
+  const [senderBalance, setSenderBalance] = useState(null); // Thêm state lưu trữ số dư
   const [error, setError] = useState("");
+  const [senderWalletCode, setSenderWalletCode] = useState("");
+  const [lockUntil, setLockUntil] = useState(null); // Thời gian bị khóa
+  const [otpAttempts, setOtpAttempts] = useState(0); // Số lần nhập OTP sai
+
+  // Thời gian khóa khi nhập sai quá số lần cho phép (ms)
+  const LOCK_TIME = 1 * 60 * 1000; // 1 phút
 
   const getUserId = async () => {
     try {
@@ -28,30 +35,47 @@ function CreateTransaction() {
       console.log(token);
 
       if (!token) {
-        throw new Error("Bạn chưa đăng nhập. Vui lòng đăng nhập để tiếp tục.");
+        throw new Error("You're not logged in. Please log in to continue");
       }
 
       const response = await axios.get("http://localhost:8888/api/v1/user/profile", {
         headers: { Authorization: token },
       });
 
-      console.log(response.data.userId);
+      console.log(response.data.data.userId);
 
       return response.data.data.userId; // Giả sử API trả về userId trong response.data
     } catch (error) {
       // Xử lý lỗi
-      axios.get("http://localhost:8888/api/v1/auth/refreshTokenUser",{
+      axios.get("http://localhost:8888/api/v1/auth/refreshTokenUser", {
         headers: {
           Authorization: `Bearer ${Cookies.get("its-cms-refreshToken")}`,
         },
-      }).then(res =>{
+      }).then(res => {
         Cookies.remove("its-cms-accessToken");
         Cookies.remove("its-cms-refreshToken");
         Cookies.set("its-cms-accessToken", res.data.data.csrfToken);
-        Cookies.set("its-cms-refreshToken",res.data.data.refreshToken);
+        Cookies.set("its-cms-refreshToken", res.data.data.refreshToken);
       })
     }
   };
+
+  useEffect(() => {
+    const fetchSenderBalance = async () => {
+      try {
+        const userId = await getUserId();
+        const senderWallet = await getWalletByUserId(userId);
+        if (senderWallet && senderWallet.balance !== undefined) {
+          setSenderWalletCode(senderWallet.walletCode);
+          setSenderBalance(senderWallet.balance); // Cập nhật số dư
+        }
+      } catch (error) {
+        setError("Unable to retrieve your balance information. Please try again");
+      }
+    };
+
+    fetchSenderBalance();
+  }, []);
 
   // Step 1: Transaction Details Schema
   const createTransactionSchema = Yup.object().shape({
@@ -79,6 +103,19 @@ function CreateTransaction() {
       try {
         setError("");
 
+        if (lockUntil && new Date() < lockUntil) {
+          toast.error("You are temporarily locked. Please try again later.", {
+            position: "top-right",
+            autoClose: 3000,
+          });
+          return;
+        }
+
+        // Kiểm tra số dư
+        if (senderBalance !== null && values.amount > senderBalance) {
+          throw new Error("The deposit amount exceeds your balance");
+        }
+
         // Call API to get wallet info by wallet code
         const walletInfo = await getWalletByWalletCode(values.recipientWalletCode);
 
@@ -95,7 +132,10 @@ function CreateTransaction() {
         if (!senderWalletCode) {
           throw new Error("Unable to fetch sender wallet code. Please check your login status.");
         }
-        console.log(senderWalletCode);
+
+        if (values.recipientWalletCode === senderWalletCode.walletCode) {
+          throw new Error("Wallet code cannot match your wallet code");
+        }
 
         // Send OTP
         const response = await sendOTP({
@@ -112,7 +152,7 @@ function CreateTransaction() {
           setStep(2);
         }
       } catch (err) {
-        setError("Failed to validate recipient or send OTP. Please try again.");
+        setError(err.message || "Failed to validate recipient or send OTP. Please try again.");
       }
     },
   });
@@ -152,7 +192,24 @@ function CreateTransaction() {
         }
 
       } catch (err) {
-        setError("Transaction failed. Please verify OTP and try again.");
+        setOtpAttempts(prev => prev + 1);
+
+        if (otpAttempts + 1 >= 5) {
+          const lockTime = new Date();
+          lockTime.setMinutes(lockTime.getMinutes() + 1);
+          setLockUntil(lockTime);
+
+          toast.error("Too many incorrect OTP attempts. You are temporarily locked for 5 minutes.", {
+            position: "top-right",
+            autoClose: 3000,
+          });
+          setStep(1);
+        } else {
+          toast.error("Incorrect OTP. Please try again.", {
+            position: "top-right",
+            autoClose: 3000,
+          });
+        }
       }
     },
   });
@@ -162,6 +219,10 @@ function CreateTransaction() {
     <div className="create-transaction-form">
       <h2>Create Transaction</h2>
       {error && <div className="error">{error}</div>}
+      <div>
+        <p><strong>Current balance:</strong> {senderBalance !== null ? `${senderBalance} đ` : "Loading..."}</p>
+        <br></br>
+      </div>
       <form onSubmit={formikCreateTransaction.handleSubmit}>
         <div>
           <label>Recipient Wallet Code</label>
@@ -214,7 +275,12 @@ function CreateTransaction() {
             )}
         </div>
 
-        <button type="submit">Continue</button>
+        {/* <button type="submit">Continue</button> */}
+        <div className="button-group">
+          <button type="button" className="btn-continue" onClick={handleContinue}>
+            Continue
+          </button>
+        </div>
       </form>
     </div>
   );
@@ -259,9 +325,13 @@ function CreateTransaction() {
             <div className="error">{formikOTP.errors.otp}</div>
           )}
         </div>
-
-        <button type="submit">Confirm Transaction</button>
-        <button type="button" onClick={() => setStep(1)}>Back</button>
+        <div className="button-group">
+          <button type="submit">Confirm Transaction</button>
+          {/* <button type="submit" disabled={lockUntil && new Date() < lockUntil}>
+            Confirm
+          </button> */}
+          <button type="button" className="btn-back" onClick={() => setStep(1)}>Back</button>
+        </div>
       </form>
     </div>
   );
@@ -271,11 +341,21 @@ function CreateTransaction() {
     if (!walletCode) return;
 
     try {
+      if (walletCode === senderWalletCode) {
+        setRecipientName("");
+        setError("Wallet code cannot match your wallet code"); // Chỉ báo lỗi
+        // toast.error("Wallet code cannot match your wallet code", {
+        //   position: "top-right",
+        //   autoClose: 3000,
+        // });
+        return;
+      }
+
       // Gọi API để lấy thông tin ví
       const walletInfo = await getWalletByWalletCode(walletCode);
       if (!walletInfo || !walletInfo.userId) {
         setRecipientName("");
-        throw new Error("Không tìm thấy thông tin ví hoặc thông tin không hợp lệ.");
+        throw new Error("Wallet information not found or invalid information");
       }
 
       // Gọi API để lấy thông tin người dùng dựa trên userId từ ví
@@ -284,9 +364,41 @@ function CreateTransaction() {
       setRecipientName(recipientFullName); // Cập nhật trạng thái tên người nhận
     } catch (err) {
       setRecipientName(""); // Reset tên nếu xảy ra lỗi
-      setError("Không thể tìm thấy người nhận. Vui lòng kiểm tra mã ví.");
+      toast.error(err.message, {
+        position: "top-right",
+        autoClose: 3000,
+      });
+      // setError("Recipient not found. Please check wallet code!");
     }
   };
+
+  const handleContinue = async () => {
+    if (lockUntil && new Date() < lockUntil) {
+      const remainingTime = Math.ceil((lockUntil - new Date()) / 60000); // Tính số phút còn lại
+      toast.error(
+        `You are temporarily locked. Please try again after ${remainingTime} minute(s).`,
+        { position: "top-right", autoClose: 3000 }
+      );
+      return;
+    }
+
+    // Gọi submit nếu không bị khóa
+    if (!formikCreateTransaction.isSubmitting) {
+      await formikCreateTransaction.handleSubmit();
+    }
+  };
+
+  // Xử lý thay đổi form
+  useEffect(() => {
+    if (otpAttempts > 0 || lockUntil) {
+      // Reset trạng thái khi sửa form
+      setOtpAttempts(0);
+      // setLockUntil(null);
+      // toast.info("Form updated. Lock reset.", { position: "top-right", autoClose: 2000 });
+    }
+  }, [formikCreateTransaction.values]);
+
+
 
 
   // Main Render
@@ -299,7 +411,7 @@ function CreateTransaction() {
         </div>
         <div className="layout-page">
           <Header />
-          <div className="content-wrapper">
+          <div className="transaction-content-wrapper">
             {step === 1 ? renderCreateTransactionStep() : renderOTPStep()}
           </div>
           <Footer />

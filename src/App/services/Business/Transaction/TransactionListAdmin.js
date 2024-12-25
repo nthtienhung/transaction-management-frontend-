@@ -2,11 +2,13 @@ import { useEffect, useState } from "react";
 import Footer from "../../../compoment/fragment/Footer";
 import Header from "../../../compoment/fragment/Header";
 import Navbar from "../../../compoment/fragment/Navbar";
+import ConfigService from "./../../../services/CONFIGFE/ConfigService";
 import { useFormik } from "formik";
 import axios from "axios";
 import Cookies from 'js-cookie';
 function TransactionListAdmin(){
   const [transactions, setTransactions] = useState([]);
+  const [activeContent, setActiveContent] = useState("dashboard");
   const [currentPage, setCurrentPage] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
   const formDataTransasction = useFormik({
@@ -115,143 +117,168 @@ function TransactionListAdmin(){
     if (number == null || isNaN(number)) return "0"; // Handle invalid numbers
     return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
   };
+
+  const renderContent = () => {
+    switch (activeContent) {
+      case "configuration":
+        return <ConfigService />;
+      case "dashboard":
+        return (
+          <>
+            <div className="talbe-transaction">
+              <p>Transaction Manager</p>
+              <hr></hr>
+              {/* Nội dung quản lý giao dịch */}
+              <div className="table-transaction-form-input">
+                <form
+                  onSubmit={formDataTransasction.handleSubmit}
+                  onReset={formDataTransasction.handleReset}
+                >
+                  {/* Các input form */}
+                  <div className="top-form-input">
+                    <div>
+                      Transaction UUID{" "}
+                      <input
+                        type="text"
+                        className="input-search"
+                        id="transactionId"
+                        name="transactionId"
+                        onChange={formDataTransasction.handleChange}
+                      />
+                    </div>
+                    <div>
+                      Wallet{" "}
+                      <input
+                        type="text"
+                        className="input-search"
+                        id="walletCode"
+                        name="walletCode"
+                        onChange={formDataTransasction.handleChange}
+                      />
+                    </div>
+                    <div>
+                      Status{" "}
+                      <select
+                        className="input-search"
+                        id="status"
+                        name="status"
+                        onChange={formDataTransasction.handleChange}
+                      >
+                        <option value={""}>-------</option>
+                        <option value={"SUCCESS"}>SUCCESS</option>
+                        <option value={"PENDING"}>PENDING</option>
+                        <option value={"FAILED"}>FAILED</option>
+                      </select>
+                    </div>
+                  </div>
+                  <div className="bot-form-input">
+                    <div>
+                      Từ ngày
+                      <input
+                        type="date"
+                        className="input-search"
+                        id="fromDate"
+                        name="fromDate"
+                        onChange={formDataTransasction.handleChange}
+                      />
+                    </div>
+                    <div>
+                      Đến ngày
+                      <input
+                        type="date"
+                        className="input-search"
+                        id="toDate"
+                        name="toDate"
+                        onChange={formDataTransasction.handleChange}
+                      />
+                    </div>
+                  </div>
+                  <div className="fot-input">
+                    <div>
+                      <button className="button" type="submit">
+                        Submit
+                      </button>
+                    </div>
+                    <div>
+                      <button className="button" type="reset">
+                        Reset
+                      </button>
+                    </div>
+                  </div>
+                </form>
+              </div>
+              <hr></hr>
+              <div className="table-transaction-show">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>ID</th>
+                      <th>Transaction Code</th>
+                      <th>From Wallet</th>
+                      <th>From User</th>
+                      <th>To Wallet</th>
+                      <th>Amount</th>
+                      <th>Description</th>
+                      <th>Status</th>
+                      <th>Operator</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {transactions.map((transaction, index) => (
+                      <tr key={transaction.id}>
+                        <td>{index}</td>
+                        <td>{transaction.transactionCode}</td>
+                        <td>{transaction.senderWalletCode}</td>
+                        <td>{transaction.fromUser}</td>
+                        <td>{transaction.receiverWalletCode}</td>
+                        <td>{formatNumber(transaction.amount)}</td>
+                        <td>{transaction.description}</td>
+                        <td>{transaction.status}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+                {/* Thanh phân trang */}
+                <div className="pagination">
+                  <button
+                    onClick={() => setCurrentPage(currentPage - 1)}
+                    disabled={currentPage === 0}
+                  >
+                    Previous
+                  </button>
+                  <span>
+                    Page {currentPage + 1} of {totalPages}
+                  </span>
+                  <button
+                    onClick={() => setCurrentPage(currentPage + 1)}
+                    disabled={currentPage === totalPages - 1}
+                  >
+                    Next
+                  </button>
+                </div>
+              </div>
+            </div>
+          </>
+        );
+      default:
+        return <div>Content not found</div>;
+    }
+  };
     
     
       return (
         <>
-          <div class="layout-wrapper layout-content-navbar">
-            <div class="layout-container">
-              <Navbar></Navbar>
-            </div>
-            <div class="layout-page">
-              <Header></Header>
-    
-              <div class="content-wrapper">
-                <div className="talbe-transaction">
-                  <p>Transaction Manager</p>
-                  <hr></hr>
-                  <div className="table-transaction-form-input">
-                    <form onSubmit={formDataTransasction.handleSubmit} onReset={formDataTransasction.handleReset} >
-                      <div className="top-form-input">
-                        <div>
-                          Transaction UUID{" "}
-                          <input
-                            type="text"
-                            class="input-search"
-                            id="transactionId"
-                            name="transactionId"
-                            onChange={formDataTransasction.handleChange}
-                          />
-                        </div>
-                        <div>
-                          Wallet{" "}
-                          <input
-                            type="text"
-                            className="input-search"
-                            id="walletCode"
-                            name="walletCode"
-                            onChange={formDataTransasction.handleChange}
-                          />
-                        </div>
-                        <div>
-                          Status{" "}
-                          <select
-                            className="input-search"
-                            id="status"
-                            name="status"
-                            onChange={formDataTransasction.handleChange}
-                          >
-                            <option value={""}>-------</option>
-                            <option value={"SUCCESS"}>SUCCESS</option>
-                            <option value={"PENDING"}>PENDING</option>
-                            <option value={"FAILED"}>FAILED</option>
-                          </select>
-                        </div>
-                      </div>
-                      <div className="bot-form-input">
-                        <div>
-                          Từ ngày
-                          <input
-                            type="date"
-                            className="input-search"
-                            id="fromDate"
-                            name="fromDate"
-                            onChange={formDataTransasction.handleChange}
-                          />
-                        </div>
-                        <div>
-                          Đến ngày
-                          <input
-                            type="date"
-                            className="input-search"
-                            id="toDate"
-                            name="toDate"
-                            onChange={formDataTransasction.handleChange}
-                          />
-                        </div>
-                      </div>
-                      <div className="fot-input">
-                        <div><button className="button" type="submit">Submit</button></div>
-                        <div><button className="button" type="reset">Reset</button></div>
-                      </div>
-                    </form>
-                  </div>
-                  <hr></hr>
-                  <div className="table-transaction-show">
-                  <table>
-        <thead>
-          <tr>
-            <th>ID</th>
-            <th>Transaction Code</th>
-            <th>From Wallet</th>
-            <th>From User</th>
-            <th>To Wallet</th>
-            <th>Amount</th>
-            <th>Descripsion</th>
-            <th>Status</th>
-            <th>Operator</th>
-          </tr>
-        </thead>
-        <tbody>
-          {transactions.map((transaction,index) => (
-            <tr key={transaction.id}>
-              <td>{index}</td>
-              <td>{transaction.transactionCode}</td>
-              <td>{transaction.senderWalletCode}</td>
-              <td>{transaction.fromUser}</td>
-              <td>{transaction.receiverWalletCode}</td>
-              <td>{formatNumber(transaction.amount)}</td>
-              <td>{transaction.description}</td>
-              <td>{transaction.status}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-                     {/* Thanh phân trang */}
-                     <div className="pagination">
-                                <button
-                                    onClick={() => setCurrentPage(currentPage - 1)}
-                                    disabled={currentPage === 0}
-                                >
-                                    Previous
-                                </button>
-                                <span>
-                  Page {currentPage + 1} of {totalPages}
-                </span>
-                                <button
-                                    onClick={() => setCurrentPage(currentPage + 1)}
-                                    disabled={currentPage === totalPages - 1}
-                                >
-                                    Next
-                                </button>
-                            </div>
-                  </div>
-                </div>
-              </div>
-              <Footer></Footer>
-            </div>
-          </div>
-        </>
+    <div className="layout-wrapper layout-content-navbar">
+      <div className="layout-container">
+        <Navbar setActiveContent={setActiveContent} />
+      </div>
+      <div className="layout-page">
+        <Header />
+        <div className="content-wrapper">{renderContent()}</div>
+        <Footer />
+      </div>
+    </div>
+  </>
     )
 }
 export default TransactionListAdmin;

@@ -13,7 +13,7 @@ export const sendOTP = async (payload) => {
 
 export const confirmTransaction = async (payload) => {
   try {
-    const response = await axios.post(`${API_BASE_URL}/confirm`, payload);
+    const response = await axios.post(`${API_BASE_URL}/confirmsaga`, payload);
     return response.data;
   } catch (error) {
     throw new Error(error.response?.data?.message || "Error confirming transaction");
