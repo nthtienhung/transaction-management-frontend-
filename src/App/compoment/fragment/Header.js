@@ -2,8 +2,10 @@ import axios from "axios";
 import { useEffect, useState } from "react";
 import Cookies from "js-cookie";
 import { useNavigate } from "react-router-dom";
-import { toast } from "react-toastify";
+import { toast, ToastContainer } from "react-toastify";
 import { jwtDecode } from "jwt-decode";
+import WalletInfoModal from '../WalletInfoModal';
+import { formatNumber } from '../../utils/formatNumber'; 
 
 function Header({ setActiveContent }) {
   const [users, setUsers] = useState({ firstName: "", lastName: "" });
@@ -11,7 +13,11 @@ function Header({ setActiveContent }) {
   const [isDashboardOpen, setIsDashboardOpen] = useState(false); // Quản lý trạng thái mở menu Dashboard
   const [isConfigurationOpen, setIsConfigurationOpen] = useState(false); // Trạng thái mở cho Configuration
   const navigate = useNavigate();
-  const token = Cookies.get("its-cms-accessToken");
+
+  const [walletInfo, setWalletInfo] = useState(null);
+  const [showWalletModal, setShowWalletModal] = useState(false);
+  const [error, setError] = useState(null);
+
   const handleDashboardToggle = () => {
     setIsDashboardOpen((prev) => !prev);
   };
@@ -19,20 +25,7 @@ function Header({ setActiveContent }) {
   const handleConfigurationToggle = () => {
     setIsConfigurationOpen((prevState) => !prevState);
   };
-  useEffect(() => {
-    if (!token) {
-      toast.warning("Hết phiên đăng nhập, vui lòng đăng nhập lại !", {
-        position: "top-right",
-        autoClose: 3000,
-        hideProgressBar: true,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-      });
-      navigate("/");
-    }
-  }, [token]);
+
   useEffect(() => {
     if (Cookies.get("its-cms-accessToken")) {
       const decodeToken = jwtDecode(Cookies.get("its-cms-accessToken"));
@@ -41,22 +34,21 @@ function Header({ setActiveContent }) {
       axios
         .get("http://localhost:8888/api/v1/user/profile", {
           headers: {
-            Authorization: `${Cookies.get("its-cms-accessToken")}`,
+            Authorization: `Bearer ${Cookies.get("its-cms-accessToken")}`,
           },
         })
         .then((res) => {
-          if (sessionStorage.getItem("userId") == null) {
+          if (sessionStorage.getItem("userId") === null) {
             sessionStorage.setItem("userId", res.data.data.userId);
           }
+          console.log(res.data);
           setUsers(res.data.data);
         })
         .catch((error) => {
-          if (error.response.status === 401 || error.response.status === 400) {
-            // Xử lý lỗi 400 riêng
             axios
               .get("http://localhost:8888/api/v1/auth/refreshTokenUser", {
                 headers: {
-                  Authorization: `Bearer ${sessionStorage.getItem(
+                  Authorization: `${sessionStorage.getItem(
                     "its-cms-refreshToken"
                   )}`,
                 },
@@ -66,27 +58,20 @@ function Header({ setActiveContent }) {
                 Cookies.remove("its-cms-accessToken");
                 sessionStorage.removeItem("its-cms-refreshToken");
                 Cookies.set("its-cms-accessToken", res.data.data.csrfToken);
-                sessionStorage.setItem(
-                  "its-cms-refreshToken",
-                  res.data.data.refreshToken
-                );
-
-                // Gọi lại API profile với token mới
-                axios
-                  .get("http://localhost:8888/api/v1/user/profile", {
-                    headers: {
-                      Authorization: `${Cookies.get("its-cms-accessToken")}`,
-                    },
-                  })
-                  .then((res) => {
-                    sessionStorage.setItem("userId", res.data.data.userId);
-                    setUsers(res.data.data);
-                    window.location.reload();
-                  });
-              });
-          } else {
-            console.error(error);
-          }
+                sessionStorage.setItem("its-cms-refreshToken", res.data.data.refreshToken);
+                window.location.reload();
+              }).catch((error) =>{
+                toast.error("Tài khoản hết hạn, xin vui lòng đăng nhập lại !", {
+                                    position: "top-right",
+                                    autoClose: 3000,
+                                    hideProgressBar: true,
+                                    closeOnClick: true,
+                                    pauseOnHover: true,
+                                    draggable: true,
+                                    progress: undefined,
+                                  });
+                                  navigate("/");
+              })
         });
     } else {
       toast.error("Tài khoản truy cập trái phép, xin vui lòng đăng nhập !", {
@@ -141,7 +126,7 @@ function Header({ setActiveContent }) {
         axios
           .get("http://localhost:8888/api/v1/auth/refreshTokenUser", {
             headers: {
-              Authorization: `Bearer ${sessionStorage.getItem(
+              Authorization: `${sessionStorage.getItem(
                 "its-cms-refreshToken"
               )}`,
             },
@@ -154,6 +139,7 @@ function Header({ setActiveContent }) {
               "its-cms-refreshToken",
               res.data.data.refreshToken
             );
+            window.location.reload();
           });
       });
   };
@@ -163,8 +149,46 @@ function Header({ setActiveContent }) {
   const toggleMenuVisibility = () => {
     setIsMenuVisible(!isMenuVisible);
   }; // Đổi trạng thái ẩn/hiện menu
+
+  const fetchWalletInfo = async () => {
+      try {
+          const userId = sessionStorage.getItem('userId');
+          
+          // Get user profile
+          const userResponse = await axios.get(
+              `http://localhost:8888/api/v1/user/profile`,
+              {
+                  headers: {
+                      'Authorization': `Bearer ${Cookies.get('its-cms-accessToken')}`
+                  }
+              }
+          );
+
+          // Get wallet info
+          const walletResponse = await axios.get(
+              `http://localhost:8888/api/v1/wallet/getWallet/${userId}`,
+              {
+                  headers: {
+                      'Authorization': `Bearer ${Cookies.get('its-cms-accessToken')}`
+                  }
+              }
+          );
+
+          setWalletInfo({
+              firstName: userResponse.data.data.firstName,
+              lastName: userResponse.data.data.lastName,
+              walletCode: walletResponse.data.walletCode,
+              balance: walletResponse.data.balance
+          });
+      } catch (err) {
+          setError('Failed to fetch wallet information');
+          console.error(err);
+      }
+  };
+
   return (
     <>
+    <ToastContainer/>
       <nav
         class="layout-navbar container-xxl navbar navbar-expand-xl navbar-detached align-items-center bg-navbar-theme"
         id="layout-navbar"
@@ -318,10 +342,28 @@ function Header({ setActiveContent }) {
                   </a>
                 </li>
                 <li>
-                  <a class="dropdown-item" href="#">
-                    <i class="bx bx-credit-card bx-sm me-2"></i> Wallet
-                    {/* <span class="badge bg-danger rounded-pill ms-2">4</span> */}
+
+                  <a 
+                      className="dropdown-item" 
+                      href="#"
+                      onClick={(e) => {
+                          e.preventDefault();
+                          if (role === 'ROLE_USER') {
+                              fetchWalletInfo();
+                              setShowWalletModal(true);
+                          }
+                      }}
+                      style={{ display: role === 'ROLE_ADMIN' ? 'none' : 'block' }}
+                  >
+                      <i className="bx bx-credit-card bx-sm me-2"></i> Wallet
                   </a>
+                  
+                  <WalletInfoModal 
+                      open={showWalletModal}
+                      onClose={() => setShowWalletModal(false)}
+                      walletData={walletInfo}
+                  />
+
                 </li>
                 <li>
                   <hr class="dropdown-divider" />

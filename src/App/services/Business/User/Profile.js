@@ -24,6 +24,7 @@ import * as Yup from "yup";
 import { useFormik } from "formik";
 import { use } from "react";
 import { jwtDecode } from 'jwt-decode';
+import { toast } from "react-toastify";
 
 const Profile = () => {
     const navigate = useNavigate();
@@ -52,7 +53,7 @@ const Profile = () => {
     useEffect(() =>{
         const token = Cookies.get("its-cms-accessToken");
         axios.get("http://localhost:8888/api/v1/user/profile", {
-            headers: { Authorization: token },
+            headers: { Authorization: `Bearer ${token}` },
         }).then(res =>{
             setUser(res.data.data);
             setLoading(false);
@@ -68,6 +69,18 @@ const Profile = () => {
                 sessionStorage.removeItem("its-cms-refreshToken");
                 Cookies.set("its-cms-accessToken", res.data.data.csrfToken);
                 sessionStorage.setItem("its-cms-refreshToken",res.data.data.refreshToken);
+                window.location.reload();
+        }).catch((error) =>{
+              toast.error("Tài khoản hết hạn, xin vui lòng đăng nhập lạilại !", {
+                    position: "top-right",
+                    autoClose: 3000,
+                    hideProgressBar: true,
+                    closeOnClick: true,
+                    pauseOnHover: true,
+                    draggable: true,
+                    progress: undefined,
+                  });
+                  navigate("/");
         })
     })
     // Fetch user profile
@@ -187,7 +200,7 @@ const changePasswordFormik = useFormik({
                     {
                         headers: {
                             "Content-Type": "application/json",
-                            Authorization: token,
+                            Authorization: `Bearer ${token}`,
                         },
                     }
                 );

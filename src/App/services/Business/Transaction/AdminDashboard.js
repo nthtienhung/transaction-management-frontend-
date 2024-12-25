@@ -55,27 +55,26 @@ const AdminDashboard = () => {
             params: { startDate, endDate },
             headers: { Authorization: `Bearer ${Cookies.get("its-cms-accessToken")}` },
           }
-      ).catch((error) => {
-                axios
-                  .get("http://localhost:8888/api/v1/auth/refreshTokenUser", {
-                    headers: {
-                      Authorization: `Bearer ${sessionStorage.getItem(
-                        "its-cms-refreshToken"
-                      )}`,
-                    },
-                  })
-                  .then((res) => {
-                    Cookies.remove("its-cms-accessToken");
-                    sessionStorage.removeItem("its-cms-refreshToken");
-                    Cookies.set("its-cms-accessToken", res.data.data.csrfToken);
-                    sessionStorage.setItem(
-                      "its-cms-refreshToken",
-                      res.data.data.refreshToken
-                    );
-                  });
-              });
-   
-
+      ).catch((error =>{
+        axios
+            .get("http://localhost:8888/api/v1/auth/refreshTokenUser", {
+              headers: {
+                Authorization: `${sessionStorage.getItem(
+                    "its-cms-refreshToken"
+                )}`,
+              },
+            })
+            .then((res) => {
+              Cookies.remove("its-cms-accessToken");
+              sessionStorage.removeItem("its-cms-refreshToken");
+              Cookies.set("its-cms-accessToken", res.data.data.csrfToken);
+              sessionStorage.setItem(
+                  "its-cms-refreshToken",
+                  res.data.data.refreshToken
+              );
+              window.location.reload()
+            });
+      }));
 
       const userResponse = await axios.get(
           "http://localhost:8888/api/v1/transaction/users",
@@ -83,28 +82,25 @@ const AdminDashboard = () => {
             params: { startDate, endDate },
             headers: { Authorization: `Bearer ${Cookies.get("its-cms-accessToken")}` },
           }
-
-      ).catch((error) => {
-                axios
-                  .get("http://localhost:8888/api/v1/auth/refreshTokenUser", {
-                    headers: {
-                      Authorization: `Bearer ${sessionStorage.getItem(
-                        "its-cms-refreshToken"
-                      )}`,
-                    },
-                  })
-                  .then((res) => {
-                    Cookies.remove("its-cms-accessToken");
-                    sessionStorage.removeItem("its-cms-refreshToken");
-                    Cookies.set("its-cms-accessToken", res.data.data.csrfToken);
-                    sessionStorage.setItem(
-                      "its-cms-refreshToken",
-                      res.data.data.refreshToken
-                    );
-                  });
-              });
-
-
+      ).catch((error =>{
+        axios
+            .get("http://localhost:8888/api/v1/auth/refreshTokenUser", {
+              headers: {
+                Authorization: `${sessionStorage.getItem(
+                    "its-cms-refreshToken"
+                )}`,
+              },
+            })
+            .then((res) => {
+              Cookies.remove("its-cms-accessToken");
+              sessionStorage.removeItem("its-cms-refreshToken");
+              Cookies.set("its-cms-accessToken", res.data.data.csrfToken);
+              sessionStorage.setItem(
+                  "its-cms-refreshToken",
+                  res.data.data.refreshToken
+              );
+            });
+      }));
 
       const transactionResponse = await axios.get(
           "http://localhost:8888/api/v1/transaction/transactions",
@@ -112,27 +108,25 @@ const AdminDashboard = () => {
             params: { startDate, endDate },
             headers: { Authorization: `Bearer ${Cookies.get("its-cms-accessToken")}` },
           }
-
-      ).catch((error) => {
-                axios
-                  .get("http://localhost:8888/api/v1/auth/refreshTokenUser", {
-                    headers: {
-                      Authorization: `Bearer ${sessionStorage.getItem(
-                        "its-cms-refreshToken"
-                      )}`,
-                    },
-                  })
-                  .then((res) => {
-                    Cookies.remove("its-cms-accessToken");
-                    sessionStorage.removeItem("its-cms-refreshToken");
-                    Cookies.set("its-cms-accessToken", res.data.data.csrfToken);
-                    sessionStorage.setItem(
-                      "its-cms-refreshToken",
-                      res.data.data.refreshToken
-                    );
-                  });
-              });
-
+      ).catch((error =>{
+        axios
+            .get("http://localhost:8888/api/v1/auth/refreshTokenUser", {
+              headers: {
+                Authorization: `${sessionStorage.getItem(
+                    "its-cms-refreshToken"
+                )}`,
+              },
+            })
+            .then((res) => {
+              Cookies.remove("its-cms-accessToken");
+              sessionStorage.removeItem("its-cms-refreshToken");
+              Cookies.set("its-cms-accessToken", res.data.data.csrfToken);
+              sessionStorage.setItem(
+                  "its-cms-refreshToken",
+                  res.data.data.refreshToken
+              );
+            });
+      }));
 
       setGeneralReport(generalResponse.data);
       setUserReports(userResponse.data);

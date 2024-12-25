@@ -12,6 +12,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import Cookies from 'js-cookie';
 import { jwtDecode } from 'jwt-decode';
 import {generateOTP} from "../api/ApiRequest";
+import {generateOtp} from "../api/authService";
 
 function Login() {
   const [showPassword, setShowPassword] = useState(false);
@@ -24,7 +25,7 @@ function Login() {
     axios
         .get("http://localhost:8888/api/v1/user/profile", {
           headers: {
-            Authorization: `${Cookies.get("its-cms-accessToken")}`,
+            Authorization: `Bearer ${Cookies.get("its-cms-accessToken")}`,
           },
         })
         .then((res) => {
@@ -75,7 +76,7 @@ function Login() {
   });
   const userFormData = useFormik({
     initialValues: {
-      role: "ROLE_ADMIN",
+      role: "ADMIN",
       email: "",
       password: "",
     },
@@ -92,14 +93,15 @@ function Login() {
             const decodeToken = jwtDecode(Cookies.get("its-cms-accessToken"));
             const role = decodeToken.role;
             console.log(role);
-            if(value.role === role){
+            console.log(Cookies.get("its-cms-accessToken"))
+            if("ROLE_" + value.role === role){
               axios.get("http://localhost:8888/api/v1/user/getUser",{
                 headers: {
-                  Authorization: `${Cookies.get("its-cms-accessToken")}`,
+                  Authorization: `Bearer ${Cookies.get("its-cms-accessToken")}`,
                 },
               })
               .then(res =>{
-                console.log(res.data)
+                console.log(res)
                 if(res.data.isVerified === "VERIFIED"){
                   toast.success("Đăng nhập thành công", {
                     position: "top-right",
@@ -112,6 +114,7 @@ function Login() {
                   });
                   setTimeout(() => {
                     sessionStorage.setItem("userId",res.data.userId);
+                    console.log(role)
                     if(role === "ROLE_ADMIN"){
                       navigate("/homeAdmin");
                     }else{
@@ -128,7 +131,7 @@ function Login() {
                       draggable: true,
                       progress: undefined,
                     });
-                    generateOTP(value.email);
+                    generateOtp(value.email);
                     setTimeout(() => navigate("/verify", { state: { email: value.email } }), 1500);
                 }
               })
@@ -145,16 +148,6 @@ function Login() {
             }
             }, 100); 
            
-          } else {
-            toast.error("Tài khoản hoặc mật khẩu sai, thử lại.", {
-              position: "top-right",
-              autoClose: 3000,
-              hideProgressBar: true,
-              closeOnClick: true,
-              pauseOnHover: true,
-              draggable: true,
-              progress: undefined,
-            });
           }
         })
         .catch((error) => {
@@ -171,7 +164,17 @@ function Login() {
             progress: undefined,
           });
 
-         }else if(messageError === "Account has been temporarily locked"){
+         }else if(messageError === "You have no permission to access") {
+            toast.error("Tài khoản không có quyền truy cập.", {
+              position: "top-right",
+              autoClose: 2000,
+              hideProgressBar: true,
+              closeOnClick: true,
+              pauseOnHover: true,
+              draggable: true,
+              progress: undefined,
+            });
+          }else if(messageError === "Account has been temporarily locked"){
           toast.error("Tài khoản đã bị khóa do đăng nhập sai quá 5 lần, thử lại sau", {
             position: "top-right",
             autoClose: 3000,
@@ -185,6 +188,28 @@ function Login() {
           toast.error("Tài khoản sai định dạng (abc@gmail.com), thử lại.", {
             position: "top-right",
             autoClose: 3000,
+            hideProgressBar: true,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+          });
+         } else if(messageError === "Account is inactive"){
+          toast.warning("Tài khoản chưa được xác thực, đang điều hướng trang xác thực", {
+            position: "top-right",
+            autoClose: 1500, // Tự động đóng sau 3 giây
+            hideProgressBar: true,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+          });
+          generateOtp(value.email);
+          setTimeout(() => navigate("/verify", { state: { email: value.email } }), 1500);
+         } else if(messageError === "Account has been blocked"){
+          toast.warning("Tài khoản đang bị chặn bởi nhà quản lý", {
+            position: "top-right",
+            autoClose: 1500, // Tự động đóng sau 3 giây
             hideProgressBar: true,
             closeOnClick: true,
             pauseOnHover: true,
@@ -236,10 +261,10 @@ function Login() {
                         value={userFormData.values.role}
                         className="form-control"
                       >
-                        <option defaultValue={"ROLE_ADMIN"} value={"ROLE_ADMIN"}>
+                        <option defaultValue={"ADMIN"} value={"ADMIN"}>
                           ADMIN
                         </option>
-                        <option value={"ROLE_USER"}>USER</option>
+                        <option value={"USER"}>USER</option>
                       </select>
                     </div>
                   </div>

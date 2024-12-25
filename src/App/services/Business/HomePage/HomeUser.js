@@ -12,6 +12,7 @@ import {
 import Cookies from "js-cookie";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import { toast, ToastContainer } from "react-toastify";
 
 function HoneUser() {
   const [wallet, setWallet] = useState(null);
@@ -20,7 +21,7 @@ function HoneUser() {
   const [totalSent, setTotalSent] = useState(0);
   const [totalReceived, setTotalReceived] = useState(0);
   const [totalTransactions, setTotalTransactions] = useState(0);
-
+  const navigate = useNavigate();
   useEffect(() => {
     const fetchWalletData = async () => {
       try {
@@ -62,7 +63,7 @@ function HoneUser() {
       } catch (error) {
         axios.get("http://localhost:8888/api/v1/auth/refreshTokenUser",{
           headers: {
-            Authorization: `Bearer ${sessionStorage.getItem("its-cms-refreshToken")}`,
+            Authorization: `${sessionStorage.getItem("its-cms-refreshToken")}`,
           },
         }).then(res =>{
           Cookies.remove("its-cms-accessToken");
@@ -89,9 +90,23 @@ function HoneUser() {
       day: "2-digit",
     });
   };
-
+useEffect(() =>{
+if(!Cookies.get("its-cms-accessToken")){
+  toast.warning("Truy cập trái phép, vui lòng đăng nhập", {
+    position: "top-right",
+    autoClose: 3000,
+    hideProgressBar: true,
+    closeOnClick: true,
+    pauseOnHover: true,
+    draggable: true,
+    progress: undefined,
+  });
+  navigate("/");
+}
+},[])
   return (
       <>
+      <ToastContainer/>
         <div className="layout-wrapper layout-content-navbar">
           <div className="layout-container">
             <Navbar></Navbar>
