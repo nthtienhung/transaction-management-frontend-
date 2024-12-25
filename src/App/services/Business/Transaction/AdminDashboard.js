@@ -109,9 +109,6 @@ const AdminDashboard = () => {
             headers: { Authorization: `Bearer ${Cookies.get("its-cms-accessToken")}` },
           }
       ).catch((error =>{
-        console.log(sessionStorage.getItem(
-            "its-cms-refreshToken"
-        ))
         axios
             .get("http://localhost:8888/api/v1/auth/refreshTokenUser", {
               headers: {

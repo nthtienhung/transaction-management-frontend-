@@ -15,7 +15,6 @@ export const fetchAllTransactions = async (walletCodeByUserLogIn, page, filters 
         size: 10,
         ...cleanedFilters
     }).toString();
-
     return axios.get(`${API_BASE_URL}/transaction/transaction-list-by-user?${query}`, {
         headers: {
             Authorization: `Bearer ${Cookies.get("its-cms-accessToken")}`,
@@ -52,8 +51,8 @@ export const getUserId = async () => {
             Cookies.remove("its-cms-accessToken");
             sessionStorage.removeItem("its-cms-refreshToken");
             Cookies.set("its-cms-accessToken", res.data.data.csrfToken);
-            sessionStorage.setItem("its-cms-refreshToken", res.data.data.refreshToken);
-        })
+            sessionStorage.setItem("its-cms-refreshToken",res.data.data.refreshToken);
+          })
     }
 };
 

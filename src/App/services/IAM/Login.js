@@ -25,7 +25,7 @@ function Login() {
     axios
         .get("http://localhost:8888/api/v1/user/profile", {
           headers: {
-            Authorization: `${Cookies.get("its-cms-accessToken")}`,
+            Authorization: `Bearer ${Cookies.get("its-cms-accessToken")}`,
           },
         })
         .then((res) => {
@@ -35,6 +35,11 @@ function Login() {
             navigate("/homeUser");
           }
         }).catch((error) =>{
+          localStorage.removeItem("userId");
+          sessionStorage.removeItem("its-cms-refreshToken");
+          sessionStorage.removeItem("userId");
+          sessionStorage.clear();
+          Cookies.remove("its-cms-accessToken");
           toast.warning("Hết phiên đăng nhập, vui lòng đăng nhập lại !", {
             position: "top-right",
             autoClose: 3000,
@@ -45,6 +50,21 @@ function Login() {
             progress: undefined,
           });
         })
+      }else{
+        localStorage.removeItem("userId");
+        sessionStorage.removeItem("its-cms-refreshToken");
+        sessionStorage.removeItem("userId");
+        sessionStorage.clear();
+        Cookies.remove("its-cms-accessToken");
+        toast.warning("Hết phiên đăng nhập, vui lòng đăng nhập lại !", {
+          position: "top-right",
+          autoClose: 3000,
+          hideProgressBar: true,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+        });
       }
   }, [navigate]);
   const togglePasswordVisibility = () => {
@@ -128,16 +148,6 @@ function Login() {
             }
             }, 100); 
            
-          } else {
-            toast.error("Tài khoản hoặc mật khẩu sai, thử lại.", {
-              position: "top-right",
-              autoClose: 3000,
-              hideProgressBar: true,
-              closeOnClick: true,
-              pauseOnHover: true,
-              draggable: true,
-              progress: undefined,
-            });
           }
         })
         .catch((error) => {
@@ -178,6 +188,28 @@ function Login() {
           toast.error("Tài khoản sai định dạng (abc@gmail.com), thử lại.", {
             position: "top-right",
             autoClose: 3000,
+            hideProgressBar: true,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+          });
+         } else if(messageError === "Account is inactive"){
+          toast.warning("Tài khoản chưa được xác thực, đang điều hướng trang xác thực", {
+            position: "top-right",
+            autoClose: 1500, // Tự động đóng sau 3 giây
+            hideProgressBar: true,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+          });
+          generateOtp(value.email);
+          setTimeout(() => navigate("/verify", { state: { email: value.email } }), 1500);
+         } else if(messageError === "Account has been blocked"){
+          toast.warning("Tài khoản đang bị chặn bởi nhà quản lý", {
+            position: "top-right",
+            autoClose: 1500, // Tự động đóng sau 3 giây
             hideProgressBar: true,
             closeOnClick: true,
             pauseOnHover: true,

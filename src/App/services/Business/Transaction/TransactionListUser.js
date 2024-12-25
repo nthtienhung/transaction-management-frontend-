@@ -17,7 +17,6 @@ import {getTransactionDetailByUser} from "../../api/transactionServiceApi";
 import {CiSearch} from "react-icons/ci";
 import TransactionDetail from "./TransactionDetail";
 
-
 function TransactionListUser() {
     const navigate = useNavigate();
     const [transactions, setTransactions] = useState([]);
@@ -34,7 +33,7 @@ function TransactionListUser() {
     const [isDialogOpen, setIsDialogOpen] = useState(false);
     const [transactionDetail, setTransactionDetail] = useState(null);
 
-    const fetchTransactions = async (page, currentFilters) => {
+    const fetchTransactions = async (page,currentFilters) => {
         try {
             const userId = await getUserId();
             const walletResponse = await getWalletByUserId(userId);
@@ -372,7 +371,6 @@ function TransactionListUser() {
 
                                             return (
                                                 <tr key={index}>
-
                                                     <td data-label="Transaction Code">{transaction.transactionCode}</td>
                                                     <td data-label="From Wallet">{transaction.senderWalletCode}</td>
                                                     <td data-label="To Wallet">{transaction.receiverWalletCode}</td>
