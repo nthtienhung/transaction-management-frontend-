@@ -1,11 +1,10 @@
-
-import React, { useEffect, useState } from "react";
-import { useFormik } from "formik";
-import { useNavigate } from "react-router-dom";
+import React, {useEffect, useState} from "react";
+import {useFormik} from "formik";
+import {useNavigate} from "react-router-dom";
 import Footer from "../../../compoment/fragment/Footer";
 import Header from "../../../compoment/fragment/Header";
 import Navbar from "../../../compoment/fragment/Navbar";
-import { formatISO, parseISO } from "date-fns";
+import {formatISO, parseISO} from "date-fns";
 
 import {
     fetchAllTransactions,
@@ -35,7 +34,7 @@ function TransactionListUser() {
     const [isDialogOpen, setIsDialogOpen] = useState(false);
     const [transactionDetail, setTransactionDetail] = useState(null);
 
-    const fetchTransactions = async (page,currentFilters) => {
+    const fetchTransactions = async (page, currentFilters) => {
         try {
             const userId = await getUserId();
             const walletResponse = await getWalletByUserId(userId);
@@ -60,7 +59,7 @@ function TransactionListUser() {
     };
 
     useEffect(() => {
-        fetchTransactions(currentPage,filters);
+        fetchTransactions(currentPage, filters);
     }, [currentPage]);
 
     const formDataTransaction = useFormik({
@@ -132,10 +131,10 @@ function TransactionListUser() {
         <>
             <div className="layout-wrapper layout-content-navbar">
                 <div className="layout-container">
-                    <Navbar />
+                    <Navbar/>
                 </div>
                 <div className="layout-page">
-                    <Header />
+                    <Header/>
 
                     <div className="content-wrapper">
                         <div
@@ -158,7 +157,7 @@ function TransactionListUser() {
                             >
                                 Transaction Manager
                             </p>
-                            <hr />
+                            <hr/>
                             <div
                                 className="table-transaction-form-input"
                                 style={{
@@ -180,7 +179,7 @@ function TransactionListUser() {
                                             marginBottom: "20px",
                                         }}
                                     >
-                                        <div className="form-group" style={{ flex: 1 }}>
+                                        <div className="form-group" style={{flex: 1}}>
                                             <label htmlFor="transactionCode">Transaction Code</label>
                                             <input
                                                 type="text"
@@ -194,10 +193,10 @@ function TransactionListUser() {
                                                     borderRadius: "5px",
                                                     width: "100%",
                                                     boxSizing: "border-box",
-                                                  }}
+                                                }}
                                             />
                                         </div>
-                                        <div className="form-group" style={{ flex: 1 }}>
+                                        <div className="form-group" style={{flex: 1}}>
                                             <label htmlFor="walletCodeByUserSearch">Wallet</label>
                                             <input
                                                 type="text"
@@ -211,10 +210,10 @@ function TransactionListUser() {
                                                     borderRadius: "5px",
                                                     width: "100%",
                                                     boxSizing: "border-box",
-                                                  }}
+                                                }}
                                             />
                                         </div>
-                                        <div className="form-group" style={{ flex: 1 }}>
+                                        <div className="form-group" style={{flex: 1}}>
                                             <label htmlFor="status">Status</label>
                                             <select
                                                 type="text"
@@ -228,7 +227,7 @@ function TransactionListUser() {
                                                     borderRadius: "5px",
                                                     width: "100%",
                                                     boxSizing: "border-box",
-                                                  }}
+                                                }}
                                             >
                                                 <option value={""}>-------</option>
                                                 <option value={"SUCCESS"}>SUCCESS</option>
@@ -244,7 +243,7 @@ function TransactionListUser() {
                                             gap: "20px",
                                         }}
                                     >
-                                        <div className="form-group" style={{ flex: 1 }}>
+                                        <div className="form-group" style={{flex: 1}}>
                                             <label htmlFor="fromDate">Từ ngày</label>
                                             <input
                                                 type="date"
@@ -259,10 +258,10 @@ function TransactionListUser() {
                                                     borderRadius: "5px",
                                                     width: "100%",
                                                     boxSizing: "border-box",
-                                                  }}
+                                                }}
                                             />
                                         </div>
-                                        <div className="form-group" style={{ flex: 1 }}>
+                                        <div className="form-group" style={{flex: 1}}>
                                             <label htmlFor="toDate">Đến ngày</label>
                                             <input
                                                 type="date"
@@ -277,7 +276,7 @@ function TransactionListUser() {
                                                     borderRadius: "5px",
                                                     width: "100%",
                                                     boxSizing: "border-box",
-                                                  }}
+                                                }}
                                             />
                                         </div>
                                     </div>
@@ -337,7 +336,7 @@ function TransactionListUser() {
                                 </form>
                             </div>
 
-                            <hr />
+                            <hr/>
                             <div className="table-transaction-show">
                                 <table className="transaction-table">
                                     <thead>
@@ -373,15 +372,17 @@ function TransactionListUser() {
 
                                             return (
                                                 <tr key={index}>
-                                                    <td>{transaction.transactionCode}</td>
-                                                    <td>{transaction.senderWalletCode}</td>
-                                                    <td>{transaction.firstNameSender} {transaction.lastNameSender}</td>
-                                                    <td>{transaction.receiverWalletCode}</td>
-                                                    <td>{transaction.lastName} {transaction.firstName}</td>
-                                                    <td style={amountStyle}>{amountDisplay}</td>
-                                                    <td>{transaction.description}</td>
-                                                    <td>{transaction.status}</td>
-                                                    <td>
+
+                                                    <td data-label="Transaction Code">{transaction.transactionCode}</td>
+                                                    <td data-label="From Wallet">{transaction.senderWalletCode}</td>
+                                                    <td data-label="To Wallet">{transaction.receiverWalletCode}</td>
+                                                    <td data-label="From User">{transaction.firstNameSender} {transaction.lastNameSender}</td>
+                                                    <td data-label="To User">{transaction.lastName} {transaction.firstName}</td>
+                                                    <td data-label="Amount" style={amountStyle}>{amountDisplay}</td>
+                                                    <td data-label="Description">{transaction.description}</td>
+                                                    <td data-label="Status">{transaction.status}</td>
+                                                    <td data-label="Operation">
+
                                                         <div onClick={() => openDialog(transaction.transactionCode)}>
                                                             <CiSearch style={{cursor: "pointer"}}/>
                                                         </div>
@@ -418,7 +419,7 @@ function TransactionListUser() {
                             </div>
                         </div>
                     </div>
-                    <Footer />
+                    <Footer/>
                 </div>
             </div>
         </>
