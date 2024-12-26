@@ -2,6 +2,18 @@ import axios from 'axios';
 import Cookies from "js-cookie";
 const API_BASE_URL = "http://localhost:8888/api/v1/transaction"; // URL của backend
 
+const refreshToken = () => {
+    axios.get("http://localhost:8888/api/v1/auth/refreshTokenUser", {
+        headers: {
+            Authorization: `${sessionStorage.getItem("its-cms-refreshToken")}`,
+        },
+    }).then(res => {
+        Cookies.remove("its-cms-accessToken");
+        sessionStorage.removeItem("its-cms-refreshToken");
+        Cookies.set("its-cms-accessToken", res.data.data.csrfToken);
+        sessionStorage.setItem("its-cms-refreshToken", res.data.data.refreshToken);
+    })
+}
 export const sendOTP = async (payload) => {
   try {
     const response = await axios.post(`${API_BASE_URL}/send-otp`, payload, {
@@ -11,20 +23,20 @@ export const sendOTP = async (payload) => {
     });
     return response.data;
   } catch (error) {
-    throw new Error(error.response?.data?.message || "Error sending OTP");
+    refreshToken();
   }
 };
 
 export const confirmTransaction = async (payload) => {
   try {
-    const response = await axios.post(`${API_BASE_URL}/confirm`, payload, {
+    const response = await axios.post(`${API_BASE_URL}/confirm-transaction`, payload, {
       headers: {
         Authorization: `Bearer ${Cookies.get("its-cms-accessToken")}`,
       }
     });
     return response.data;
   } catch (error) {
-    throw new Error(error.response?.data?.message || "Error confirming transaction");
+    refreshToken();
   }
 };
 
@@ -38,7 +50,7 @@ export const getRecentReceivedTransactionList = async (walletCode) => {
     });
     return response.data;
   } catch (error) {
-    throw new Error(error.response?.data?.message || "Error fetching recent received transactions");
+    refreshToken();
   }
 };
 
@@ -52,7 +64,7 @@ export const getRecentSentTransactionList = async (walletCode) => {
     });
     return response.data;
   } catch (error) {
-    throw new Error(error.response?.data?.message || "Error fetching recent sent transactions");
+    refreshToken();
   }
 };
 
@@ -66,7 +78,7 @@ export const getTotalAmountSentTransactionByUser = async (walletCode) => {
     });
     return response.data;
   } catch (error) {
-    throw new Error(error.response?.data?.message || "Error fetching total amount sent");
+    refreshToken();
   }
 };
 
@@ -80,7 +92,7 @@ export const getTotalAmountReceivedTransactionByUser = async (walletCode) => {
     });
     return response.data;
   } catch (error) {
-    throw new Error(error.response?.data?.message || "Error fetching total amount received");
+    refreshToken();
   }
 };
 
@@ -94,7 +106,7 @@ export const getTotalTransactionByUser = async (walletCode) => {
     });
     return response.data;
   } catch (error) {
-    throw new Error(error.response?.data?.message || "Error fetching total transactions");
+    refreshToken();
   }
 };
 
@@ -107,7 +119,7 @@ export const getTransactionDetailByUser = async (transactionCode) => {
     });
     return response.data.data;
   } catch (error) {
-    throw new Error(error.response?.data?.message || "Error fetching transactions");
+    refreshToken();
   }
 }
 
@@ -120,7 +132,7 @@ export const getTransactionDetailByAdmin = async (transactionCode) => {
     });
     return response.data.data;
   } catch (error) {
-    window.location.reload();
+    refreshToken();
   }
 }
 

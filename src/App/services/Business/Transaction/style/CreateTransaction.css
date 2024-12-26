@@ -1,41 +1,63 @@
-
-General Layout
-.dasboard {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 20px;
+.transaction-content-wrapper {
+  margin: 10px auto;
+  width: 800px;
 }
 
-.dasboard-item {
-  background-color: #fff;
+.app-brand {
+  display: flex;
+  justify-content: center;
   padding: 20px;
+}
+
+.app-brand img {
+  width: 50%;
+}
+
+.menu-inner {
+  padding-top: 20px;
+  padding-bottom: 20px;
+}
+
+.menu-item {
+  list-style: none;
+}
+
+.menu-link {
+  display: flex;
+  align-items: center;
+  padding: 10px 15px;
+  color: #fff;
+  text-decoration: none;
+  transition: background-color 0.3s;
+  font-weight: 500;
+  transition: all 0.3s ease;
   border-radius: 8px;
-  text-align: center;
-}
-.content-dashboard {
-  margin-top: 30px;
 }
 
-.dasboard-table p {
+.menu-link:hover {
+  background-color: #292b3d;
+}
+
+.menu-toggle {
+  cursor: pointer;
+}
+
+.menu-sub {
+  display: none;
+  list-style: none;
+  padding-left: 20px;
+}
+
+.menu-sub.show {
+  display: block;
+}
+
+.menu-icon {
+  margin-right: 10px;
+}
+
+.menu-text {
   font-weight: bold;
-  color: #333;
-  margin-bottom: 10px;
-}
-
-.dasboard-table hr {
-  border: 0;
-  height: 2px;
-  background-color: #ececec;
-}
-
-.dasboard-table table {
-  width: 100%;
-  border-collapse: collapse;
-}
-
-.dasboard-table td {
-  padding: 10px;
-  border-bottom: 1px solid #f1f1f1;
 }
 
 /* Create Transaction Styles */
@@ -47,13 +69,16 @@ General Layout
 }
 
 .create-transaction-form h2, .otp-form h2 {
-  font-size: 24px;
-  margin-bottom: 20px;
+  font-size: 28px;
+    color: #1e4db7;
+    margin-bottom: 24px;
+    font-weight: 600;
 }
 
 .create-transaction-form form, .otp-form form {
   display: flex;
   flex-direction: column;
+  gap: 20px;
 }
 
 .create-transaction-form label, .otp-form label {
@@ -80,28 +105,103 @@ General Layout
   margin-bottom: 15px;
 }
 
+input, textarea {
+  padding: 12px 16px;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  font-size: 16px;
+  transition: all 0.3s ease;
+  width: 100%;
+}
+
+input:focus, textarea:focus {
+  border-color: #1e4db7;
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(30,77,183,0.1);
+}
+
+ /* Error Messages */
+ .error {
+  color: #d32f2f;
+  font-size: 14px;
+  margin-top: 4px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.error::before {
+  content: '⚠';
+  font-size: 16px;
+}
+
+/* Transaction Summary */
+.transaction-summary {
+  background: #f8fafd;
+  padding: 24px;
+  border-radius: 8px;
+  margin: 24px 0;
+  border: 1px solid #e0e0e0;
+}
+
+.transaction-summary h3 {
+  color: #1e4db7;
+  margin-bottom: 16px;
+  font-size: 20px;
+}
+
+.transaction-summary p {
+  margin: 8px 0;
+  padding: 8px 0;
+  border-bottom: 1px solid #e0e0e0;
+  display: flex;
+  justify-content: space-between;
+}
+
+.transaction-summary p:last-child {
+  border-bottom: none;
+}
+
 button {
   padding: 10px 15px;
   border: none;
   background-color: #0056b3;
   color: #fff;
   font-size: 16px;
-  border-radius: 5px;
+  font-weight: 600;
+  border-radius: 8px;
   cursor: pointer;
   transition: background-color 0.3s;
+}
+
+/* Căn chỉnh nút trong cùng một dòng */
+.button-group {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px; /* Khoảng cách giữa các nút */
+}
+
+.button-group button{
+  width: 200px;
+}
+
+.btn-continue{
+  background-color: #0056b3;
+}
+
+.btn-back{
+  background-color: #c50518;
 }
 
 button:hover {
   background-color: #004080;
 }
 
-button[type="button"] {
-  background-color: #ccc;
+.btn-back:hover {
+  background-color: #bb5c5c;
 }
 
-button[type="button"]:hover {
-  background-color: #999;
-}
 /* Mobile Responsiveness */
 /* @media (max-width: 768px) {
   .layout-wrapper {

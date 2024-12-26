@@ -158,6 +158,7 @@ function Header({ setActiveContent }) {
                   sessionStorage.removeItem("its-cms-refreshToken");
                   navigate("/");
               }, 1000);
+
           });
       });
   };
