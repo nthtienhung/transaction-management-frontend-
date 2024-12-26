@@ -31,16 +31,7 @@ export const getWalletByWalletCode = async (walletCode) => {
         console.log(response.data);
         return response.data;
     } catch (error) {
-        axios.get("http://localhost:8888/api/v1/auth/refreshTokenUser", {
-            headers: {
-                Authorization: `Bearer ${sessionStorage.getItem("its-cms-refreshToken")}`,
-            },
-        }).then(res => {
-            Cookies.remove("its-cms-accessToken");
-            sessionStorage.removeItem("its-cms-refreshToken");
-            Cookies.set("its-cms-accessToken", res.data.data.csrfToken);
-            sessionStorage.setItem("its-cms-refreshToken", res.data.data.refreshToken);
-        })
+        refreshToken();
     }
 };
 

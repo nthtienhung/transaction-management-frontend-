@@ -130,7 +130,6 @@ function Header({ setActiveContent }) {
               "its-cms-refreshToken",
               res.data.data.refreshToken
             );
-            window.location.reload();
           });
       });
   };

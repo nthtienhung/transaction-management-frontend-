@@ -4,7 +4,6 @@ import * as Yup from "yup";
 import Cookies from "js-cookie";
 import { toast, ToastContainer } from "react-toastify";
 import axios from "axios";
-import { toast, ToastContainer } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 import Footer from "../../../compoment/fragment/Footer";
 import Header from "../../../compoment/fragment/Header";
@@ -117,8 +116,12 @@ function CreateTransaction() {
           throw new Error("The deposit amount exceeds your balance");
         }
 
+        console.log("values : " + values.recipientWalletCode)
+
         // Call API to get wallet info by wallet code
         const walletInfo = await getWalletByWalletCode(values.recipientWalletCode);
+
+        console.log(walletInfo);
 
         if (!walletInfo || !walletInfo.userId) {
           throw new Error("Wallet information is invalid or userId is missing.");
@@ -340,10 +343,10 @@ function CreateTransaction() {
       if (walletCode === senderWalletCode) {
         setRecipientName("");
         setError("Wallet code cannot match your wallet code"); // Chỉ báo lỗi
-        // toast.error("Wallet code cannot match your wallet code", {
-        //   position: "top-right",
-        //   autoClose: 3000,
-        // });
+        toast.error("Wallet code cannot match your wallet code", {
+          position: "top-right",
+          autoClose: 3000,
+        });
         return;
       }
 
@@ -393,9 +396,6 @@ function CreateTransaction() {
       // toast.info("Form updated. Lock reset.", { position: "top-right", autoClose: 2000 });
     }
   }, [formikCreateTransaction.values]);
-
-
-
 
   // Main Render
   return (
