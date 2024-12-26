@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import Cookies from "js-cookie";
-import { toast, ToastContainer } from "react-toastify";
+import { Snackbar, Alert } from "@mui/material";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import Footer from "../../../compoment/fragment/Footer";
@@ -25,6 +25,17 @@ function CreateTransaction() {
   const [senderWalletCode, setSenderWalletCode] = useState("");
   const [lockUntil, setLockUntil] = useState(null); // Thời gian bị khóa
   const [otpAttempts, setOtpAttempts] = useState(0); // Số lần nhập OTP sai
+
+  const [snackbar, setSnackbar] = useState({
+    open: false,
+    message: "",
+    severity: "info"
+  });
+
+  // Handle closing snackbar
+  const handleCloseSnackbar = () => {
+    setSnackbar({ ...snackbar, open: false });
+  };
 
   // Thời gian khóa khi nhập sai quá số lần cho phép (ms)
   const LOCK_TIME = 1 * 60 * 1000; // 1 phút
@@ -105,9 +116,10 @@ function CreateTransaction() {
         setError("");
 
         if (lockUntil && new Date() < lockUntil) {
-          toast.error("You are temporarily locked. Please try again later.", {
-            position: "top-right",
-            autoClose: 3000,
+          setSnackbar({
+            open: true,
+            message: "You are temporarily locked. Please try again later.",
+            severity: "error"
           });
           return;
         }
@@ -150,9 +162,10 @@ function CreateTransaction() {
         });
 
         if (response.status === 200) {
-          toast.success(response.message, {
-            position: "top-right",
-            autoClose: 3000,
+          setSnackbar({
+            open: true,
+            message: response.message,
+            severity: "success"
           });
 
           // Move to OTP step
@@ -186,9 +199,10 @@ function CreateTransaction() {
         });
         if (response.status === 200) {
           console.log("test")
-          toast.success(response.message, {
-            position: "top-right",
-            autoClose: 3000,
+          setSnackbar({
+            open: true,
+            message: response.message,
+            severity: "success"
           });
           // Navigate to transaction list on success
           // navigate("/transactionUser");
@@ -202,15 +216,17 @@ function CreateTransaction() {
           lockTime.setMinutes(lockTime.getMinutes() + 1);
           setLockUntil(lockTime);
 
-          toast.error("Too many incorrect OTP attempts. You are temporarily locked for 5 minutes.", {
-            position: "top-right",
-            autoClose: 3000,
+          setSnackbar({
+            open: true,
+            message: "Too many incorrect OTP attempts. You are temporarily locked for 5 minutes.",
+            severity: "error"
           });
           setStep(1);
         } else {
-          toast.error("Incorrect OTP. Please try again.", {
-            position: "top-right",
-            autoClose: 3000,
+          setSnackbar({
+            open: true,
+            message: "Incorrect OTP. Please try again.",
+            severity: "error"
           });
         }
       }
@@ -345,9 +361,10 @@ function CreateTransaction() {
       if (walletCode === senderWalletCode) {
         setRecipientName("");
         setError("Wallet code cannot match your wallet code"); // Chỉ báo lỗi
-        toast.error("Wallet code cannot match your wallet code", {
-          position: "top-right",
-          autoClose: 3000,
+        setSnackbar({
+          open: true,
+          message: "Wallet code cannot match your wallet code",
+          severity: "error"
         });
         return;
       }
@@ -366,9 +383,10 @@ function CreateTransaction() {
       setRecipientName(recipientFullName); // Cập nhật trạng thái tên người nhận
     } catch (err) {
       setRecipientName(""); // Reset tên nếu xảy ra lỗi
-      toast.error(err.message, {
-        position: "top-right",
-        autoClose: 3000,
+      setSnackbar({
+        open: true,
+        message: err.message,
+        severity: "error"
       });
       // setError("Recipient not found. Please check wallet code!");
     }
@@ -377,10 +395,11 @@ function CreateTransaction() {
   const handleContinue = async () => {
     if (lockUntil && new Date() < lockUntil) {
       const remainingTime = Math.ceil((lockUntil - new Date()) / 60000); // Tính số phút còn lại
-      toast.error(
-        `You are temporarily locked. Please try again after ${remainingTime} minute(s).`,
-        { position: "top-right", autoClose: 3000 }
-      );
+      setSnackbar({
+        open: true,
+        message: `You are temporarily locked. Please try again after ${remainingTime} minute(s).`,
+        severity: "error"
+      });
       return;
     }
 
@@ -403,7 +422,16 @@ function CreateTransaction() {
   // Main Render
   return (
     <>
-      <ToastContainer />
+      <Snackbar
+        open={snackbar.open}
+        autoHideDuration={6000}
+        onClose={handleCloseSnackbar}
+        anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+      >
+        <Alert onClose={handleCloseSnackbar} severity={snackbar.severity}>
+          {snackbar.message}
+        </Alert>
+      </Snackbar>
       <div className="layout-wrapper layout-content-navbar">
         <div className="layout-container">
           <Navbar />

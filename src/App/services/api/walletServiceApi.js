@@ -22,7 +22,7 @@ const refreshToken = () => {
 }
 export const getWalletByWalletCode = async (walletCode) => {
     try {
-        const response = await axios.get(`${BASE_URL}/${walletCode}`, {
+        const response = await axios.get(`${BASE_URL}/get-wallet/${walletCode}`, {
             headers: {
                 Authorization: `Bearer ${Cookies.get("its-cms-accessToken")}`,
             }
