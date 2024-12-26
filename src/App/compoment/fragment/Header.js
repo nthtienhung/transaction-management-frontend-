@@ -141,7 +141,23 @@ function Header({ setActiveContent }) {
               "its-cms-refreshToken",
               res.data.data.refreshToken
             );
-            window.location.reload();
+              setTimeout(() => {
+                  toast.success("Hẹn gặp lại ❤️❤️❤️!", {
+                      position: "top-right",
+                      autoClose: 3000,
+                      hideProgressBar: true,
+                      closeOnClick: true,
+                      pauseOnHover: true,
+                      draggable: true,
+                      progress: undefined,
+                  });
+              }, 500);
+              setTimeout(() => {
+                  sessionStorage.clear();
+                  Cookies.remove("its-cms-accessToken");
+                  sessionStorage.removeItem("its-cms-refreshToken");
+                  navigate("/");
+              }, 1000);
           });
       });
   };
