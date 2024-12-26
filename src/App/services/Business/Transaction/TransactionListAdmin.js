@@ -10,6 +10,7 @@ import UserManagement from "../../../pages/Admin/UserManagement";
 import {CiSearch} from "react-icons/ci";
 import TransactionDetail from "./TransactionDetail";
 import {getTransactionDetailByAdmin} from "../../api/transactionServiceApi";
+import { date } from "yup";
 
 
 function TransactionListAdmin() {
@@ -20,6 +21,8 @@ function TransactionListAdmin() {
     const [isDialogOpen, setIsDialogOpen] = useState(false);
     const [transactionDetail, setTransactionDetail] = useState(null);
 
+    const [error, setError] = useState("");
+    
     const formDataTransasction = useFormik({
         initialValues: {
             transactionId: "",
@@ -27,15 +30,29 @@ function TransactionListAdmin() {
             status: "",
             fromDate: "",
             toDate: "",
-        },
+        },validate: (values) => {
+          const errors = {};
+
+          // Check if `toDate` is before `fromDate`
+          if (values.fromDate && values.toDate) {
+              const fromDate = new Date(values.fromDate);
+              const toDate = new Date(values.toDate);
+
+              if (toDate < fromDate) {
+                  errors.toDate = "Invalid logic date search.";
+              }
+          }
+
+          return errors;
+      },
         onSubmit: async (values) => {
             console.log(values);
             const params = new URLSearchParams();
             params.append("transactionId", values.transactionId || "");
             params.append("walletCode", values.walletCode || "");
             params.append("status", values.status || "");
-            params.append("fromDate", values.fromDate || "");
-            params.append("toDate", values.toDate || "");
+            params.append("fromDate", values.fromDate ? new Date(values.fromDate).toISOString() : "");
+            params.append("toDate", values.toDate ? new Date(values.toDate).toISOString() : "");
             console.log(params);
             axios
                 .post(
@@ -47,7 +64,7 @@ function TransactionListAdmin() {
                             size: 5, // Số lượng bản ghi mỗi trang
                         },
                         headers: {
-                            Authorization: `Bearer ${Cookies.get("its-cms-accessToken")}`,
+                          Authorization: `Bearer ${Cookies.get("its-cms-accessToken")}`,
                         },
                     }
                 )
@@ -61,7 +78,7 @@ function TransactionListAdmin() {
                                     size: 5, // Số lượng bản ghi mỗi trang
                                 },
                                 headers: {
-                                    Authorization: `Bearer ${Cookies.get("its-cms-accessToken")}`,
+                                  Authorization: `Bearer ${Cookies.get("its-cms-accessToken")}`,
                                 },
                             }
                         ).then(res => {
@@ -103,6 +120,7 @@ function TransactionListAdmin() {
                                 "its-cms-refreshToken",
                                 res.data.data.refreshToken
                             );
+                            window.location.reload();
                         });
                 });
         },
@@ -220,6 +238,7 @@ function TransactionListAdmin() {
                                                         id="fromDate"
                                                         name="fromDate"
                                                         onChange={formDataTransasction.handleChange}
+                                                        value={formDataTransasction.values.fromDate}
                                                     />
                                                 </div>
                                                 <div>
@@ -230,8 +249,12 @@ function TransactionListAdmin() {
                                                         id="toDate"
                                                         name="toDate"
                                                         onChange={formDataTransasction.handleChange}
+                                                        value={formDataTransasction.values.toDate}
                                                     />
                                                 </div>
+                                                {formDataTransasction.errors.toDate && (
+                    <p style={{ color: "red" }}>{formDataTransasction.errors.toDate}</p>
+                )}
                                             </div>
                                             <div className="fot-input">
                                                 <div>
