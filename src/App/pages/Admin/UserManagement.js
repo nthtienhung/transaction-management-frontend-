@@ -46,11 +46,11 @@ const UserManagement = () => {
     const [searchTerm, setSearchTerm] = useState('');
     const [debouncedSearchTerm] = useDebounce(searchTerm, 500);
     const [sortDirection, setSortDirection] = useState('desc');
-    
+
     const fetchUsers = async (pageNumber, search) => {
         try {
             const response = await axios.get(
-                `http://localhost:8888/api/v1/user/user-list?page=${pageNumber}&size=${rowsPerPage}&searchTerm=${search || ''}&sortBy=createDate&sortDirection=${sortDirection}`, 
+                `http://localhost:8888/api/v1/user/user-list?page=${pageNumber}&size=${rowsPerPage}&searchTerm=${search || ''}&sortBy=createDate&sortDirection=${sortDirection}`,
                 {
                     headers: {
                         'Authorization': `Bearer ${Cookies.get('its-cms-accessToken')}`
@@ -59,11 +59,29 @@ const UserManagement = () => {
             );
             // Log the response to see the user data structure
             console.log('Users data:', response.data.data.content);
-            console.log('API response:', response.data); 
+            console.log('API response:', response.data);
             setUsers(response.data.data.content);
             setTotalElements(response.data.data.totalElements);
             setLoading(false);
         } catch (err) {
+
+            // Handle token refresh like TransactionListAdmin
+            axios.get("http://localhost:8888/api/v1/auth/refreshTokenUser", {
+                headers: {
+                    Authorization: `${sessionStorage.getItem("its-cms-refreshToken")}`,
+                },
+            })
+                .then((res) => {
+                    Cookies.remove("its-cms-accessToken");
+                    sessionStorage.removeItem("its-cms-refreshToken");
+                    Cookies.set("its-cms-accessToken", res.data.data.csrfToken);
+                    sessionStorage.setItem(
+                        "its-cms-refreshToken",
+                        res.data.data.refreshToken
+                    );
+                    window.location.reload(); // Reload page with new token
+                });
+
             console.error('Error fetching users:', err);
             setError('Failed to fetch users');
             setLoading(false);
@@ -117,33 +135,105 @@ const UserManagement = () => {
     const handleChangePage = (event, newPage) => {
         setPage(newPage);
     };
-    const handleStatusChange = async ( userId, newStatus) => {
+
+    // const handleStatusChange = async ( userId, newStatus) => {
+    //     try {
+    //         // const userId = sessionStorage.getItem('userId');
+    //         if (!userId) {
+    //             console.error('User ID is undefined',userId);
+    //             return;
+    //         }
+    //         console.log('Updating status for user:', userId, newStatus);
+
+
+
+    //         await axios.put(
+    //             // `http://localhost:8888/api/v1/user/user-list/${userId}/status`,
+    //             // { status: newStatus ? 'ACTIVE' : 'INACTIVE' },
+    //             `http://localhost:8888/api/v1/auth/update-status/${userId}`,  // Changed URL to call IAM service
+    //             { status: newStatus ? 'ACTIVE' : 'INACTIVE' },  // Send status directly
+    //             {
+    //                 headers: {
+    //                     'Authorization': `Bearer ${Cookies.get('its-cms-accessToken')}`,
+    //                     'Content-Type': 'application/json'
+    //                 }
+    //             }
+    //         );
+    //         // Refresh user list after status update
+    //         fetchUsers(page, debouncedSearchTerm);
+    //     } catch (err) {
+
+    //         // Handle token refresh here too
+    //         axios.get("http://localhost:8888/api/v1/auth/refreshTokenUser", {
+    //             headers: {
+    //                 Authorization: `${sessionStorage.getItem("its-cms-refreshToken")}`,
+    //             },
+    //         })
+    //         .then((res) => {
+    //             Cookies.remove("its-cms-accessToken");
+    //             sessionStorage.removeItem("its-cms-refreshToken");
+    //             Cookies.set("its-cms-accessToken", res.data.data.csrfToken);
+    //             sessionStorage.setItem(
+    //                 "its-cms-refreshToken",
+    //                 res.data.data.refreshToken
+    //             );
+    //             // window.location.reload();
+    //         });
+
+    //         console.error('Error updating status:', err);
+    //         // fetchUsers(page, debouncedSearchTerm);
+    //     } finally {
+    //         fetchUsers(page, debouncedSearchTerm);
+    //     }
+    // };
+
+    const handleStatusChange = async (userId, newStatus) => {
         try {
-            // const userId = sessionStorage.getItem('userId');
             if (!userId) {
-                console.error('User ID is undefined',userId);
+                console.error('User ID is undefined', userId);
                 return;
             }
-            console.log('Updating status for user:', userId, newStatus);
 
-
-            
-            await axios.put(
-                // `http://localhost:8888/api/v1/user/user-list/${userId}/status`,
-                // { status: newStatus ? 'ACTIVE' : 'INACTIVE' },
-                `http://localhost:8888/api/v1/auth/update-status/${userId}`,  // Changed URL to call IAM service
-                { status: newStatus ? 'ACTIVE' : 'INACTIVE' },  // Send status directly
-                {
-                    headers: {
-                        'Authorization': `Bearer ${Cookies.get('its-cms-accessToken')}`,
-                        'Content-Type': 'application/json'
+            const updateStatus = async (token) => {
+                return axios.put(
+                    `http://localhost:8888/api/v1/auth/update-status/${userId}`,
+                    { status: newStatus ? 'ACTIVE' : 'INACTIVE' },
+                    {
+                        headers: {
+                            'Authorization': `Bearer ${token}`,
+                            'Content-Type': 'application/json'
+                        }
                     }
+                );
+            };
+
+            try {
+                await updateStatus(Cookies.get('its-cms-accessToken'));
+            } catch (error) {
+                if (error.response?.status === 401) {
+                    // Refresh token and retry
+                    const refreshResponse = await axios.get("http://localhost:8888/api/v1/auth/refreshTokenUser", {
+                        headers: {
+                            Authorization: `${sessionStorage.getItem("its-cms-refreshToken")}`,
+                        },
+                    });
+
+                    Cookies.remove("its-cms-accessToken");
+                    sessionStorage.removeItem("its-cms-refreshToken");
+                    Cookies.set("its-cms-accessToken", refreshResponse.data.data.csrfToken);
+                    sessionStorage.setItem("its-cms-refreshToken", refreshResponse.data.data.refreshToken);
+
+                    // Retry with new token
+                    await updateStatus(refreshResponse.data.data.csrfToken);
+                } else {
+                    throw error;
                 }
-            );
-            // Refresh user list after status update
-            fetchUsers(page, debouncedSearchTerm);
+            }
+
         } catch (err) {
             console.error('Error updating status:', err);
+        } finally {
+            fetchUsers(page, debouncedSearchTerm);
         }
     };
 
@@ -153,24 +243,24 @@ const UserManagement = () => {
     return (
         <Box sx={{ p: 3 }}>
             <div style={styles.header}>
-                    <Typography variant="h4" gutterBottom>
-                        User Management
-                    </Typography>
-                    <div style={styles.searchBox}>
-                        <input
-                            type="text"
-                            className="form-control"
-                            placeholder="Search by name..."
-                            value={searchTerm}
-                            onChange={handleSearchChange}
-                        />
-                        <button 
-                            style={styles.sortButton}
-                            onClick={toggleSortDirection}
-                        >
-                            Sort {sortDirection === 'asc' ? '↑' : '↓'}
-                        </button>
-                    </div>
+                <Typography variant="h4" gutterBottom>
+                    User Management
+                </Typography>
+                <div style={styles.searchBox}>
+                    <input
+                        type="text"
+                        className="form-control"
+                        placeholder="Search by name..."
+                        value={searchTerm}
+                        onChange={handleSearchChange}
+                    />
+                    <button
+                        style={styles.sortButton}
+                        onClick={toggleSortDirection}
+                    >
+                        Sort {sortDirection === 'asc' ? '↑' : '↓'}
+                    </button>
+                </div>
 
             </div>
 
@@ -184,6 +274,7 @@ const UserManagement = () => {
                             <TableCell>Phone</TableCell>
                             <TableCell>Address</TableCell>
                             <TableCell>Role</TableCell>
+                            <TableCell>Verification State</TableCell>
                             <TableCell align="center">Status</TableCell>
                         </TableRow>
                     </TableHead>
@@ -196,6 +287,9 @@ const UserManagement = () => {
                                 <TableCell>{user.phone}</TableCell>
                                 <TableCell>{user.address}</TableCell>
                                 <TableCell>{user.role}</TableCell>
+                                <TableCell>
+                                    {user.isVerified === 'NOT_VERIFIED' ? 'NOT VERIFIED' : 'VERIFIED'}
+                                </TableCell>
                                 <TableCell align="center">
                                     <StatusSwitch
                                         checked={user.status === true} // Use boolean comparison
