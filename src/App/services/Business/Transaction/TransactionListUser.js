@@ -13,7 +13,7 @@ import axios from "axios";
 import {getTransactionDetailByAdmin, getTransactionDetailByUser} from "../../api/transactionServiceApi";
 import {CiSearch} from "react-icons/ci";
 import TransactionDetail from "./TransactionDetail";
-
+import  "./style/TransactionListUser.css"
 function TransactionListUser() {
     const navigate = useNavigate();
     const [transactions, setTransactions] = useState([]);
@@ -357,15 +357,15 @@ function TransactionListUser() {
 
                                             return (
                                                 <tr key={index}>
-                                                    <td>{transaction.transactionCode}</td>
-                                                    <td>{transaction.lastNameSender} {transaction.firstNameSender}</td>
-                                                    <td>{transaction.senderWalletCode}</td>
-                                                    <td>{transaction.receiverWalletCode}</td>
-                                                    <td>{transaction.lastName} {transaction.firstName}</td>
-                                                    <td style={amountStyle}>{amountDisplay}</td>
-                                                    <td>{transaction.description}</td>
-                                                    <td>{transaction.status}</td>
-                                                    <td style={{width: "50%", height: "50%"}}>
+                                                    <td data-label="Transaction Code">{transaction.transactionCode}</td>
+                                                    <td data-label="From User">{transaction.lastNameSender} {transaction.firstNameSender}</td>
+                                                    <td data-label="From Wallet">{transaction.senderWalletCode}</td>
+                                                    <td data-label="To Wallet">{transaction.receiverWalletCode}</td>
+                                                    <td data-label="To User">{transaction.lastName} {transaction.firstName}</td>
+                                                    <td data-label="Amount" style={amountStyle}>{amountDisplay}</td>
+                                                    <td data-label="Description">{transaction.description}</td>
+                                                    <td data-label="Status">{transaction.status}</td>
+                                                    <td data-label="Operation" style={{width: "50%", height: "50%"}}>
                                                         <div onClick={() => openDialog(transaction.transactionCode)}>
                                                             <CiSearch style={{cursor: "pointer"}}/>
                                                         </div>
