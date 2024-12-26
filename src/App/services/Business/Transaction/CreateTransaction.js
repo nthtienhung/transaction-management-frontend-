@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import Cookies from "js-cookie";
-import { toast, ToastContainer } from "react-toastify";
 import { Snackbar, Alert } from "@mui/material";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
@@ -423,7 +422,6 @@ function CreateTransaction() {
   // Main Render
   return (
     <>
-      {/* <ToastContainer /> */}
       <Snackbar
         open={snackbar.open}
         autoHideDuration={6000}
