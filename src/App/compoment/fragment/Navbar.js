@@ -2,7 +2,6 @@ import { useEffect, useRef, useState } from "react";
 import Cookies from "js-cookie";
 import { jwtDecode } from "jwt-decode";
 import { useNavigate } from "react-router-dom";
-
 function Navbar({ setActiveContent}) {
   const [isDashboardOpen, setIsDashboardOpen] = useState(false); // Quản lý trạng thái mở menu Dashboard
   const [isConfigurationOpen, setIsConfigurationOpen] = useState(false); // Trạng thái mở cho Configuration
@@ -77,8 +76,9 @@ function Navbar({ setActiveContent}) {
           <a href="index.html" className="app-brand-link">
             <span className="app-brand-text demo menu-text fw-bold ms-2">
               <img
-                style={{ width: "20%" }}
-                src="https://rubicmarketing.com/wp-content/uploads/2022/11/y-nghia-logo-mb-bank-2.jpg"
+                style={{width:"4%"}}
+                src= "../assets/img/avatars/Logo.png"
+                // src="../"
               ></img>
             </span>
           </a>

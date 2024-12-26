@@ -359,7 +359,6 @@ const AdminDashboard = () => {
             )}
 
             <Col>
-              <Button type="primary" onClick={fetchReports} loading={loading}>Apply Filters</Button>
               <Button type="primary" onClick={exportToExcel}>Export to Excel</Button>
             </Col>
           </Row>

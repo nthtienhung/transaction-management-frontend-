@@ -60,7 +60,7 @@ function TransactionListAdmin() {
                     params, // Không có body
                     {
                         params: {
-                            page: currentPage, // Trang hiện tại
+                            page: 0, // Trang hiện tại
                             size: 5, // Số lượng bản ghi mỗi trang
                         },
                         headers: {
@@ -133,10 +133,16 @@ function TransactionListAdmin() {
         try {
             console.log(Cookies.get("its-cms-accessToken"));
             console.log(formDataTransasction.values);
+            const params = new URLSearchParams();
+            params.append("transactionId", formDataTransasction.values.transactionId || "");
+            params.append("walletCode", formDataTransasction.values.walletCode || "");
+            params.append("status", formDataTransasction.values.status || "");
+            params.append("fromDate", formDataTransasction.values.fromDate ? new Date(formDataTransasction.values.fromDate).toISOString() : "");
+            params.append("toDate", formDataTransasction.values.toDate ? new Date(formDataTransasction.values.toDate).toISOString() : "");
             console.log(currentPage);
             const response = await axios.post(
                 "http://localhost:8888/api/v1/transaction/getAllTransaction",
-                formDataTransasction.values, // Không có body
+                params, // Không có body
                 {
                     params: {
                         page: page, // Trang hiện tại
@@ -173,10 +179,46 @@ function TransactionListAdmin() {
                         "its-cms-refreshToken",
                         res.data.data.refreshToken
                     );
-                    window.location.reload();
+                    console.log(Cookies.get("its-cms-accessToken"));
+                    console.log(formDataTransasction.values);
+                    const params = new URLSearchParams();
+                    params.append("transactionId", formDataTransasction.values.transactionId || "");
+                    params.append("walletCode", formDataTransasction.values.walletCode || "");
+                    params.append("status", formDataTransasction.values.status || "");
+                    params.append("fromDate", formDataTransasction.values.fromDate ? new Date(formDataTransasction.values.fromDate).toISOString() : "");
+                    params.append("toDate", formDataTransasction.values.toDate ? new Date(formDataTransasction.values.toDate).toISOString() : "");
+                    console.log(currentPage);
+                    axios.post(
+                        "http://localhost:8888/api/v1/transaction/getAllTransaction",
+                        params, // Không có body
+                        {
+                            params: {
+                                page: page, // Trang hiện tại
+                                size: 5, // Số lượng bản ghi mỗi trang
+                            },
+                            headers: {
+                                Authorization: `Bearer ${Cookies.get("its-cms-accessToken")}`,
+                            },
+                        }
+                    ).then(res =>{
+                        const {content, totalElements} = res.data;
+                        setTransactions(content);
+
+                        // Tính tổng số trang nếu API không trả về totalPages
+                        const calculatedTotalPages = Math.ceil(totalElements / 1); // Chia theo `size`
+                        setTotalPages(calculatedTotalPages);
+
+                        console.log("Transactions:", content);
+                        console.log("Total pages:", calculatedTotalPages);
+                    });
+
+
                 });
         }
     };
+    useEffect(() => {
+        fetchTransactions(currentPage);
+    }, [currentPage]);
     const renderContent = () => {
         switch (activeContent) {
             case "configuration":
@@ -344,9 +386,7 @@ function TransactionListAdmin() {
         }
     };
     // Gọi API khi trang thay đổi
-    useEffect(() => {
-        fetchTransactions(currentPage);
-    }, [currentPage]);
+
 
     // Xử lý khi người dùng chọn trang
     const handlePageChange = (newPage) => {

@@ -311,7 +311,7 @@ function Header({ setActiveContent }) {
               >
                 <div class="avatar avatar-online ">
                   <img
-                    src="../assets/img/avatars/1.png"
+                    src="../assets/img/avatars/avatarUser.png"
                     alt="Avatar"
                     class="w-px-40 h-auto rounded-circle"
                   />
@@ -324,7 +324,7 @@ function Header({ setActiveContent }) {
                       <div class="flex-shrink-0 me-3">
                         <div class="avatar avatar-online">
                           <img
-                            src="../assets/img/avatars/1.png"
+                            src="../assets/img/avatars/avatarUser.png"
                             alt="Avatar"
                             class="w-px-40 h-auto rounded-circle"
                           />

@@ -71,7 +71,7 @@ const Profile = () => {
                 sessionStorage.setItem("its-cms-refreshToken",res.data.data.refreshToken);
                 window.location.reload();
         }).catch((error) =>{
-              toast.error("Tài khoản hết hạn, xin vui lòng đăng nhập lạilại !", {
+              toast.error("Tài khoản hết hạn, xin vui lòng đăng nhập lại !", {
                     position: "top-right",
                     autoClose: 3000,
                     hideProgressBar: true,
@@ -142,7 +142,31 @@ const changePasswordFormik = useFormik({
                         Authorization: token,
                     },
                     body: JSON.stringify(values),
-                });
+                }).catch((error) =>{
+                    console.log(sessionStorage.getItem("its-cms-refreshToken"));
+                    axios.get("http://localhost:8888/api/v1/auth/refreshTokenUser",{
+                        headers: {
+                            Authorization: `${sessionStorage.getItem("its-cms-refreshToken")}`,
+                        },
+                    }).then(res =>{
+                        Cookies.remove("its-cms-accessToken");
+                        sessionStorage.removeItem("its-cms-refreshToken");
+                        Cookies.set("its-cms-accessToken", res.data.data.csrfToken);
+                        sessionStorage.setItem("its-cms-refreshToken",res.data.data.refreshToken);
+                        window.location.reload();
+                    }).catch((error) =>{
+                        toast.error("Tài khoản hết hạn, xin vui lòng đăng nhập lại !", {
+                            position: "top-right",
+                            autoClose: 3000,
+                            hideProgressBar: true,
+                            closeOnClick: true,
+                            pauseOnHover: true,
+                            draggable: true,
+                            progress: undefined,
+                        });
+                        navigate("/");
+                    })
+                })
 
                 const data = await response.json();
 
@@ -203,7 +227,31 @@ const changePasswordFormik = useFormik({
                             Authorization: `Bearer ${token}`,
                         },
                     }
-                );
+                ).catch((error) =>{
+                    console.log(sessionStorage.getItem("its-cms-refreshToken"));
+                    axios.get("http://localhost:8888/api/v1/auth/refreshTokenUser",{
+                        headers: {
+                            Authorization: `${sessionStorage.getItem("its-cms-refreshToken")}`,
+                        },
+                    }).then(res =>{
+                        Cookies.remove("its-cms-accessToken");
+                        sessionStorage.removeItem("its-cms-refreshToken");
+                        Cookies.set("its-cms-accessToken", res.data.data.csrfToken);
+                        sessionStorage.setItem("its-cms-refreshToken",res.data.data.refreshToken);
+                        window.location.reload();
+                    }).catch((error) =>{
+                        toast.error("Tài khoản hết hạn, xin vui lòng đăng nhập lại !", {
+                            position: "top-right",
+                            autoClose: 3000,
+                            hideProgressBar: true,
+                            closeOnClick: true,
+                            pauseOnHover: true,
+                            draggable: true,
+                            progress: undefined,
+                        });
+                        navigate("/");
+                    })
+                })
 
                 if (response.status === 200) {
                     setSnackbar({
@@ -262,7 +310,7 @@ return (
                         <Grid container spacing={4}>
                             <Grid item xs={12} sm={4} display="flex" justifyContent="center">
                                 <Avatar
-                                    src={user?.avatar || process.env.PUBLIC_URL + "/assets/img/avatars/1.png"}
+                                    src={user?.avatar || process.env.PUBLIC_URL + "/assets/img/avatars/avatarUser.png"}
                                     alt="Avatar"
                                     sx={{ width: "180px", height: "180px", border: "5px solid #fff" }}
                                 />
