@@ -56,6 +56,7 @@ function CreateTransaction() {
         sessionStorage.removeItem("its-cms-refreshToken");
         Cookies.set("its-cms-accessToken", res.data.data.csrfToken);
         sessionStorage.setItem("its-cms-refreshToken", res.data.data.refreshToken);
+
       })
     }
   };
@@ -120,6 +121,7 @@ function CreateTransaction() {
 
         // Call API to get wallet info by wallet code
         const walletInfo = await getWalletByWalletCode(values.recipientWalletCode);
+        console.log(walletInfo);
 
         console.log(walletInfo);
 
@@ -352,6 +354,7 @@ function CreateTransaction() {
 
       // Gọi API để lấy thông tin ví
       const walletInfo = await getWalletByWalletCode(walletCode);
+      console.log(walletInfo)
       if (!walletInfo || !walletInfo.userId) {
         setRecipientName("");
         throw new Error("Wallet information not found or invalid information");

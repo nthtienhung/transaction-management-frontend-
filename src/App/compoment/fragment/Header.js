@@ -13,7 +13,6 @@ function Header({ setActiveContent }) {
   const [isDashboardOpen, setIsDashboardOpen] = useState(false); // Quản lý trạng thái mở menu Dashboard
   const [isConfigurationOpen, setIsConfigurationOpen] = useState(false); // Trạng thái mở cho Configuration
   const navigate = useNavigate();
-  const token = Cookies.get("its-cms-accessToken");
 
   const [walletInfo, setWalletInfo] = useState(null);
   const [showWalletModal, setShowWalletModal] = useState(false);
@@ -61,6 +60,18 @@ function Header({ setActiveContent }) {
                 Cookies.set("its-cms-accessToken", res.data.data.csrfToken);
                 sessionStorage.setItem("its-cms-refreshToken", res.data.data.refreshToken);
                 window.location.reload();
+
+              }).catch((error) =>{
+                toast.error("Tài khoản hết hạn, xin vui lòng đăng nhập lại !", {
+                                    position: "top-right",
+                                    autoClose: 3000,
+                                    hideProgressBar: true,
+                                    closeOnClick: true,
+                                    pauseOnHover: true,
+                                    draggable: true,
+                                    progress: undefined,
+                                  });
+                                  navigate("/");
               })
 
         });

@@ -24,6 +24,7 @@ import * as Yup from "yup";
 import { useFormik } from "formik";
 import { use } from "react";
 import { jwtDecode } from 'jwt-decode';
+import { toast } from "react-toastify";
 
 const Profile = () => {
     const navigate = useNavigate();
@@ -61,13 +62,25 @@ const Profile = () => {
             console.log(sessionStorage.getItem("its-cms-refreshToken"));
             axios.get("http://localhost:8888/api/v1/auth/refreshTokenUser",{
               headers: {
-                Authorization: `Bearer ${sessionStorage.getItem("its-cms-refreshToken")}`,
+                Authorization: `${sessionStorage.getItem("its-cms-refreshToken")}`,
               },
             }).then(res =>{
                 Cookies.remove("its-cms-accessToken");
                 sessionStorage.removeItem("its-cms-refreshToken");
                 Cookies.set("its-cms-accessToken", res.data.data.csrfToken);
                 sessionStorage.setItem("its-cms-refreshToken",res.data.data.refreshToken);
+                window.location.reload();
+        }).catch((error) =>{
+              toast.error("Tài khoản hết hạn, xin vui lòng đăng nhập lạilại !", {
+                    position: "top-right",
+                    autoClose: 3000,
+                    hideProgressBar: true,
+                    closeOnClick: true,
+                    pauseOnHover: true,
+                    draggable: true,
+                    progress: undefined,
+                  });
+                  navigate("/");
         })
     })
     // Fetch user profile

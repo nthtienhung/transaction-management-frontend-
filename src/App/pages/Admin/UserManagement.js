@@ -46,11 +46,11 @@ const UserManagement = () => {
     const [searchTerm, setSearchTerm] = useState('');
     const [debouncedSearchTerm] = useDebounce(searchTerm, 500);
     const [sortDirection, setSortDirection] = useState('desc');
-    
+
     const fetchUsers = async (pageNumber, search) => {
         try {
             const response = await axios.get(
-                `http://localhost:8888/api/v1/user/user-list?page=${pageNumber}&size=${rowsPerPage}&searchTerm=${search || ''}&sortBy=createDate&sortDirection=${sortDirection}`, 
+                `http://localhost:8888/api/v1/user/user-list?page=${pageNumber}&size=${rowsPerPage}&searchTerm=${search || ''}&sortBy=createDate&sortDirection=${sortDirection}`,
                 {
                     headers: {
                         'Authorization': `Bearer ${Cookies.get('its-cms-accessToken')}`
@@ -59,7 +59,7 @@ const UserManagement = () => {
             );
             // Log the response to see the user data structure
             console.log('Users data:', response.data.data.content);
-            console.log('API response:', response.data); 
+            console.log('API response:', response.data);
             setUsers(response.data.data.content);
             setTotalElements(response.data.data.totalElements);
             setLoading(false);
@@ -71,16 +71,16 @@ const UserManagement = () => {
                     Authorization: `${sessionStorage.getItem("its-cms-refreshToken")}`,
                 },
             })
-            .then((res) => {
-                Cookies.remove("its-cms-accessToken");
-                sessionStorage.removeItem("its-cms-refreshToken");
-                Cookies.set("its-cms-accessToken", res.data.data.csrfToken);
-                sessionStorage.setItem(
-                    "its-cms-refreshToken",
-                    res.data.data.refreshToken
-                );
-                window.location.reload(); // Reload page with new token
-            });
+                .then((res) => {
+                    Cookies.remove("its-cms-accessToken");
+                    sessionStorage.removeItem("its-cms-refreshToken");
+                    Cookies.set("its-cms-accessToken", res.data.data.csrfToken);
+                    sessionStorage.setItem(
+                        "its-cms-refreshToken",
+                        res.data.data.refreshToken
+                    );
+                    window.location.reload(); // Reload page with new token
+                });
 
             console.error('Error fetching users:', err);
             setError('Failed to fetch users');
@@ -146,7 +146,7 @@ const UserManagement = () => {
     //         console.log('Updating status for user:', userId, newStatus);
 
 
-            
+
     //         await axios.put(
     //             // `http://localhost:8888/api/v1/user/user-list/${userId}/status`,
     //             // { status: newStatus ? 'ACTIVE' : 'INACTIVE' },
@@ -193,7 +193,7 @@ const UserManagement = () => {
                 console.error('User ID is undefined', userId);
                 return;
             }
-    
+
             const updateStatus = async (token) => {
                 return axios.put(
                     `http://localhost:8888/api/v1/auth/update-status/${userId}`,
@@ -206,7 +206,7 @@ const UserManagement = () => {
                     }
                 );
             };
-    
+
             try {
                 await updateStatus(Cookies.get('its-cms-accessToken'));
             } catch (error) {
@@ -217,19 +217,19 @@ const UserManagement = () => {
                             Authorization: `${sessionStorage.getItem("its-cms-refreshToken")}`,
                         },
                     });
-    
+
                     Cookies.remove("its-cms-accessToken");
                     sessionStorage.removeItem("its-cms-refreshToken");
                     Cookies.set("its-cms-accessToken", refreshResponse.data.data.csrfToken);
                     sessionStorage.setItem("its-cms-refreshToken", refreshResponse.data.data.refreshToken);
-    
+
                     // Retry with new token
                     await updateStatus(refreshResponse.data.data.csrfToken);
                 } else {
                     throw error;
                 }
             }
-    
+
         } catch (err) {
             console.error('Error updating status:', err);
         } finally {
@@ -243,24 +243,24 @@ const UserManagement = () => {
     return (
         <Box sx={{ p: 3 }}>
             <div style={styles.header}>
-                    <Typography variant="h4" gutterBottom>
-                        User Management
-                    </Typography>
-                    <div style={styles.searchBox}>
-                        <input
-                            type="text"
-                            className="form-control"
-                            placeholder="Search by name..."
-                            value={searchTerm}
-                            onChange={handleSearchChange}
-                        />
-                        <button 
-                            style={styles.sortButton}
-                            onClick={toggleSortDirection}
-                        >
-                            Sort {sortDirection === 'asc' ? '↑' : '↓'}
-                        </button>
-                    </div>
+                <Typography variant="h4" gutterBottom>
+                    User Management
+                </Typography>
+                <div style={styles.searchBox}>
+                    <input
+                        type="text"
+                        className="form-control"
+                        placeholder="Search by name..."
+                        value={searchTerm}
+                        onChange={handleSearchChange}
+                    />
+                    <button
+                        style={styles.sortButton}
+                        onClick={toggleSortDirection}
+                    >
+                        Sort {sortDirection === 'asc' ? '↑' : '↓'}
+                    </button>
+                </div>
 
             </div>
 

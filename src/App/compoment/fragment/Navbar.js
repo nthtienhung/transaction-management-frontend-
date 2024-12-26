@@ -140,7 +140,7 @@ function Navbar({ setActiveContent}) {
                 {role === "ROLE_ADMIN" && <>
                   <a
                       href="javascript:void(0);"
-                      className="menu-link"
+                      className="menu-link menu-toggle"
                       onClick={() => {
                         setActiveContent("configuration"); // Cập nhật nội dung hiển thị
                         handleConfigurationToggle(); // Đổi trạng thái mở menu
@@ -153,18 +153,13 @@ function Navbar({ setActiveContent}) {
                   </a>
                 </> || <></>}
               </li>
-              <li 
-                className={`menu-item ${
-                  isUserManagementOpen ? "active open" : ""
-                }`}
-              >
+              <li className="menu-item">
                 <a 
                   href="#" 
-                  className="menu-link"
+                  className="menu-link menu-toggle"
                   onClick={(e) => {
                     e.preventDefault();
                     setActiveContent("users");
-                    handleUserManagementToggle();
                   }}
                 >
                   <i className="menu-icon tf-icons bx bx-user"></i>

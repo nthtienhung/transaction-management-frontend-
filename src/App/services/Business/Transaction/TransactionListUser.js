@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from "react";
 import { useFormik } from "formik";
 import { useNavigate } from "react-router-dom";
@@ -10,12 +9,11 @@ import {
     getUserId,
     getWalletByUserId
 } from "../../api/TransactionApiRequest";
-import './style/TransactionListUser.css';
 import axios from "axios";
-import {getTransactionDetailByUser} from "../../api/transactionServiceApi";
+import {getTransactionDetailByAdmin, getTransactionDetailByUser} from "../../api/transactionServiceApi";
 import {CiSearch} from "react-icons/ci";
 import TransactionDetail from "./TransactionDetail";
-
+import  "./style/TransactionListUser.css"
 function TransactionListUser() {
     const navigate = useNavigate();
     const [transactions, setTransactions] = useState([]);
@@ -31,6 +29,7 @@ function TransactionListUser() {
     });
     const [isDialogOpen, setIsDialogOpen] = useState(false);
     const [transactionDetail, setTransactionDetail] = useState(null);
+
 
     const fetchTransactions = async (page,currentFilters) => {
         try {
@@ -69,10 +68,14 @@ function TransactionListUser() {
             toDate: ""
         },
         onSubmit: async (values) => {
-
-            setFilters(values);
+            const formattedValues = {
+                ...values,
+                fromDate: values.fromDate ? new Date(values.fromDate).toISOString() : null,
+                toDate: values.toDate ? new Date(values.toDate).toISOString() : null,
+            };
+            setFilters(formattedValues);
             setCurrentPage(0);
-            await fetchTransactions(0, values);
+            await fetchTransactions(0, formattedValues);
         },
         onReset: () => {
             // console.log("Form reset to:", formDataTransaction.initialValues);
@@ -117,6 +120,7 @@ function TransactionListUser() {
     return (
 
         <>
+
             <div className="layout-wrapper layout-content-navbar">
                 <div className="layout-container">
                     <Navbar />
@@ -179,9 +183,8 @@ function TransactionListUser() {
                                                     padding: "10px",
                                                     border: "1px solid #ccc",
                                                     borderRadius: "5px",
-                                                    width: "100%",
-                                                    boxSizing: "border-box",
-                                                  }}
+                                                    width: "150px",
+                                                }}
                                             />
                                         </div>
                                         <div className="form-group" style={{ flex: 1 }}>
@@ -196,9 +199,8 @@ function TransactionListUser() {
                                                     padding: "10px",
                                                     border: "1px solid #ccc",
                                                     borderRadius: "5px",
-                                                    width: "100%",
-                                                    boxSizing: "border-box",
-                                                  }}
+                                                    width: "200px",
+                                                }}
                                             />
                                         </div>
                                         <div className="form-group" style={{ flex: 1 }}>
@@ -213,9 +215,8 @@ function TransactionListUser() {
                                                     padding: "10px",
                                                     border: "1px solid #ccc",
                                                     borderRadius: "5px",
-                                                    width: "100%",
-                                                    boxSizing: "border-box",
-                                                  }}
+                                                    width: "200px",
+                                                }}
                                             >
                                                 <option value={""}>-------</option>
                                                 <option value={"SUCCESS"}>SUCCESS</option>
@@ -243,9 +244,8 @@ function TransactionListUser() {
                                                     padding: "10px",
                                                     border: "1px solid #ccc",
                                                     borderRadius: "5px",
-                                                    width: "100%",
-                                                    boxSizing: "border-box",
-                                                  }}
+                                                    width: "200px",
+                                                }}
                                             />
                                         </div>
                                         <div className="form-group" style={{ flex: 1 }}>
@@ -260,9 +260,8 @@ function TransactionListUser() {
                                                     padding: "10px",
                                                     border: "1px solid #ccc",
                                                     borderRadius: "5px",
-                                                    width: "100%",
-                                                    boxSizing: "border-box",
-                                                  }}
+                                                    width: "200px",
+                                                }}
                                             />
                                         </div>
                                     </div>
@@ -328,6 +327,7 @@ function TransactionListUser() {
                                     <thead>
                                     <tr>
                                         <th>Transaction Code</th>
+                                        <th>From User</th>
                                         <th>From Wallet</th>
                                         <th>To Wallet</th>
                                         <th>To User</th>
@@ -358,29 +358,32 @@ function TransactionListUser() {
                                             return (
                                                 <tr key={index}>
                                                     <td data-label="Transaction Code">{transaction.transactionCode}</td>
+                                                    <td data-label="From User">{transaction.lastNameSender} {transaction.firstNameSender}</td>
                                                     <td data-label="From Wallet">{transaction.senderWalletCode}</td>
                                                     <td data-label="To Wallet">{transaction.receiverWalletCode}</td>
                                                     <td data-label="To User">{transaction.lastName} {transaction.firstName}</td>
                                                     <td data-label="Amount" style={amountStyle}>{amountDisplay}</td>
                                                     <td data-label="Description">{transaction.description}</td>
                                                     <td data-label="Status">{transaction.status}</td>
-                                                    <td data-label="Operation">
+                                                    <td data-label="Operation" style={{width: "50%", height: "50%"}}>
                                                         <div onClick={() => openDialog(transaction.transactionCode)}>
                                                             <CiSearch style={{cursor: "pointer"}}/>
                                                         </div>
                                                     </td>
                                                 </tr>
-                                            );
+                                        );
                                         })}
                                     </tbody>
                                 </table>
                             </div>
+                            {/* {information transaction detail} */}
                             {isDialogOpen && transactionDetail && (
                                 <TransactionDetail
                                     transactionDetail={transactionDetail}
                                     onClose={closeDialog}
                                 />
                             )}
+
                             <div className="pagination">
                                 <button
                                     onClick={() => setCurrentPage((prevPage) => Math.max(prevPage - 1, 0))}
@@ -409,4 +412,3 @@ function TransactionListUser() {
 }
 
 export default TransactionListUser;
-
