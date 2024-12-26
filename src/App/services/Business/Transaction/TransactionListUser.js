@@ -4,7 +4,6 @@ import {useNavigate} from "react-router-dom";
 import Footer from "../../../compoment/fragment/Footer";
 import Header from "../../../compoment/fragment/Header";
 import Navbar from "../../../compoment/fragment/Navbar";
-import {formatISO, parseISO} from "date-fns";
 
 import {
     fetchAllTransactions,
@@ -72,19 +71,15 @@ function TransactionListUser() {
         },
         onSubmit: async (values) => {
 
-            // const convertedValues = {
-            //     ...values,
-            //     fromDate: values.fromDate
-            //         ? dayjs(`${values.fromDate}T00:00:00`).toISOString() // Định dạng ngày bắt đầu
-            //         : null,
-            //     toDate: values.toDate
-            //         ? dayjs(`${values.toDate}T23:59:59`).toISOString() // Định dạng ngày kết thúc
-            //         : null,
-            // }
-
-            setFilters(values);
+            const formattedValues = {
+                ...values,
+                fromDate: values.fromDate ? new Date(values.fromDate).toISOString() : null,
+                toDate: values.toDate ? new Date(values.toDate).toISOString() : null,
+            };
+            setFilters(formattedValues);
             setCurrentPage(0);
-            await fetchTransactions(0, values);
+            await fetchTransactions(0, formattedValues);
+
         },
         onReset: () => {
             // console.log("Form reset to:", formDataTransaction.initialValues);
