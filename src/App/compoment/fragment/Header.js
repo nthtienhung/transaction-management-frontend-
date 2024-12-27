@@ -60,7 +60,6 @@ function Header({ setActiveContent }) {
                 Cookies.set("its-cms-accessToken", res.data.data.csrfToken);
                 sessionStorage.setItem("its-cms-refreshToken", res.data.data.refreshToken);
                 window.location.reload();
-
               }).catch((error) =>{
                 toast.error("Tài khoản hết hạn, xin vui lòng đăng nhập lại !", {
                                     position: "top-right",
