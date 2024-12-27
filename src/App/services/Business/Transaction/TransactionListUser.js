@@ -9,11 +9,12 @@ import {
     getUserId,
     getWalletByUserId
 } from "../../api/TransactionApiRequest";
-import axios from "axios";
+
 import {getTransactionDetailByAdmin, getTransactionDetailByUser} from "../../api/transactionServiceApi";
 import {CiSearch} from "react-icons/ci";
 import TransactionDetail from "./TransactionDetail";
 import  "./style/TransactionListUser.css"
+
 function TransactionListUser() {
     const navigate = useNavigate();
     const [transactions, setTransactions] = useState([]);
@@ -118,9 +119,7 @@ function TransactionListUser() {
     };
 
     return (
-
         <>
-
             <div className="layout-wrapper layout-content-navbar">
                 <div className="layout-container">
                     <Navbar />
@@ -371,7 +370,7 @@ function TransactionListUser() {
                                                         </div>
                                                     </td>
                                                 </tr>
-                                        );
+                                            );
                                         })}
                                     </tbody>
                                 </table>

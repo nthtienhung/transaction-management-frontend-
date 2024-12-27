@@ -116,7 +116,7 @@ const UserManagement = () => {
         },
         sortButton: {
             padding: '8px 12px',
-            backgroundColor: '#f0f0f0',
+            backgroundColor: '#1308cd',
             border: '1px solid #ddd',
             borderRadius: '4px',
             cursor: 'pointer'
