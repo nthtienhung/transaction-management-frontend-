@@ -39,10 +39,10 @@ function CreateTransaction() {
 
   // Thời gian khóa khi nhập sai quá số lần cho phép (ms)
   const LOCK_TIME = 1 * 60 * 1000; // 1 phút
-
   const getUserId = async () => {
+    const token = Cookies.get("its-cms-accessToken");
     try {
-      const token = Cookies.get("its-cms-accessToken");
+
       console.log(token);
 
       if (!token) {
@@ -67,7 +67,7 @@ function CreateTransaction() {
         sessionStorage.removeItem("its-cms-refreshToken");
         Cookies.set("its-cms-accessToken", res.data.data.csrfToken);
         sessionStorage.setItem("its-cms-refreshToken", res.data.data.refreshToken);
-
+        getUserId();
       })
     }
   };
@@ -82,12 +82,21 @@ function CreateTransaction() {
           setSenderBalance(senderWallet.balance); // Cập nhật số dư
         }
       } catch (error) {
-        setError("Unable to retrieve your balance information. Please try again");
-      }
-    };
-
-    fetchSenderBalance();
-  }, []);
+        axios.get("http://localhost:8888/api/v1/auth/refreshTokenUser", {
+          headers: {
+            Authorization: `${sessionStorage.getItem("its-cms-refreshToken")}`,
+          },
+        }).then(res => {
+          Cookies.remove("its-cms-accessToken");
+          sessionStorage.removeItem("its-cms-refreshToken");
+          Cookies.set("its-cms-accessToken", res.data.data.csrfToken);
+          sessionStorage.setItem("its-cms-refreshToken", res.data.data.refreshToken);
+          window.location.reload();
+        })
+      };
+    }
+      fetchSenderBalance();
+    }, []);
 
   // Step 1: Transaction Details Schema
   const createTransactionSchema = Yup.object().shape({

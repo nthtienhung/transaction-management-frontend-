@@ -27,11 +27,15 @@ export const getWalletByWalletCode = async (walletCode) => {
                 Authorization: `Bearer ${Cookies.get("its-cms-accessToken")}`,
             }
         });
-
         console.log(response.data);
         return response.data;
     } catch (error) {
-        refreshToken();
+        const messageError = error.response.data.message;
+        console.log(messageError)
+        if(messageError === "Unauthorized"){
+            refreshToken(); 
+            window.location.reload();
+        }
     }
 };
 
@@ -45,6 +49,12 @@ export const getWalletByUserId = async (userId) => {
         return response.data;
     } catch (error) {
         refreshToken();
+        const response = await axios.get(`${BASE_URL}/code/${userId}`, {
+            headers: {
+                Authorization: `Bearer ${Cookies.get("its-cms-accessToken")}`,
+            }
+        });
+        return response.data;
     }
 };
 
